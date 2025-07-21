@@ -122,6 +122,10 @@
   }
 }
 
+/* ===============================
+   Font Family and Weights (Rubik)
+   =============================== */
+
 .font-rubik {
   font-family: var(--font-rubik), sans-serif;
 }
@@ -154,29 +158,64 @@
   font-weight: 900;
 }
 
-/* Modern custom scrollbar */
+/* ===============================
+   Custom Scrollbar Styles (Global & Scrollable Elements)
+   =============================== */
+
+body,
+html,
 .scroll-bar {
-  overflow-y: auto;
-  scrollbar-width: thin;               /* Firefox */
-  scrollbar-color: #999 #f0f0f0;       /* Firefox */
+  scrollbar-width: thin;             /* Firefox */
+  scrollbar-color: #999 #f0f0f0;    /* Firefox */
 }
 
-/* WebKit (Chrome, Safari, Edge) */
+body::-webkit-scrollbar,
+html::-webkit-scrollbar,
 .scroll-bar::-webkit-scrollbar {
-  width: 2px;
+  width: 2px;                       /* WebKit browsers */
 }
 
+body::-webkit-scrollbar-track,
+html::-webkit-scrollbar-track,
 .scroll-bar::-webkit-scrollbar-track {
-  background: #f0f0f0;                 /* Track background */
+  background: #f0f0f0;              /* Track background */
   border-radius: 10px;
 }
 
+body::-webkit-scrollbar-thumb,
+html::-webkit-scrollbar-thumb,
 .scroll-bar::-webkit-scrollbar-thumb {
-  background-color: #999;              /* Scrollbar color */
+  background-color: #999;           /* Scrollbar thumb */
   border-radius: 10px;
-  border: 2px solid #f0f0f0;           /* Creates padding around thumb */
+  border: 2px solid #f0f0f0;       /* Padding around thumb */
 }
 
+body::-webkit-scrollbar-thumb:hover,
+html::-webkit-scrollbar-thumb:hover,
 .scroll-bar::-webkit-scrollbar-thumb:hover {
-  background-color: #666;              /* On hover */
+  background-color: #666;           /* Hover effect */
+}
+
+/* ===============================
+   Text Selection Styling
+   =============================== */
+
+*::selection {
+  @apply bg-emerald-300 text-black;
+}
+
+/* ===============================
+   Remove Spinner from Number Inputs
+   =============================== */
+
+/* Chrome, Safari, Edge, Opera */
+input[type="number"].hide-spinner::-webkit-outer-spin-button,
+input[type="number"].hide-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"].hide-spinner {
+  -moz-appearance: textfield;
 }

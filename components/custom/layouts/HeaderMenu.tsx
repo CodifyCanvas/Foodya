@@ -29,20 +29,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { HeaderMenuCards as components } from "@/constants";
 
-// --------------------- Shared Data ---------------------
-const components = [
-  { title: "Dashboard", icon: "/icons/dashboard.png", href: "/restaurant/dashboard", description: "Charts & Overview" },
-  { title: "Users", icon: "/icons/users.png", href: "/restaurant/users", description: "Manage Users" },
-  { title: "Employees", icon: "/icons/employees.png", href: "/restaurant/employees", description: "Staff & Payroll" },
-  { title: "Menu Items", icon: "/icons/menu.png", href: "/restaurant/menu-items", description: "Manage Food Menu" },
-  { title: "Tables", icon: "/icons/tables.png", href: "/restaurant/tables", description: "Dining Setup" },
-  { title: "Orders", icon: "/icons/orders.png", href: "/restaurant/orders", description: "Order Tracking" },
-  { title: "Invoices", icon: "/icons/invoices.png", href: "/restaurant/invoices", description: "Sales & Purchases" },
-  { title: "Expenses", icon: "/icons/expenses.png", href: "/restaurant/expenses", description: "Track Spending" },
-  { title: "Incomes", icon: "/icons/incomes.png", href: "/restaurant/incomes", description: "View Earnings" },
-  { title: "Reports", icon: "/icons/reports.png", href: "/restaurant/reports", description: "Insights & Stats" },
-];
 
 // --------------------- Main Components ---------------------
 export function HeaderMenu() {
@@ -160,12 +148,12 @@ function DeveloperInfo() {
   return (
     <div className="flex flex-col gap-2 md:w-[400px] md:flex-row lg:w-[500px]">
       <div className="row-span-3">
-        <div className="from-muted/50 to-muted flex flex-col justify-end rounded-md bg-linear-to-b p-2 select-none">
-          <Image src="/profile/shahzaib-awan.png" width={500} height={500} alt="developer" />
+        <div className="from-muted/50 aspect-square to-muted flex flex-col justify-end rounded-md bg-linear-to-b p-2 select-none">
+          <Image src="/profile/shahzaib-awan.png" width={300} height={300} alt="developer" />
         </div>
       </div>
-      <div className="min-w-56 font-rubik-500 text-sm gap-2 flex flex-col">
-        <h3>Shahzaib Awan</h3>
+      <div className="min-w-56 text-sm font-rubik-400 gap-2 flex flex-col">
+        <h3 className="font-semibold text-lg text-emerald-600">Shahzaib Awan</h3>
         <h3>Age: 20 Years</h3>
         <h3>Developer: Full-Stack Developer</h3>
         <h3>Experience: 1 Year</h3>

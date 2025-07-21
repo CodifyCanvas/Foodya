@@ -36,7 +36,7 @@ export default function Applayout({
         </header>
 
         {/* Page content */}
-        <main className="bg-white rounded-lg flex-1 p-2 mb-2">
+        <main className="bg-transparent flex-1 mb-2 font-rubik-400">
           {children}
         </main>
       </SidebarInset>
