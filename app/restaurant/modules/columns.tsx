@@ -5,13 +5,14 @@ import { RowActions } from "./table-actions"
 import { ExtendedColumnDef } from "@/types/columns.data-table"
 
 /* === Role Type Definition === */
-export type Role = {
+export type Module = {
   id?: number;
-  role: string;
+  name: string;
+  label: string;
 }
 
 /* === Table Columns for Roles === */
-export const columns = (): ExtendedColumnDef<Role>[] => [
+export const columns = (): ExtendedColumnDef<Module>[] => [
   
   // === Id Column ===
   {
@@ -31,15 +32,29 @@ export const columns = (): ExtendedColumnDef<Role>[] => [
 
   // === Role Column ===
   {
-    accessorKey: "role",
+    accessorKey: "label",
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title="role"
+        title="Label"
       />
     ),
     cell: ({ row }) => (
-      <div>{row.original.role}</div>
+      <div>{row.original.label}</div>
+    ),
+  },
+  
+  // === Role Column ===
+  {
+    accessorKey: "name",
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title="page"
+      />
+    ),
+    cell: ({ row }) => (
+      <div>{row.original.name}</div>
     ),
   },
 

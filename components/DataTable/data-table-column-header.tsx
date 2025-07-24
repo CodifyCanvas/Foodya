@@ -33,7 +33,9 @@ interface DataTableColumnHeaderProps<TData, TValue>
   column: Column<TData, TValue>
   title: string
   search?: boolean
-  filter?: string[]
+  // filter?: string[]
+  filter?: (string | { label: string; value: string })[]
+
 }
 
 export function DataTableColumnHeader<TData, TValue>({
@@ -85,21 +87,6 @@ export function DataTableColumnHeader<TData, TValue>({
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="start" className="w-56 p-2 space-y-1 font-rubik-400">
-          {/* 🔽 Filter Dropdown */}
-          {filter?.length ? (
-            <Select value={selectValue} onValueChange={handleSelectChange}>
-              <SelectTrigger className="h-8 w-full">
-                <SelectValue placeholder={`Filter ${title}`} />
-              </SelectTrigger>
-              <SelectContent className="font-rubik-400">
-                {filter.map((item) => (
-                  <SelectItem key={item} value={item}>
-                    {item}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          ) : null}
 
           {/* 🔍 Text Search Input */}
           {!filter?.length && search && column.getCanFilter() ? (
@@ -110,6 +97,29 @@ export function DataTableColumnHeader<TData, TValue>({
               className="h-8"
             />
           ) : null}
+
+          {/* Filter Dropdown menu */}
+          {filter?.length ? (
+            <Select value={selectValue} onValueChange={handleSelectChange}>
+              <SelectTrigger className="h-8 w-full">
+                <SelectValue placeholder={`Filter ${title}`} />
+              </SelectTrigger>
+              <SelectContent className="font-rubik-400">
+                {filter.map((item) =>
+                  typeof item === "string" ? (
+                    <SelectItem key={item} value={item}>
+                      {item}
+                    </SelectItem>
+                  ) : (
+                    <SelectItem key={item.value} value={item.label}>
+                      {item.label}
+                    </SelectItem>
+                  )
+                )}
+              </SelectContent>
+            </Select>
+          ) : null}
+
 
           {/* ❌ reset columns Visibilty */}
           {(inputValue || selectValue) && (

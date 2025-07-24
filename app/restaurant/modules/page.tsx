@@ -1,7 +1,7 @@
 "use client"
 
 import { DataTable } from '@/components/DataTable/data-table'
-import { columns, Role } from './columns'
+import { columns, Module } from './columns'
 import { CreateForm } from './table-actions'
 import useSWR from 'swr'
 import { Loader } from 'lucide-react'
@@ -11,14 +11,14 @@ const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 const RolesPage = () => {
   /* === Fetch Roles from API === */
-  const { data, error, isLoading } = useSWR<Role[]>("/api/role", fetcher)
+  const { data, error, isLoading } = useSWR<Module[]>("/api/module", fetcher)
 
   return (
     <div className="bg-white rounded-lg min-h-[50vh] flex flex-col">
 
       {/* === Page Header === */}
       <h3 className="text-3xl font-medium text-start px-4 pt-3 text-emerald-600">
-        Roles
+        Modules
       </h3>
 
       {/* === Loading State === */}
@@ -36,7 +36,7 @@ const RolesPage = () => {
         <DataTable
           columns={columns()}
           data={data ?? []}
-          filterColumns={["role"]}
+          filterColumns={["name"]}
           createComponent={<CreateForm />}
         />
       )}

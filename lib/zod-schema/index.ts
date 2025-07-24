@@ -1,4 +1,4 @@
-import z from "zod";
+import z, { email } from "zod";
 
 // Login Form Schema
 export const loginSchema = z.object({
@@ -10,4 +10,21 @@ export const loginSchema = z.object({
 export const roleFormSchema = z.object({
   id: z.union([z.number(), z.string().transform(String)]).optional(),
   role: z.string().min(2).max(50),
+})
+
+// Role Form Schema
+export const moduleFormSchema = z.object({
+  id: z.union([z.number(), z.string().transform(String)]).optional(),
+  name: z.string().min(2).max(50),
+  label: z.string().min(2).max(50).optional(),
+})
+
+// User Form Schema
+export const userFormSchema = z.object({
+  id: z.union([z.number(), z.string().transform(String)]).optional(),
+  name: z.string().min(2, { error: "Required" }).max(50),
+  email: z.email({ error: "A valid email address is required"}),
+  password: z.string().min(6, { error: "Password must be greater than 5 characters" }).max(50, { error: "Password must be less than 50 characters" }),
+  is_active: z.boolean().optional(),
+  role_id: z.string().min(1, { error: "Required"}),
 })

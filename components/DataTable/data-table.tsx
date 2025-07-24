@@ -23,7 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { DataTablePagination } from "./data-table-pagination"
-import React, { useState } from "react"
+import React, { ReactNode, useState } from "react"
 import { Input } from "../ui/input"
 import { DataTableViewOptions } from "./data-table-view-options"
 import { Search } from "lucide-react"
@@ -34,7 +34,7 @@ interface DataTableProps<TData, TValue> {
   columns: ExtendedColumnDef<TData, TValue>[]
   data: TData[]
   filterColumns?: string[] // optional list of columns to filter on
-  createComponent?: React.FC
+  createComponent?: ReactNode;
 }
 
 export function DataTable<TData, TValue>({
@@ -122,7 +122,7 @@ const defaultVisibility = Object.fromEntries(
 
           <DataTableViewOptions table={table} />
 
-          {createComponent && React.createElement(createComponent)}
+          {createComponent && <div>{createComponent}</div>}
         </div>
       </div>
 

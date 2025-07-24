@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar";
+import { DbChecker } from "@/components/custom/Db/db-health-checker";
 import { HeaderMenu, HeaderMenuMobile } from "@/components/custom/layouts/HeaderMenu";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -7,6 +8,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { ClientOnly } from "@/hooks/use-IsMounted";
+import { useDbCheck } from "@/hooks/useDbStatus";
 
 export default function Applayout({
   children,
@@ -18,6 +20,7 @@ export default function Applayout({
     <ClientOnly> 
     <SidebarProvider className="bg-blue-100 font-rubik">
       {/* Sidebar */}
+      <DbChecker />
       <AppSidebar />
 
       {/* Main content area */}

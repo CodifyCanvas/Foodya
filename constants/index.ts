@@ -27,7 +27,7 @@ export const navLink = [
       { title: "Users", module: "Users", url: "/restaurant/users" },
       { title: 'Roles', module: 'Roles', url: '/restaurant/roles' },
       { title: 'Permissions', module: 'Permissions', url: '/restaurant/permissions' },
-      { title: 'Pages', module: 'Pages', url: '/restaurant/pages' },
+      { title: 'Modules', module: 'Modules', url: '/restaurant/modules' },
     ],
   },
 
