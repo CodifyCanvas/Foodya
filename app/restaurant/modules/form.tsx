@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input"
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -157,6 +158,7 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
                           className="h-10"
                         />
                       </FormControl>
+                      <FormDescription className="font-rubik-300">Used to check access for this page.</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}

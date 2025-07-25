@@ -1,34 +1,51 @@
 import { boolean, int, mysqlTable, timestamp, varchar } from 'drizzle-orm/mysql-core';
 
 
+/**
+ * USERS TABLE
+ * Stores user accounts and links each user to a role.
+ */
 export const users = mysqlTable('users', {
-  id: int().autoincrement().primaryKey(),
-  name: varchar({ length: 255 }),
-  email: varchar({ length: 255 }).notNull().unique(),
-  password: varchar({ length: 50 }).notNull(),
-  is_active: boolean().default(false),
-  role_id: int().references(() => roles.id),
-  created_at: timestamp().defaultNow(),
+  id: int().autoincrement().primaryKey(),                      // Primary key
+  name: varchar({ length: 255 }),                              // User's full name (optional)
+  email: varchar({ length: 255 }).notNull().unique(),          // Unique email address (required)
+  password: varchar({ length: 50 }).notNull(),                 // User's hashed password (required)
+  is_active: boolean().default(false),                         // Account active status
+  role_id: int().references(() => roles.id),                   // Foreign key to roles
+  created_at: timestamp().defaultNow(),                        // Timestamp of account creation
 });
 
+
+/**
+ * ROLES TABLE
+ * Defines user roles like admin, operator, etc.
+ */
 export const roles = mysqlTable('roles', {
-  id: int().autoincrement().primaryKey(),
-  role: varchar({ length: 255 }).notNull().unique(),
+  id: int().autoincrement().primaryKey(),                      // Primary key
+  role: varchar({ length: 255 }).notNull().unique(),           // Role name (e.g., "admin", "user")
 });
 
+/**
+ * MODULES TABLE
+ * Represents application modules or pages, such as User Management, Roles, etc.
+ */
 export const modules = mysqlTable('modules', {
-  id: int().autoincrement().primaryKey(),
-  name: varchar({ length: 255 }).notNull().unique(), // page name (like: user, role)
-  label: varchar({ length: 255 }), // label that show in the datatable (like: User Managment)
+  id: int().autoincrement().primaryKey(),                      // Primary key
+  name: varchar({ length: 255 }).notNull().unique(),           // Technical name of the module (e.g., "users", "roles")
+  label: varchar({ length: 255 }),                             // Human-readable name (e.g., "User Management")
 });
 
+/**
+ * PERMISSIONS TABLE
+ * Defines access rights per role per module.
+ */
 export const permissions = mysqlTable('permissions', {
-  id: int().autoincrement().primaryKey(),
-  roleId: int().references(() => roles.id), // role id (like: operator, admin)
-  moduleId: int().references(() => modules.id), // page id (like: user, role)
-  label: varchar({ length: 255 }), // label that show in the datatable
-  can_view: boolean().default(false),
-  can_edit: boolean().default(false),
-  can_create: boolean().default(false),
-  can_delete: boolean().default(false),
+  id: int().autoincrement().primaryKey(),                      // Primary key
+  role_id: int().references(() => roles.id),                   // Foreign key to roles
+  module_id: int().references(() => modules.id),               // Foreign key to modules
+  label: varchar({ length: 255 }),                             // Permission label (optional UI-friendly name)
+  can_view: boolean().default(false),                          // Can view the module
+  can_edit: boolean().default(false),                          // Can edit items in the module
+  can_create: boolean().default(false),                        // Can create items in the module
+  can_delete: boolean().default(false),                        // Can delete items in the module
 });

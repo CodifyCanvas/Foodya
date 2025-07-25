@@ -1,281 +1,238 @@
-"use client"
+"use client";
 
-import { useCallback, useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { useEffect, useState } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-import toast from "react-hot-toast"
-import { EyeIcon, EyeOffIcon } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
-import { userFormSchema } from "@/lib/zod-schema"
-import { refreshData } from "@/lib/swr"
-
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Form,
-  FormControl,
   FormField,
   FormItem,
-  FormLabel,
+  FormControl,
   FormMessage,
-} from "@/components/ui/form"
-import SwitchInput from "@/components/ui/switch-input"
-import { ComboboxInput } from "@/components/ui/combobox-input"
-import { User } from "./columns"
+} from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Loader } from "lucide-react";
+
+import toast from "react-hot-toast";
+import { permissionsFormSchema } from "@/lib/zod-schema";
+import { Role } from "./columns";
 
 interface FormDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  data: User | null
-  roles?: { label: string; value: string }[]
-  [key: string]: any
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  data: Role | null;
+  [key: string]: any;
 }
 
-export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogProps) {
-  const [isVisible, setIsVisible] = useState(false)
-  const [manualReset, setManualReset] = useState(false)
+type PermissionsFormData = z.infer<typeof permissionsFormSchema>;
 
-  { /* === Initialize react-hook-form with Zod validation schema === */ }
-  const form = useForm<z.infer<typeof userFormSchema>>({
-    resolver: zodResolver(userFormSchema),
-    defaultValues: {
-      id: undefined,
-      name: "",
-      email: "",
-      password: "",
-      is_active: false,
-      role_id: "",
-    },
-  })
+export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
+  const [fetchLoading, setFetchLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
 
-  {/* === Reset from values if data changes (for editing) === */ }
+  // === Initialize react-hook-form with Zod schema ===
+  const form = useForm<{ permissions: PermissionsFormData }>({
+    resolver: zodResolver(z.object({ permissions: permissionsFormSchema })),
+    defaultValues: { permissions: [] },
+  });
+
+  const { control, handleSubmit, reset } = form;
+
+  const { fields } = useFieldArray({
+    control,
+    name: "permissions",
+  });
+
+  // === Fetch permissions when dialog is opened with a role ===
   useEffect(() => {
-    if (!manualReset && data) {
-      form.reset({
-        id: data.id ?? 0,
-        name: data.name ?? "",
-        email: data.email ?? "",
-        password: data.password ?? "",
-        is_active: data.is_active ?? false,
-        role_id: data.role_id ?? "",
-      })
-    }
-  }, [data, manualReset, form])
+    if (!data?.id) return;
 
-  {/* === Toggle Password Visibilty === */ }
-  const togglePasswordVisibility = useCallback(() => {
-    setIsVisible(prev => !prev)
-  }, [])
+    const fetchPermissions = async () => {
+      setFetchLoading(true);
 
-  {/* === Handle Form Submit === */ }
-  async function onSubmit(formValues: z.infer<typeof userFormSchema>) {
-    const API_URL = "/api/permission"
-    const isEditing = !!data?.id
+      try {
+        const response = await fetch("/api/permission", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: data.id }),
+        });
 
-    const requestOptions = {
-      method: isEditing ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formValues),
-    }
+        const result = await response.json();
+
+        if (Array.isArray(result)) {
+          // === Clean and format the response ===
+          const cleaned = result.map((item) => ({
+            id: item.id,
+            role_id: item.role_id,
+            module_id: item.module_id,
+            label: item.module_name,
+            can_view: item.can_view,
+            can_create: item.can_create,
+            can_edit: item.can_edit,
+            can_delete: item.can_delete,
+          }));
+
+          reset({ permissions: cleaned });
+        } else {
+          toast.error("Failed to load permissions.");
+        }
+      } catch (error) {
+        console.error("Unexpected error:", error);
+        toast.error("An unexpected error occurred.");
+      } finally {
+        setFetchLoading(false);
+      }
+    };
+
+    fetchPermissions();
+  }, [data, reset]);
+
+  // === Handle form submission ===
+  const onSubmit = async (formValues: { permissions: PermissionsFormData }) => {
+    setSubmitLoading(true);
 
     try {
-      const response = await fetch(API_URL, requestOptions)
-      const result = await response.json()
+      const response = await fetch("/api/permission", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formValues.permissions),
+      });
 
-      {/* === Show warning toast for duplicate/409 error === */ }
-      if (result.status === 409) {
-        toast.error(result?.message ?? "Duplicate value found.");
+      const result = await response.json();
+
+      if (!response.ok) {
+        // === Show warning toast for server error ===
+        toast.error(result?.message || "Failed to update permissions.");
         return;
       }
 
-      if (!response.ok) {
-        toast.error(result?.message ?? (isEditing
-          ? "User can't be updated. Please try again."
-          : "User can't be created. Please try again."))
-        return
-      }
-
-      toast.success(result?.message ?? (isEditing
-        ? "User updated successfully."
-        : "New user created successfully."))
-
-      // Reset form only after successful create
-      if (!isEditing) {
-        form.reset()
-      }
-
-      refreshData(API_URL)
-      onOpenChange(false)
+      // === Success toast ===
+      toast.success(result?.message || "Permissions updated successfully.");
+      onOpenChange(false);
     } catch (error) {
-      console.error("Unexpected error:", error)
-      toast.error("An unexpected error occurred. Please try again later.")
+      console.error("Unexpected error:", error);
+      toast.error("An unexpected error occurred. Please try again later.");
+    } finally {
+      setSubmitLoading(false);
     }
-  }
-
-  {/* === Manual reset logic (with ID preserved if editing) === */ }
-  const ResetForm = () => {
-    setManualReset(true)
-    form.reset({
-      id: data?.id ?? 0,
-      name: "",
-      email: "",
-      password: "",
-      is_active: false,
-      role_id: "",
-    })
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="p-0">
+      <DialogContent className="p-0 font-rubik-400" variant="full-screen">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-            {/* === Dialog Header === */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* === Header === */}
             <DialogHeader className="p-6 pb-0">
-              <DialogTitle>{data ? "Edit User" : "Create User"}</DialogTitle>
+              <DialogTitle className="font-medium">Manage Permissions</DialogTitle>
               <DialogDescription className="sr-only">
-                Create or update user information
+                Create or Update your role
               </DialogDescription>
+              <h3 className="md:text-2xl font-semibold opacity-95 text-emerald-600">
+                Role: {data?.role}
+              </h3>
             </DialogHeader>
 
-            {/* === Form Content === */}
-            <ScrollArea className="p-3 flex flex-col justify-between overflow-hidden">
-              {/* === Name Input Field === */}
-              <div className="w-full py-2">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                      <FormLabel className="absolute start-2 top-0 z-10 bg-background text-foreground -translate-y-1/2 px-1 text-xs">
-                        Full Name
-                      </FormLabel>
-                      <FormControl>
-                        <Input type="text" placeholder="Enter Name" {...field} className="h-10" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* === Email Input Field === */}
-              <div className="w-full py-2">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                      <FormLabel className="absolute start-2 top-0 z-10 bg-background text-foreground -translate-y-1/2 px-1 text-xs">
-                        Email
-                      </FormLabel>
-                      <FormControl>
-                        <Input type="text" placeholder="example123@xyz.com" {...field} className="h-10" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* === Password Input Field === */}
-              <div className="w-full py-2">
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                      <FormLabel className="absolute start-2 top-0 z-10 bg-background text-foreground -translate-y-1/2 px-1 text-xs">
-                        Password
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Input id="password" type={isVisible ? "text" : "password"} className="pe-10 pt-2 h-10 border-b" placeholder="●●●●●●" autoComplete="current-password" {...field} />
-                          <Button type="button" size="icon" variant="ghost" onClick={togglePasswordVisibility} className="absolute inset-y-0.5 end-0 text-muted-foreground hover:bg-transparent" >
-                            {isVisible ? <EyeOffIcon /> : <EyeIcon />}
-                            <span className="sr-only">
-                              {isVisible ? "Hide password" : "Show password"}
-                            </span>
-                          </Button>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* === Status & Role Field === */}
-              <div className="flex flex-row-reverse w-full items-end gap-2">
-                {/* === Status Switch Field === */}
-                <div className="w-1/3 py-2 flex justify-end items-end">
-                  <FormField
-                    control={form.control}
-                    name="is_active"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs px-4">Active</FormLabel>
-                        <FormControl>
-                          <SwitchInput
-                            {...field}
-                            value={!!field.value}
-                            onChange={(checked: boolean) => field.onChange(checked)}
-                            className="px-2"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+            {/* === Permissions Table === */}
+            <ScrollArea className="flex max-h-[75vh] flex-col justify-between overflow-hidden p-3">
+              {fetchLoading ? (
+                <div className="flex-1 min-h-[20vh] flex justify-center items-center">
+                  <Loader className="animate-spin size-6 text-gray-500" />
                 </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="sm:text-center">Module</TableHead>
+                      <TableHead className="text-center">View</TableHead>
+                      <TableHead className="text-center">Create</TableHead>
+                      <TableHead className="text-center">Edit</TableHead>
+                      <TableHead className="text-center">Delete</TableHead>
+                    </TableRow>
+                  </TableHeader>
 
-                {/* === Role Select Input Field === */}
-                <div className="w-2/3 py-2">
-                  <FormField
-                    control={form.control}
-                    name="role_id"
-                    render={({ field }) => (
-                      <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                        <FormLabel className="absolute start-2 top-0 z-10 bg-background text-foreground -translate-y-1/2 px-1 text-xs">
-                          Role
-                        </FormLabel>
-                        <FormControl>
-                          <ComboboxInput
-                            {...field}
-                            value={field.value ?? ""}
-                            onSelect={field.onChange}
-                            options={roles}
-                            placeholder="Select a role"
-                            className="font-rubik-400 cursor-pointer"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                  <TableBody>
+                    {fields.length > 0 ? (
+                      fields.map((field, idx) => (
+                        <TableRow key={field.id} className="sm:text-center">
+                          {/* === Module Label === */}
+                          <TableCell className="capitalize">
+                            {field.label || "N/A"}
+                          </TableCell>
+
+                          {/* === Permission Checkboxes === */}
+                          {(["can_view", "can_create", "can_edit", "can_delete"] as const).map(
+                            (permKey) => (
+                              <TableCell key={permKey}>
+                                <FormField
+                                  control={control}
+                                  name={`permissions.${idx}.${permKey}`}
+                                  render={({ field }) => (
+                                    <FormItem className="flex justify-center">
+                                      <FormControl>
+                                        <Checkbox
+                                          checked={field.value === true}
+                                          onCheckedChange={(checked) =>
+                                            field.onChange(checked === true)
+                                          }
+                                          className="mx-auto data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600 border-emerald-600"
+                                        />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                              </TableCell>
+                            )
+                          )}
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center">
+                          No permissions found.
+                        </TableCell>
+                      </TableRow>
                     )}
-                  />
-                </div>
-              </div>
+                  </TableBody>
+                </Table>
+              )}
             </ScrollArea>
 
-            {/* === Footer Buttons === */}
-            <DialogFooter className="p-6 justify-between pt-0">
+            {/* === Footer Actions === */}
+            <DialogFooter className="p-6 justify-between pt-0 w-full fixed bottom-0 right-0">
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
-              <Button type="button" variant="secondary" onClick={ResetForm}>
-                Reset
-              </Button>
-              <Button type="submit" variant="green">
-                {data ? "Update" : "Create"}
+              <Button type="submit" disabled={submitLoading} variant="green">
+                Update
               </Button>
             </DialogFooter>
           </form>
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

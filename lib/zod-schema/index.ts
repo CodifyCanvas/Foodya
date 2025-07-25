@@ -28,3 +28,17 @@ export const userFormSchema = z.object({
   is_active: z.boolean().optional(),
   role_id: z.string().min(1, { error: "Required"}),
 })
+
+// Permissions Form Schema
+export const permissionsFormSchema = z.array(
+  z.object({
+    id: z.union([z.number(), z.string().transform(String)]).optional(),
+    role_id: z.number().min(1, { error: "Required" }),
+    module_id: z.number().min(1, { error: "Required" }),
+    label: z.string().optional(),
+    can_view: z.boolean().optional(),
+    can_edit: z.boolean().optional(),
+    can_create: z.boolean().optional(),
+    can_delete: z.boolean().optional(),
+  })
+);

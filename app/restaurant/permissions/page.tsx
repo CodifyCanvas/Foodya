@@ -1,24 +1,25 @@
 "use client"
 
+import { DataTable } from '@/components/DataTable/data-table'
+import { columns, Role } from './columns'
+import { CreateForm } from './table-actions'
 import useSWR from 'swr'
 import { Loader } from 'lucide-react'
 
-import { DataTable } from '@/components/DataTable/data-table'
-import { columns, UsersWithRolesResponse } from './columns'
-import { CreateForm } from './table-actions'
-
-/* === SWR Fetcher === */
+/* === Data Fetcher === */
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
-/* === Users Page Component === */
 const RolesPage = () => {
-  const { data, error, isLoading } = useSWR<UsersWithRolesResponse>("/api/users", fetcher)
+  /* === Fetch Roles from API === */
+  const { data, error, isLoading } = useSWR<Role[]>("/api/permission", fetcher)
 
   return (
     <div className="bg-white rounded-lg min-h-[50vh] flex flex-col">
-      
+
       {/* === Page Header === */}
-      <h3 className="text-3xl font-medium text-start px-4 pt-3 text-emerald-600">Users</h3>
+      <h3 className="text-3xl font-medium text-start px-4 pt-3 text-emerald-600">
+        Permissions
+      </h3>
 
       {/* === Loading State === */}
       {isLoading ? (
@@ -26,19 +27,16 @@ const RolesPage = () => {
           <Loader className="animate-spin size-7 text-gray-500" />
         </div>
 
+      /* === Error State === */
       ) : error ? (
-        /* === Error State === */
-        <div className="text-center py-4 text-red-500">Failed to load data</div>
+        <div className="text-center text-destructive py-4 font-medium">Failed to load data</div>
 
+      /* === DataTable Display === */
       ) : (
-        /* === Data Table === */
         <DataTable
-          columns={columns({ roles: data?.roles ?? [] })}
-          data={data?.users ?? []}
-          filterColumns={["email", "name"]}
-          createComponent={
-            <CreateForm props={{ roles: data?.roles ?? [] }} />
-          }
+          columns={columns()}
+          data={data ?? []}
+          filterColumns={["role"]}
         />
       )}
     </div>

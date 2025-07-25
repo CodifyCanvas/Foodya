@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1753118411839,
-      "tag": "0000_real_kylun",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1753119136541,
-      "tag": "0001_pretty_blindfold",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1753122065117,
-      "tag": "0002_nosy_lucky_pierre",
+      "when": 1753384481713,
+      "tag": "0000_sleepy_retro_girl",
       "breakpoints": true
     }
   ]
