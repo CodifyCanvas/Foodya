@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/form"
 import SwitchInput from "@/components/ui/switch-input"
 import { ComboboxInput } from "@/components/ui/combobox-input"
-import { User } from "./columns"
+import { User } from "@/lib/definations"
 
 interface FormDialogProps {
   open: boolean

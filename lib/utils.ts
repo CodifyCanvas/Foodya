@@ -19,3 +19,10 @@ export function mapToLabelValue<T extends Record<string, any>>(
     value: String(item[keys.value]),
   }));
 }
+
+// Get last segments into the url (like: '/app/page/roles' -> 'roles') and remove 'roles?q=hello' to 'roles'
+export function getLastPathSegment(url: string): string {
+  const segments = url.split('/').filter(Boolean);
+  if (segments.length === 0) return '';
+  return segments[segments.length - 1].split('?')[0].split('#')[0].toLowerCase();
+}

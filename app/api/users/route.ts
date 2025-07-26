@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import { checkDuplicate, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions";
 import { getAllUserWithRole } from "@/lib/crud-actions/users";
 import { mapToLabelValue } from "@/lib/utils";
@@ -9,6 +10,12 @@ import { NextRequest, NextResponse } from "next/server";
 ========================================= */
 export async function GET() {
   try {
+    const session = await auth()
+
+    if (!session?.user.id) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
     const user = await getAllUserWithRole();
     const role = await getAllData("roles");
 

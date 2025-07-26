@@ -3,12 +3,7 @@
 import { DataTableColumnHeader } from "@/components/DataTable/data-table-column-header"
 import { RowActions } from "./table-actions"
 import { ExtendedColumnDef } from "@/types/columns.data-table"
-
-/* === Role Type Definition === */
-export type Role = {
-  id?: number;
-  role: string;
-}
+import { Role } from "@/lib/definations"
 
 /* === Table Columns for Roles === */
 export const columns = (): ExtendedColumnDef<Role>[] => [

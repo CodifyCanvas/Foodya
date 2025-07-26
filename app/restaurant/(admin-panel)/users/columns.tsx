@@ -4,40 +4,23 @@ import { DataTableColumnHeader } from "@/components/DataTable/data-table-column-
 import { RowActions } from "./table-actions"
 import { ExtendedColumnDef } from "@/types/columns.data-table"
 import { Badge } from "@/components/ui/badge"
+import { RoleSelectInput, User } from "@/lib/definations"
 
 // ================================
 // Type Definitions
 // ================================
 
-// Role object used in dropdowns or display
-export interface Role {
-  label: string;
-  value: string;
-}
-
-// User object returned from API
-export interface User {
-  id: number;
-  name: string;
-  password: string; // Consider omitting this for security in real UI
-  email: string;
-  is_active: boolean;
-  role_id: string;
-  role_name: string;
-  created_at: string; // Format: ISO 8601
-}
-
 // API response structure
 export interface UsersWithRolesResponse {
   users: User[];
-  roles: Role[];
+  roles: RoleSelectInput[];
 }
 
 // ================================
 // Column Definitions
 // ================================
 
-export const columns = (props: { roles: Role[] }): ExtendedColumnDef<User>[] => [
+export const columns = (props: { roles: RoleSelectInput[] }): ExtendedColumnDef<User>[] => [
   // === Index Column ===
   {
     accessorKey: "id",

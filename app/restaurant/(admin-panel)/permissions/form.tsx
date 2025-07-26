@@ -37,7 +37,7 @@ import { Loader } from "lucide-react";
 
 import toast from "react-hot-toast";
 import { permissionsFormSchema } from "@/lib/zod-schema";
-import { Role } from "./columns";
+import { Role } from "@/lib/definations";
 
 interface FormDialogProps {
   open: boolean;

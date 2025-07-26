@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import { checkDuplicate, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions"
 import { roleFormSchema } from "@/lib/zod-schema"
 import { NextRequest, NextResponse } from "next/server"
@@ -7,6 +8,12 @@ import { NextRequest, NextResponse } from "next/server"
 ========================================= */
 export async function GET() {
   try {
+    const session = await auth()
+
+    if (!session?.user.id) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
     const roles = await getAllData("roles")
 
     return NextResponse.json(roles, { status: 200 })

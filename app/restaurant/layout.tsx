@@ -7,6 +7,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { UserProvider, useUserContext } from "@/hooks/context/useUserContext";
 import { ClientOnly } from "@/hooks/use-IsMounted";
 import { useDbCheck } from "@/hooks/useDbStatus";
 
@@ -17,7 +18,7 @@ export default function Applayout({
 }) {
 
   return (
-    <ClientOnly> 
+    <UserProvider>
     <SidebarProvider className="bg-blue-100 font-rubik">
       {/* Sidebar */}
       <DbChecker />
@@ -44,6 +45,6 @@ export default function Applayout({
         </main>
       </SidebarInset>
     </SidebarProvider>
-    </ClientOnly>
+    </UserProvider>
   );
 }

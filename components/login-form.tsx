@@ -19,22 +19,50 @@ import {
   Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
 } from "@/components/ui/form"
 import { EyeIcon, EyeOffIcon } from "lucide-react"
-import { loginSchema } from "@/lib/zod-schema"
+import { signInFormSchema } from "@/lib/zod-schema"
+import { signIn } from "next-auth/react"
+import toast from "react-hot-toast"
+import { useRouter } from "next/navigation"
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
   const [isVisible, setIsVisible] = useState(false)
+  const router = useRouter();
 
-  const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<z.infer<typeof signInFormSchema>>({
+    resolver: zodResolver(signInFormSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   })
 
-  const onSubmit = (values: z.infer<typeof loginSchema>) => {
-    console.log(values)
+  async function onSubmit (values: z.infer<typeof signInFormSchema>) {
+    try {
+      const result = await signIn('credentials', {
+      email: values.email,
+      password: values.password,
+      redirect: false, // prevent redirect on failure
+      callbackUrl: '/chat',
+    });
+
+    if (result?.error) {
+      if (result.error === 'CredentialsSignin') {
+        toast.error("Oops! We couldn't log you in. Double-check your email and password.");
+        
+      } else {
+        toast.error(`We're having trouble: ${result.error}. Check logs or try again.`);
+      }
+    } else if (result?.ok) {
+      toast.success(`Successfully logged in. Welcome back!`);
+
+      router.push('/restaurant'); 
+    }
+
+    } catch (e) {
+      console.log("Error from login page: ", e)
+    }
   }
+
 
   const togglePasswordVisibility = () => setIsVisible(prev => !prev)
 

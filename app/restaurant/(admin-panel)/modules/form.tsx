@@ -19,24 +19,24 @@ import { Input } from "@/components/ui/input"
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 import { ScrollArea } from "@/components/ui/scroll-area"
-
-import { Role } from "./columns"
-import { roleFormSchema } from "@/lib/zod-schema"
+import { moduleFormSchema } from "@/lib/zod-schema"
 
 import toast from 'react-hot-toast'
 import { refreshData } from "@/lib/swr"
+import { ModuleInterface } from "@/lib/definations"
 
 /* === Props Interface === */
 interface FormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  data: Role | null
+  data: ModuleInterface | null
   [key: string]: any
 }
 
@@ -45,11 +45,12 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
   const [manualReset, setManualReset] = useState(false)
 
   /* === React Hook Form Setup === */
-  const form = useForm<z.infer<typeof roleFormSchema>>({
-    resolver: zodResolver(roleFormSchema),
+  const form = useForm<z.infer<typeof moduleFormSchema>>({
+    resolver: zodResolver(moduleFormSchema),
     defaultValues: {
       id: undefined,
-      role: ""
+      name: "",
+      label: "",
     },
   })
 
@@ -58,14 +59,15 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
     if (!manualReset && data) {
       form.reset({
         id: data.id ?? 0,
-        role: data.role ?? "",
+        name: data.name ?? "",
+        label: data.label ?? "",
       })
     }
   }, [data, manualReset, form])
 
   /* === Submit Handler === */
-  async function onSubmit(formValues: z.infer<typeof roleFormSchema>) {
-    const API_URL = "/api/role";
+  async function onSubmit(formValues: z.infer<typeof moduleFormSchema>) {
+    const API_URL = "/api/module";
     const isEditing = !!data?.id;
 
     const requestOptions = {
@@ -115,7 +117,8 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
     setManualReset(true)
     form.reset({
       id: data?.id ?? 0,
-      role: ""
+      name: "",
+      label: "",
     })
   }
 
@@ -127,7 +130,7 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
 
             {/* === Dialog Header === */}
             <DialogHeader className="p-6 pb-0">
-              <DialogTitle>{data ? "Edit Role" : "Create Role"}</DialogTitle>
+              <DialogTitle>{data ? "Edit Module" : "Create Module"}</DialogTitle>
               <DialogDescription className="sr-only">
                 Create or Update your role
               </DialogDescription>
@@ -136,20 +139,45 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
             {/* === Scrollable Form Area === */}
             <ScrollArea className="flex flex-col justify-between overflow-hidden p-3">
 
-              {/* === Role Field === */}
+              {/* === Name Field === */}
               <div className="w-full py-2">
                 <FormField
                   control={form.control}
-                  name="role"
+                  name="name"
                   render={({ field }) => (
                     <FormItem className="group relative w-auto sm:max-w-sm m-1">
                       <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
-                        Role
+                        Name
                       </FormLabel>
                       <FormControl>
                         <Input
                           type="text"
-                          placeholder="Enter role"
+                          placeholder="Enter Page Name"
+                          {...field}
+                          className="h-10"
+                        />
+                      </FormControl>
+                      <FormDescription className="font-rubik-300">Used to check access for this page.</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              {/* === Label Field === */}
+              <div className="w-full py-2">
+                <FormField
+                  control={form.control}
+                  name="label"
+                  render={({ field }) => (
+                    <FormItem className="group relative w-auto sm:max-w-sm m-1">
+                      <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                        Label
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Enter Label"
                           {...field}
                           className="h-10"
                         />

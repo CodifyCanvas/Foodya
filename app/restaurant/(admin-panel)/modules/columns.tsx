@@ -3,16 +3,10 @@
 import { DataTableColumnHeader } from "@/components/DataTable/data-table-column-header"
 import { RowActions } from "./table-actions"
 import { ExtendedColumnDef } from "@/types/columns.data-table"
-
-/* === Role Type Definition === */
-export type Module = {
-  id?: number;
-  name: string;
-  label: string;
-}
+import { ModuleInterface } from "@/lib/definations"
 
 /* === Table Columns for Roles === */
-export const columns = (): ExtendedColumnDef<Module>[] => [
+export const columns = (): ExtendedColumnDef<ModuleInterface>[] => [
   
   // === Id Column ===
   {

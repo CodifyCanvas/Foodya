@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import { getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions";
 import { getPermissionsViaRoleId } from "@/lib/crud-actions/permission";
 import { permissionsFormSchema } from "@/lib/zod-schema";
@@ -10,6 +11,12 @@ const path = "/api/permission";
 ========================================================== */
 export async function GET() {
   try {
+    const session = await auth()
+
+    if (!session?.user.id) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
     const roles = await getAllData("roles");
 
     return NextResponse.json(roles, { status: 200 });
