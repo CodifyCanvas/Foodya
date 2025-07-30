@@ -12,8 +12,9 @@ const path = "/api/permission";
 export async function GET() {
   try {
     const session = await auth()
+    const userId = session?.user.id
 
-    if (!session?.user.id) {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
@@ -35,6 +36,13 @@ export async function GET() {
 ========================================================== */
 export async function POST(req: NextRequest) {
   try {
+    const session = await auth()
+    const userId = session?.user.id
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
     const { id } = await req.json();
 
     // === Validate input ===
@@ -66,7 +74,7 @@ export async function POST(req: NextRequest) {
       return {
         id: 0, // Means not saved yet
         role_id: Number(id),
-        role_name: "", // Not required in this context
+        role_name: "",
         module_id: mod.id,
         module_name: mod.name,
         can_view: false,
@@ -87,11 +95,18 @@ export async function POST(req: NextRequest) {
   }
 }
 
-/* =======================================================
+/* =============================================
   [PUT] Update or insert permissions for a role
-========================================================== */
+============================================= */
 export async function PUT(req: NextRequest) {
   try {
+    const session = await auth()
+    const userId = session?.user.id
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
     const body = await req.json();
 
     // === Validate incoming data using Zod schema ===

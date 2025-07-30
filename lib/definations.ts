@@ -42,3 +42,57 @@ export interface Role {
   role: string;
 }
 
+/* === Role Type Definition === */
+export interface MenuCategories {
+  id?: number;
+  name: string;
+  description: string; 
+}
+
+
+/* === Mune Items Definition === */
+export interface ItemWithOptions {
+  id?: number;
+  item: string;
+  description: string;
+  price: number;
+  is_available: boolean;
+  category: string;
+  category_id: string;
+  options: { option_name: string; price: number }[];  
+};
+
+// Categories object used in dropdowns or display
+export interface CategoriesSelectInput {
+    label: string;
+    value: string;
+}
+
+/* === Module Type Definition === */
+export interface RestaurantTablesInterface {
+  id?: number;
+  table_number: string;
+  status: 'booked' | 'occupied' | 'available';
+}
+
+/* === Bookings Tables Type Definition === */
+export interface BookingsTablesInterface {
+  id: number;
+  tableId: string;
+  tableName: string | null;
+  customerName: string;
+  advancePaid: string | null;
+  status: 'Scheduled' | 'Booked' | 'Completed' | 'Expired';
+  bookedByUserId: number; 
+  bookedByUserName: string | null;
+  bookedByUserEmail: string | null; 
+  reservationStart: Date;
+  reservationEnd: Date;  
+  bookingDate: Date;      
+}
+
+// Categories object used in dropdowns or display
+export interface TablesSelectInput {
+    label: string;
+    value: string;
+}

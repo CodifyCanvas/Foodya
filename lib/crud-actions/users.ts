@@ -1,9 +1,12 @@
 "use server";
 
-import { roles, users } from "@/lib/drizzle-schema/schema";
+import { schema } from "@/lib/drizzle-schema";
 import { db } from "../db";
 import { and, eq } from "drizzle-orm";
 import { User } from '@/lib/definations'
+
+const users = schema.users;
+const roles = schema.roles;
 
 export const getAllUserWithRole = async () => {
     const result = await db

@@ -101,10 +101,10 @@ export function DataTableColumnHeader<TData, TValue>({
           {/* Filter Dropdown menu */}
           {filter?.length ? (
             <Select value={selectValue} onValueChange={handleSelectChange}>
-              <SelectTrigger className="h-8 w-full">
+              <SelectTrigger className="h-8 w-full capitalize">
                 <SelectValue placeholder={`Filter ${title}`} />
               </SelectTrigger>
-              <SelectContent className="font-rubik-400">
+              <SelectContent className="font-rubik-400 capitalize">
                 {filter.map((item) =>
                   typeof item === "string" ? (
                     <SelectItem key={item} value={item}>

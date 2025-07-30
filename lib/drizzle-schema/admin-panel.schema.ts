@@ -5,7 +5,7 @@ import { boolean, int, mysqlTable, timestamp, varchar } from 'drizzle-orm/mysql-
  * USERS TABLE
  * Stores user accounts and links each user to a role.
  */
-export const users = mysqlTable('users', {
+const users = mysqlTable('users', {
   id: int().autoincrement().primaryKey(),                      // Primary key
   name: varchar({ length: 255 }),                              // User's full name (optional)
   email: varchar({ length: 255 }).notNull().unique(),          // Unique email address (required)
@@ -20,7 +20,7 @@ export const users = mysqlTable('users', {
  * ROLES TABLE
  * Defines user roles like admin, operator, etc.
  */
-export const roles = mysqlTable('roles', {
+const roles = mysqlTable('roles', {
   id: int().autoincrement().primaryKey(),                      // Primary key
   role: varchar({ length: 255 }).notNull().unique(),           // Role name (e.g., "admin", "user")
 });
@@ -29,7 +29,7 @@ export const roles = mysqlTable('roles', {
  * MODULES TABLE
  * Represents application modules or pages, such as User Management, Roles, etc.
  */
-export const modules = mysqlTable('modules', {
+const modules = mysqlTable('modules', {
   id: int().autoincrement().primaryKey(),                      // Primary key
   name: varchar({ length: 255 }).notNull().unique(),           // Technical name of the module (e.g., "users", "roles")
   label: varchar({ length: 255 }),                             // Human-readable name (e.g., "User Management")
@@ -39,7 +39,7 @@ export const modules = mysqlTable('modules', {
  * PERMISSIONS TABLE
  * Defines access rights per role per module.
  */
-export const permissions = mysqlTable('permissions', {
+const permissions = mysqlTable('permissions', {
   id: int().autoincrement().primaryKey(),                      // Primary key
   role_id: int().references(() => roles.id),                   // Foreign key to roles
   module_id: int().references(() => modules.id),               // Foreign key to modules
@@ -49,3 +49,12 @@ export const permissions = mysqlTable('permissions', {
   can_create: boolean().default(false),                        // Can create items in the module
   can_delete: boolean().default(false),                        // Can delete items in the module
 });
+
+export const adminSchema = {
+  users,
+  roles,
+  modules,
+  permissions
+};
+
+export type AdminSchema = typeof adminSchema;

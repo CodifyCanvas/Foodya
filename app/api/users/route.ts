@@ -5,26 +5,32 @@ import { mapToLabelValue } from "@/lib/utils";
 import { userFormSchema } from "@/lib/zod-schema";
 import { NextRequest, NextResponse } from "next/server";
 
-/* ======================================
-  === [GET] Fetch All Roles from DB ===
-========================================= */
+const path = '/api/users'
+
+/* ==============================================
+  === [GET] Fetch All Users and Roles from DB ===
+============================================== */
 export async function GET() {
   try {
     const session = await auth()
+    const userId = session?.user.id
 
-    if (!session?.user.id) {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    const user = await getAllUserWithRole();
-    const role = await getAllData("roles");
+    // === Fetch all users with their roles ===
+    const users = await getAllUserWithRole();
 
-    // Convert roles into label/value format for the combobox
-    const formattedRoles = mapToLabelValue(role, { label: "role", value: "id" });
+    // === Fetch all roles ===
+    const roles = await getAllData("roles");
 
-    return NextResponse.json({ users: user, roles: formattedRoles }, { status: 200 });
+    // === Map roles to label/value pairs for frontend combobox usage ===
+    const formattedRoles = mapToLabelValue(roles, { label: "role", value: "id" });
+
+    return NextResponse.json({ users, roles: formattedRoles }, { status: 200 });
   } catch (error) {
-    console.error("[GET /api/users] Failed to fetch users:", error);
+    console.error(`[GET ${path}] Failed to fetch users:`, error);
     return NextResponse.json(
       { error: "Failed to fetch users. Please try again later." },
       { status: 500 }
@@ -33,17 +39,24 @@ export async function GET() {
 }
 
 /* ======================================
-  === [POST] Create a New Role Entry ===
+  === [POST] Create a New User Entry ===
 ========================================= */
 export async function POST(req: NextRequest) {
   try {
+    const session = await auth()
+    const userId = session?.user.id
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
     const body = await req.json();
 
-    // Validate request body using Zod
+    // === Validate request body with Zod schema ===
     const parsed = userFormSchema.parse(body);
     const { name, email, password, is_active, role_id } = parsed;
 
-    // Check for duplicate email
+    // === Check for duplicate email in users table ===
     const duplicate = await checkDuplicate("users", "email", email);
     if (duplicate) {
       return NextResponse.json(
@@ -52,7 +65,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Insert user into DB
+    // === Insert new user into DB ===
     await insertData("users", {
       name: name.trim(),
       email,
@@ -61,9 +74,12 @@ export async function POST(req: NextRequest) {
       role_id: Number(role_id),
     });
 
-    return NextResponse.json({ message: "User created successfully." }, { status: 201 });
+    return NextResponse.json(
+      { message: "User created successfully." },
+      { status: 201 }
+    );
   } catch (error) {
-    console.error("[POST /api/users] User creation failed:", error);
+    console.error(`[POST ${path}] User creation failed:`, error);
     return NextResponse.json(
       { error: "An unexpected error occurred while creating the User. Please try again later." },
       { status: 500 }
@@ -72,13 +88,20 @@ export async function POST(req: NextRequest) {
 }
 
 /* ======================================
-  === [PUT] Update an Existing Role ===
+  === [PUT] Update an Existing User ===
 ========================================= */
 export async function PUT(req: NextRequest) {
   try {
+    const session = await auth()
+    const userId = session?.user.id
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
     const body = await req.json();
 
-    // Validate input with Zod
+    // === Validate input data with Zod schema ===
     const parsed = userFormSchema.parse(body);
     const { id, name, email, password, is_active, role_id } = parsed;
 
@@ -89,7 +112,7 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Update user in DB
+    // === Update user data in DB by ID ===
     await updateData("users", "id", id, {
       name: name.trim(),
       email,
@@ -98,9 +121,12 @@ export async function PUT(req: NextRequest) {
       role_id: Number(role_id),
     });
 
-    return NextResponse.json({ message: "User updated successfully." }, { status: 202 });
+    return NextResponse.json(
+      { message: "User updated successfully." },
+      { status: 202 }
+    );
   } catch (error) {
-    console.error("[PUT /api/users] User update failed:", error);
+    console.error(`[PUT ${path}] User update failed:`, error);
     return NextResponse.json(
       { error: "An unexpected error occurred while updating the User. Please try again later." },
       { status: 500 }

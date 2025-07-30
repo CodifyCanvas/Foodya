@@ -34,22 +34,12 @@ export const navLink = [
   // --- Restaurant Management ---
   { heading: "Restaurant" },
   {
-    title: "Staff & Payroll",
-    url: "#",
-    icon: Users, // Group/staff symbol
-    items: [
-      { title: 'Employees', url: '/restaurant/employees' },
-      { title: 'Salaries', url: '/restaurant/salaries' },
-    ],
-  },
-  {
     title: "Menu Management",
     url: "#",
     icon: Utensils, // Food/menu icon
     items: [
       { title: 'Menu Categories', url: '/restaurant/menu-categories' },
       { title: 'Menu Items', url: '/restaurant/menu-items' },
-      { title: 'Item Options', url: '/restaurant/menu-item-options' },
     ],
   },
   {
@@ -61,6 +51,15 @@ export const navLink = [
       { title: 'Bookings', url: '/restaurant/bookings' },
       { title: 'Orders', url: '/restaurant/orders' },
       { title: 'Invoices', url: '/restaurant/invoices' },
+    ],
+  },
+  {
+    title: "Staff & Payroll",
+    url: "#",
+    icon: Users, // Group/staff symbol
+    items: [
+      { title: 'Employees', url: '/restaurant/employees' },
+      { title: 'Salaries', url: '/restaurant/salaries' },
     ],
   },
 

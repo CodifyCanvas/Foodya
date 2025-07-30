@@ -1,7 +1,7 @@
 "use server";
 import { db } from '@/lib/db'
-import * as schema from '@/lib/drizzle-schema/schema'
-import { asc, desc, eq } from 'drizzle-orm'
+import { schema } from '@/lib/drizzle-schema';
+import { asc, eq } from 'drizzle-orm'
 import type { MySqlUpdateSetSource } from 'drizzle-orm/mysql-core'
 
 type Schema = typeof schema
@@ -25,8 +25,13 @@ export async function getAllData<T extends TableName>(
 export async function insertData<T extends TableName>(
   tableName: T,                                       // table name 
   data: Schema[T]['$inferInsert']                     // data in object form 
-): Promise<void> {
-  await db.insert(schema[tableName]).values(data)
+): Promise<{ insertId: number }> {
+  const result = await db.insert(schema[tableName]).values(data).execute();
+  const insertResult = result[0];
+  
+  return {
+    insertId: insertResult.insertId
+  };
 }
 
 // ✅ UPDATE with column, value, and new data
@@ -39,7 +44,9 @@ export async function updateData<T extends TableName, K extends ColumnName<T>>(
 
   const table = schema[tableName]
   const column = table[columnName] as any
-  await db.update(table).set(values).where(eq(column, columnValue))
+  const result = await db.update(table).set(values).where(eq(column, columnValue))
+
+  console.log(result)
 }
 
 // ✅ DELETE with column and value

@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     const parsed = moduleFormSchema.parse(body)
     const { name, label } = parsed
 
-    // === Check for Duplicates in Users Table ===
+    // === Check for Duplicates in Modules Table ===
     const duplicate = await checkDuplicate("modules", "name", name)
 
     if (duplicate) {
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // === Insert New Role into DB ===
+    // === Insert New Module into DB ===
     await insertData("modules", { 
       name: name.trim(), 
       label: label?.trim() ?? ""
@@ -81,7 +81,7 @@ export async function PUT(req: NextRequest) {
     const parsed = moduleFormSchema.parse(body)
     const { id, name, label } = parsed
 
-    // === Update Role by ID ===
+    // === Update Module by ID ===
     await updateData("modules", "id", id!, {
        name: name.trim(),
        label: label?.trim() 

@@ -16,7 +16,7 @@ export const roleFormSchema = z.object({
   role: z.string().min(2).max(50),
 })
 
-// Role Form Schema
+// Module/Pages Form Schema
 export const moduleFormSchema = z.object({
   id: z.union([z.number(), z.string().transform(String)]).optional(),
   name: z.string().min(2).max(50),
@@ -46,3 +46,4 @@ export const permissionsFormSchema = z.array(
     can_delete: z.boolean().optional(),
   })
 );
+

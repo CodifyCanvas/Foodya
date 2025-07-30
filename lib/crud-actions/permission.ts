@@ -1,8 +1,12 @@
 "use server";
 
-import { modules, permissions, roles } from "@/lib/drizzle-schema/schema";
+import { schema } from "@/lib/drizzle-schema";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
+
+const modules = schema.modules
+const roles = schema.roles
+const permissions = schema.permissions
 
 type PermissionDetails = {
   id: number;

@@ -30,31 +30,33 @@ export function DataTableViewOptions<TData>({
           Columns
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[150px] font-rubik-400">
+      <DropdownMenuContent align="end" className="w-[180px] font-rubik-400">
         <DropdownMenuLabel className="text-xs">Toggle columns</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {table
-          .getAllColumns()
-          .filter((column) => column.getCanHide()) // ✅ no accessorFn check
-          .map((column) => (
-            <DropdownMenuCheckboxItem
-              key={column.id}
-              className="capitalize"
-              checked={column.getIsVisible()}
-              onCheckedChange={(value) => column.toggleVisibility(!!value)}
-            >
-              {column.id}
-            </DropdownMenuCheckboxItem>
-          ))}
-          <DropdownMenuSeparator />
-          {/* ❌ Clear Filter */}
-          <DropdownMenuItem
-              onClick={() => {
-                table.resetColumnVisibility()
-              }}
-            >
-              <RefreshCcwIcon /> Reset
-            </DropdownMenuItem>
+  .getAllColumns()
+  .filter((column) => column.getCanHide())
+  .map((column) => {
+    const label = column.columnDef.meta?.title ?? column.id
+
+    return (
+      <DropdownMenuCheckboxItem
+        key={column.id}
+        className="capitalize"
+        checked={column.getIsVisible()}
+        onCheckedChange={(value) => column.toggleVisibility(!!value)}
+      >
+        {label}
+      </DropdownMenuCheckboxItem>
+    )
+  })}
+
+
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => table.resetColumnVisibility()}>
+          <RefreshCcwIcon className="mr-2 h-4 w-4" />
+          Reset
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

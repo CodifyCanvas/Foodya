@@ -10,13 +10,13 @@ import { NextRequest, NextResponse } from "next/server"
 export async function GET() {
   try {
     const session = await auth()
-    const id = session?.user.id
+    const userId = session?.user.id
 
-    if (!id) {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    const data = await getUserWithRole(Number(id));
+    const data = await getUserWithRole(Number(userId));
 
     return NextResponse.json(data, { status: 200 })
   } catch (error) {
@@ -34,6 +34,13 @@ export async function GET() {
 ========================================= */
 export async function POST(req: NextRequest) {
   try {
+    const session = await auth()
+    const userId = session?.user.id
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
     const body = await req.json()
 
     // Validate request body using Zod schema
@@ -72,6 +79,13 @@ export async function POST(req: NextRequest) {
 ========================================= */
 export async function PUT(req: NextRequest) {
   try {
+    const session = await auth()
+    const userId = session?.user.id
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+    
     const body = await req.json()
 
     // === Validate Input ===
