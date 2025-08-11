@@ -76,7 +76,6 @@ export function RoleForm({ open, onOpenChange, data, tables = [] }: FormDialogPr
   async function onSubmit(formValues: z.infer<typeof bookingsTablesFormSchema>) {
     const API_URL = "/api/bookings-tables";
     const isEditing = !!data?.id;
-    console.log(formValues)
 
     const requestOptions = {
       method: isEditing ? "PUT" : "POST",

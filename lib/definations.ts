@@ -53,13 +53,14 @@ export interface MenuCategories {
 /* === Mune Items Definition === */
 export interface ItemWithOptions {
   id?: number;
+  image?: string | null; // Optional image file
   item: string;
   description: string;
   price: number;
   is_available: boolean;
   category: string;
   category_id: string;
-  options: { option_name: string; price: number }[];  
+  options: { option_id: number; option_name: string; price: string; }[];  
 };
 
 // Categories object used in dropdowns or display
@@ -78,11 +79,11 @@ export interface RestaurantTablesInterface {
 /* === Bookings Tables Type Definition === */
 export interface BookingsTablesInterface {
   id: number;
-  tableId: string;
+  tableId: string; 
   tableName: string | null;
   customerName: string;
   advancePaid: string | null;
-  status: 'Scheduled' | 'Booked' | 'Completed' | 'Expired';
+  status: 'scheduled' | 'booked' | 'completed' | 'processing' | 'expired' | 'cancelled';
   bookedByUserId: number; 
   bookedByUserName: string | null;
   bookedByUserEmail: string | null; 

@@ -48,7 +48,7 @@ export const columns = (): ExtendedColumnDef<ModuleInterface>[] => [
       />
     ),
     cell: ({ row }) => (
-      <div>{row.original.name}</div>
+      <div className="capitalize">{row.original.name}</div>
     ),
   },
 

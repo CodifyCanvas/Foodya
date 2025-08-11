@@ -1,3 +1,5 @@
+'use server';
+
 import { auth } from "@/auth"
 import { getAllBookingsTables, syncBookingAndTableStatuses } from "@/lib/crud-actions/bookings-tables"
 import { getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions"
@@ -81,7 +83,7 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     )
   }
-}
+} 
 
 /* ================================================
   === [PUT] Update an Existing Reservation Table ===
@@ -130,38 +132,47 @@ export async function PUT(req: NextRequest) {
   }
 }
 
-/* ================================================
-  === [Patch] Update Status of Booking Table ===
-================================================ */
-export async function Patch(req: NextRequest) {
+/* =============================================
+  === [PATCH] Update Status of Booking Table ===
+============================================= */
+export async function PATCH(req: NextRequest) {
   try {
-    const session = await auth()
-    const userId = session?.user.id
+    /* === Session & Authorization === */
+    const session = await auth();
+    const userId = session?.user.id;
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    const body = await req.json()
+    /* === Parse & Validate Body === */
+    const body = await req.json();
+    const { status, id } = body;
 
-    // === Validate Input ===
-    const { status, id } = body
+    if (!id) {
+      return NextResponse.json(
+        { error: "Reservation ID is missing." },
+        { status: 400 }
+      );
+    }
 
-    // === Update Table by ID ===
-    await updateData("bookingsTables", "id", id!, {
-      status: status
-    })
+    /* === Update Reservation Status === */
+    await updateData("bookingsTables", "id", id, { status });
 
     return NextResponse.json(
-      { message: "Marked successfully." },
+      { message: "Marked as Cancelled successfully." },
       { status: 202 }
-    )
+    );
   } catch (error) {
-    console.error(`[PATCH ${path}] Reservation Marked failed:`, error)
+    console.error(`[PATCH ${path}] Reservation update failed:`, error);
 
     return NextResponse.json(
-      { error: "An unexpected error occurred while updating the Reservation. Please try again later." },
+      {
+        error:
+          "An unexpected error occurred while updating the reservation. Please try again later.",
+      },
       { status: 500 }
-    )
+    );
   }
 }
+

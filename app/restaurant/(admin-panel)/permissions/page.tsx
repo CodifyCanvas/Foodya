@@ -8,6 +8,7 @@ import { columns } from './columns';
 import { useModulePermission } from '@/hooks/useModulePermission';
 import AccessDenied from '@/app/errors/access-control-view/access-denied';
 import { Role } from '@/lib/definations';
+import { useUserContext } from '@/hooks/context/useUserContext';
 
 /* === Data Fetcher === */
 const fetcher = (url: string) => fetch(url).then(res => res.json());
@@ -15,6 +16,8 @@ const fetcher = (url: string) => fetch(url).then(res => res.json());
 const PermissionsPage = () => {
   // Use the permission hook
   const { canView, loading: permLoading } = useModulePermission();
+  const { refetchPermissions } = useUserContext();
+
 
   // Fetch permissions data
   const {
@@ -51,7 +54,7 @@ const PermissionsPage = () => {
         </div>
       ) : (
         <DataTable
-          columns={columns()}
+          columns={columns({ refetchPermissions })}
           data={permissions ?? []}
           filterColumns={['role']}
         />

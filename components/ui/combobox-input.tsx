@@ -18,9 +18,10 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import { Badge } from "./badge"
 
 interface ComboboxInputProps {
-    options: { value: string; label: string }[];
+    options: { value: string; label: string, badge?: string }[];
     placeholder?: string;
     onSelect: (value: string | "") => void; // ← changed here
     value: string;
@@ -61,11 +62,12 @@ export function ComboboxInput({ options, placeholder = "Select a option", onSele
                                         setOpen(false)
                                     }}
                                 >
-                                    {framework.label}
+                                    {framework.label} 
+                                    {framework.badge && <Badge className="rounded-full ml-auto font-rubik-400 border-none bg-emerald-100 text-emerald-800 dark:bg-emerald-400/10 dark:text-emerald-400 min-w-fit"> {framework.badge} </Badge>}
                                     <Check
                                         className={cn(
-                                            "ml-auto",
-                                            value === framework.value ? "opacity-100" : "opacity-0"
+                                            value === framework.value ? "opacity-100" : "opacity-0",
+                                            !framework.badge && 'ml-auto'
                                         )}
                                     />
                                 </CommandItem>

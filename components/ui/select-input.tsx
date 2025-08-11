@@ -21,7 +21,8 @@ type SelectInputProps = {
   onChange: (value: string | undefined) => void;
   className?: string;
   onBlur?: () => void;
-  name: string;
+  name?: string;
+  required?: boolean;
   options: Option[];
   placeholder?: string;
 };
@@ -32,6 +33,7 @@ const SelectInput = ({
   className,
   onBlur,
   name,
+  required = false,
   options,
   placeholder = 'Select an option',
 }: SelectInputProps) => {
@@ -39,6 +41,7 @@ const SelectInput = ({
     <Select
       value={value ?? ''}
       onValueChange={(val) => onChange(val === '' ? undefined : val)}
+      required={required}
     >
       <SelectTrigger
         className={cn(

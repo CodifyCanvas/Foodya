@@ -48,7 +48,7 @@ interface FormDialogProps {
 
 type PermissionsFormData = z.infer<typeof permissionsFormSchema>;
 
-export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
+export function RoleForm({ open, onOpenChange, data, refetchPermissions }: FormDialogProps) {
   const [fetchLoading, setFetchLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
 
@@ -130,6 +130,7 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
 
       // === Success toast ===
       toast.success(result?.message || "Permissions updated successfully.");
+      refetchPermissions();
       onOpenChange(false);
     } catch (error) {
       console.error("Unexpected error:", error);

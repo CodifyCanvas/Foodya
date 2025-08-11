@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -34,6 +34,7 @@ import { ItemWithOptions } from "@/lib/definations"
 import { ComboboxInput } from "@/components/ui/combobox-input"
 import SwitchInput from "@/components/ui/switch-input"
 import { Plus, Trash2 } from "lucide-react"
+import Image from "next/image"
 
 /* === Props Interface === */
 interface FormDialogProps {
@@ -56,6 +57,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
     resolver: zodResolver(menuItemFormSchema),
     defaultValues: {
       id: 0,
+      image: undefined as unknown as File,
       item: "",
       description: "",
       category_id: "",
@@ -90,17 +92,37 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
     }
   }, [data, manualReset, form])
 
+  const selectedFile = form.watch("image");
+
+  // 👇 File preview URL
+  const previewUrl = useMemo(() => {
+    if (selectedFile instanceof File) {
+      return URL.createObjectURL(selectedFile);
+    }
+    return null;
+  }, [selectedFile]);
+
   /* === Submit Handler === */
   async function onSubmit(formValues: z.infer<typeof menuItemFormSchema>) {
     const API_URL = "/api/menu-items";
     const isEditing = !!data?.id;
 
+    const formData = new FormData();
+
+    // Destructure image out
+    const { image, ...rest } = formValues;
+
+    // Send Zod values (without image) as JSON string
+    formData.append("data", JSON.stringify(rest));
+
+    // Add image file if available
+    if (image instanceof File) {
+      formData.append("image", image);
+    }
+
     const requestOptions = {
       method: isEditing ? "PUT" : "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formValues),
+      body: formData,
     }
 
     try {
@@ -142,6 +164,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
     setManualReset(true)
     form.reset({
       id: data?.id ?? 0,
+      image: undefined as unknown as File,
       item: '',
       description: '',
       category_id: '',
@@ -159,143 +182,195 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
 
             {/* === Dialog Header === */}
             <DialogHeader className="p-6 pb-0">
-              <DialogTitle>{data ? "Edit Category" : "Create Category"}</DialogTitle>
+              <DialogTitle>{data ? "Edit Menu Item" : "Create Menu Item"}</DialogTitle>
               <DialogDescription className="sr-only">
-                Create or Update your Category
+                Create or Update your Menu Item
               </DialogDescription>
             </DialogHeader>
 
             {/* === Scrollable Form Area === */}
             <ScrollArea className="flex flex-col max-h-[75vh] justify-between overflow-hidden p-3">
 
-              <div className="flex flex-col sm:flex-row">
+              <div className="flex flex-col md:flex-row w-full">
+                <div className=" w-fit">
+                  <div className="flex justify-start">
+                    {previewUrl ? (
+                      <div className="relative w-40 h-40 rounded-lg outline outline-gray-300 dark:outline-gray-600 overflow-hidden">
+                        <Image src={previewUrl} alt="New preview" fill style={{ objectFit: "cover" }} priority />
+                      </div>
+                    ) : data?.image ? (
+                      <div className="relative w-40 h-40 rounded-lg outline outline-gray-300 dark:outline-gray-600 overflow-hidden">
+                        <Image src={data.image} alt="Current profile" fill style={{ objectFit: "cover" }} priority />
+                      </div>
+                    ) : (
+                      <div className="w-40 h-40 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400 dark:text-gray-600">
+                        No Image
+                      </div>
+                    )}
+                  </div>
 
-                {/* === Item Name Field === */}
-                <div className="w-full py-2">
-                  <FormField
-                    control={form.control}
-                    name="item"
-                    render={({ field }) => (
-                      <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                        <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
-                          Item Name
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="text"
-                            placeholder="Enter Category"
-                            {...field}
-                            className="h-10"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                {/* === Category Select Field === */}
-                <div className="w-full py-2">
-                  <FormField
-                    control={form.control}
-                    name="category_id"
-                    render={({ field }) => (
-                      <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                        <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
-                          Category
-                        </FormLabel>
-                        <FormControl>
-                          <ComboboxInput
-                            {...field}
-                            value={field.value ?? ""}
-                            onSelect={field.onChange}
-                            options={categories}
-                            placeholder="Select a category"
-                            className="font-rubik-400 cursor-pointer"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {/* === Item Image Field === */}
+                  <div className="w-full py-2">
+                    <FormField
+                      control={form.control}
+                      name="image"
+                      render={({ field }) => (
+                        <FormItem className="group relative w-auto sm:max-w-sm m-1">
+                          <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                            Image
+                          </FormLabel>
+                          <FormControl>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              id="image-select-field"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0] ?? null;
+                                field.onChange(file);
+                              }}
+                              className="cursor-pointer text-neutral-700 h-10 w-full bg-white/5 backdrop-blur-xl rounded-lg content-center px-3"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
 
-                {/* === General Price Field === */}
-                <div className="w-full py-2">
-                  <FormField
-                    control={form.control}
-                    name="price"
-                    render={({ field }) => (
-                      <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                        <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
-                          Price
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            {...field}
-                            className="h-10 hide-spinner"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <div className=" w-full flex flex-col justify-evenly">
+                  <div className="flex flex-col sm:flex-row justify-between">
+
+                    {/* === Item Name Field === */}
+                    <div className="w-full py-2">
+                      <FormField
+                        control={form.control}
+                        name="item"
+                        render={({ field }) => (
+                          <FormItem className="group relative w-auto sm:max-w-sm m-1">
+                            <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                              Item Name
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="Enter Category"
+                                {...field}
+                                className="h-10"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* === Category Select Field === */}
+                    <div className="w-full py-2">
+                      <FormField
+                        control={form.control}
+                        name="category_id"
+                        render={({ field }) => (
+                          <FormItem className="group relative w-auto sm:max-w-sm m-1">
+                            <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                              Category
+                            </FormLabel>
+                            <FormControl>
+                              <ComboboxInput
+                                {...field}
+                                value={field.value ?? ""}
+                                onSelect={field.onChange}
+                                options={categories}
+                                placeholder="Select a category"
+                                className="font-rubik-400 cursor-pointer"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* === General Price Field === */}
+                    <div className="w-full py-2">
+                      <FormField
+                        control={form.control}
+                        name="price"
+                        render={({ field }) => (
+                          <FormItem className="group relative w-auto sm:max-w-sm m-1">
+                            <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                              Price
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                {...field}
+                                className="h-10 hide-spinner"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                  </div>
+
+                  {/* === Description Field === */}
+                  <div className="flex flex-col sm:flex-row">
+                    <div className="w-full py-2">
+                      <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                          <FormItem className="group relative w-auto sm:max-w-sm m-1">
+                            <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                              Description
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                {...field}
+                                className="h-10"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* === Available Switch Field === */}
+                    <div className="w-full py-2">
+                      <FormField
+                        control={form.control}
+                        name="is_available"
+                        render={({ field }) => (
+                          <FormItem className="group relative w-auto sm:max-w-sm m-1">
+                            <FormLabel className="text-xs px-4">Available</FormLabel>
+                            <FormControl>
+                              <SwitchInput
+                                {...field}
+                                value={!!field.value}
+                                onChange={(checked: boolean) => field.onChange(checked)}
+                                className="px-2"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+
                 </div>
               </div>
 
-              {/* === Description Field === */}
-              <div className="flex flex-col sm:flex-row">
-                <div className="w-full py-2">
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                        <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
-                          Description
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="text"
-                            {...field}
-                            className="h-10"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* === Available Switch Field === */}
-                <div className="w-full py-2">
-                  <FormField
-                    control={form.control}
-                    name="is_available"
-                    render={({ field }) => (
-                      <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                        <FormLabel className="text-xs px-4">Available</FormLabel>
-                        <FormControl>
-                          <SwitchInput
-                            {...field}
-                            value={!!field.value}
-                            onChange={(checked: boolean) => field.onChange(checked)}
-                            className="px-2"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-                  
               {/* === Repeater Fields === */}
               <div>
                 {fields.map((field, index) => (
                   <div key={field.id} className="flex gap-2 sm:flex-row flex-col">
-                    
+
                     {/* === Reapeater Option Name Field === */}
                     <div className="w-full sm:w-1/2 py-2">
                       <FormField
@@ -349,7 +424,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
                       <Button type="button" className="mb-3 size-10" variant={"destructive"} onClick={() => remove(index)} size={"icon"}><Trash2 /></Button>
                     </div>
                   </div>
-                ))} 
+                ))}
                 {/* === Add Repeater Option & Price Fields Button === */}
                 <Button type="button" className="bg-blue-500 size-10 mt-2 mb-2 hover:bg-blue-600" onClick={() => append({ option_name: '', price: 0 })}><Plus /></Button>
               </div>
@@ -358,7 +433,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
 
             {/* === Dialog Footer Buttons === */}
             <DialogFooter className="p-6  flex flex-row justify-end pt-0 w-full fixed bottom-0 right-0">
-              
+
               {/* === Cancel Form to and Close the Dialog Button === */}
               <DialogClose asChild>
                 <Button className="w-24" variant="outline">Cancel</Button>

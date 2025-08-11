@@ -40,13 +40,18 @@ export async function updateData<T extends TableName, K extends ColumnName<T>>(
   columnName: K,                                      // column Name where you check the condition
   columnValue: ColumnValue,                           // value of column for condition
   values: MySqlUpdateSetSource<Schema[T]>             // data in object form
-): Promise<void> {
+): Promise<void | { affectedRows: number }> {
 
   const table = schema[tableName]
   const column = table[columnName] as any
   const result = await db.update(table).set(values).where(eq(column, columnValue))
 
-  console.log(result)
+  const affectedRows = result[0].affectedRows;
+  console.log(affectedRows)
+
+  return { 
+    affectedRows: affectedRows
+  }
 }
 
 // ✅ DELETE with column and value

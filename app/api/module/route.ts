@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     // === Insert New Module into DB ===
     await insertData("modules", { 
-      name: name.trim(), 
+      name: name.trim().toLowerCase(), 
       label: label?.trim() ?? ""
     })
 
@@ -83,7 +83,7 @@ export async function PUT(req: NextRequest) {
 
     // === Update Module by ID ===
     await updateData("modules", "id", id!, {
-       name: name.trim(),
+       name: name.trim().toLowerCase(),
        label: label?.trim() 
       })
 

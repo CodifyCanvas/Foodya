@@ -6,7 +6,7 @@ import { ExtendedColumnDef } from "@/types/columns.data-table"
 import { Role } from "@/lib/definations"
 
 /* === Table Columns for Roles === */
-export const columns = (): ExtendedColumnDef<Role>[] => [
+export const columns = ({ refetchPermissions }: { refetchPermissions: () => void; }): ExtendedColumnDef<Role>[] => [
   
   // === Id Column ===
   {
@@ -50,6 +50,7 @@ export const columns = (): ExtendedColumnDef<Role>[] => [
       <RowActions
         data={row.original}
         className="pr-3 md:pr-5"
+        props={{ refetchPermissions }}
       />
     ),
   },

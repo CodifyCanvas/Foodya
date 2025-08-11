@@ -1,4 +1,4 @@
-import { mysqlTable, varchar, int, decimal, boolean, timestamp, datetime, mysqlEnum } from 'drizzle-orm/mysql-core';
+import { mysqlTable, varchar, int, decimal, boolean, timestamp, datetime, mysqlEnum, text } from 'drizzle-orm/mysql-core';
 import { adminSchema } from './admin-panel.schema'
 
 // Menu Categories Table
@@ -11,6 +11,7 @@ const menuCategories = mysqlTable('menu_categories', {
 // Menu Items Table
 const menuItems = mysqlTable('menu_items', {
   id: int().autoincrement().primaryKey(),
+  image: text(),
   category_id: int().notNull().references(() => menuCategories.id),
   name: varchar({ length: 255 }).notNull(),
   description: varchar({ length: 255 }),
@@ -30,7 +31,7 @@ const menuItemOptions = mysqlTable('menu_item_options', {
 const restaurantTables = mysqlTable('restaurant_tables', {
   id: int().autoincrement().primaryKey(),
   table_number: varchar({ length: 50 }).notNull(),
-  status: varchar({ length: 50 }),
+  status: mysqlEnum(['booked', 'occupied', 'available']).notNull().default('available'),
 });
 
 // Bookings Table
@@ -40,10 +41,46 @@ const bookingsTables = mysqlTable('bookings_tables', {
   customerName: varchar('customer_name', { length: 255 }).notNull(),
   advancePaid: decimal('advance_paid', { precision: 10, scale: 2 }).default('0.00'),
   bookedByUserId: int('booked_by_user_id').notNull().references(() => adminSchema.users.id),
-  status: varchar({ length: 50 }).default('Scheduled').notNull(),
+  status: mysqlEnum(['scheduled', 'booked', 'completed', 'expired', 'processing', 'cancelled']).notNull().default('scheduled'),
   reservationStart: datetime('reservation_start').notNull(),
   reservationEnd: datetime('reservation_end').notNull(),
   bookingDate: timestamp('booking_date').defaultNow().notNull(),
+});
+
+// Orders Table
+const ordersTable = mysqlTable('orders_table', {
+  id: int('id').autoincrement().primaryKey(),
+  tableId: int('table_id').references(() => restaurantTables.id),
+  waiterId: int('waiter_id').references(() => adminSchema.users.id).notNull(),
+  orderType: mysqlEnum('order_type', ['dine_In', 'drive_Thru', 'takeaway']).notNull(),
+  status: mysqlEnum(['pending', 'in_progress', 'completed']).notNull().default('pending'),
+  description: varchar('description', { length: 255 }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Order Items Table
+const orderItemsTable = mysqlTable('order_items_table', {
+  id: int('id').autoincrement().primaryKey(),
+  menuItemImage: text('menu_item_image'),
+  orderId: int('order_id').references(() => ordersTable.id).notNull(),
+  menuItemId: int('menu_item_id').references(() => menuItems.id),
+  menuItemName: varchar('menu_item_name', { length: 255 }).notNull(),
+  menuItemOptionId: int('menu_item_option_id').references(() => menuItemOptions.id),
+  menuItemOptionName: varchar('menu_item_option_name', { length: 255 }),
+  quantity: int('quantity').notNull().default(1),
+  price: decimal('price', { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Invoices Table
+const InvoicesTable = mysqlTable('invoices_table', {
+  id: int('id').autoincrement().primaryKey(),
+  orderId: int('order_id').references(() => ordersTable.id).notNull(),
+  generatedByUserId: int('menu_item_id').references(() => menuItems.id).notNull(),
+  paymentMethod: mysqlEnum('payment_method' ,['cash', 'card', 'online']).notNull().default('cash'),
+  isPaid: boolean('is_paid').default(false),
+  totalAmount: decimal('price', { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 // Export Db Table Schema -> index.ts -> export to app
@@ -52,7 +89,10 @@ export const restaurantSchema = {
   menuItems,
   menuItemOptions,
   restaurantTables,
-  bookingsTables
+  bookingsTables,
+  ordersTable,
+  orderItemsTable,
+  InvoicesTable,
 };
 
 export type RestaurantSchema = typeof restaurantSchema;

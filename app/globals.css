@@ -196,6 +196,15 @@ html::-webkit-scrollbar-thumb:hover,
   background-color: #666;           /* Hover effect */
 }
 
+/* styles/globals.css or equivalent */
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hidden {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
 /* ===============================
    Text Selection Styling
    =============================== */

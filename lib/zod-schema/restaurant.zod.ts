@@ -1,4 +1,5 @@
 import z from "zod";
+import { imageSchema } from "./index";
 
 // === Menu Category Form Schema ===
 export const menuCategoriesFormSchema = z.object({
@@ -17,6 +18,7 @@ const numberFromString = z
 // === Menu Items with Options Form Schema ===
 export const menuItemFormSchema = z.object({
   id: z.union([z.number(), z.string().transform(String)]).optional(), 
+  image: imageSchema,
   item: z.string().min(1, "Item name is required"),
   category_id: z.string().min(1, {error: "Category is required"}),
   description: z.string().optional(),
@@ -43,7 +45,7 @@ export const restaurantTablesFormSchema = z.object({
 export const bookingsTablesFormSchema = z.object({
   id: z.union([z.number(),z.string().transform(String)]).optional(),
   tableId: z.string().min(1, { error: "Oops! Please select a table to continue." }),
-  customerName: z.string().min(2, { error: "Name needs to be at least 2 characters long." }).max(50, { error: "Whoa, that’s a long name! Keep it under 50 characters." }),
+  customerName: z.string().min(2, { error: "Name needs to be at least 2 characters long." }).max(50, { error: "Whoa, that's a long name! Keep it under 50 characters." }),
   advancePaid: z.string().max(11, { error: "Hmm, that payment amount looks off. Please check again." }).optional(),
   reservationStart: z.date({ error: issue => issue.input === undefined ? "Required" : "Invalid date" }),
   reservationEnd: z.date({ error: issue => issue.input === undefined ? "Required" : "Invalid date" }),

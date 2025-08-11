@@ -1,5 +1,22 @@
 import z from "zod";
 
+/**
+ * 🖼️ Image upload schema
+ * Validates uploaded image file size & type.
+ */
+export const imageSchema = z
+  .instanceof(File, { message: "Choose an image to upload" })
+  .refine((file) => file.size <= 2 * 1024 * 1024, {
+    message: "Image must be smaller than 2MB",
+  })
+  .refine(
+    (file) => ["image/jpeg", "image/png", "image/gif"].includes(file.type),
+    {
+      message: "Unsupported format — try JPG, PNG, or GIF 🚀",
+    }
+  )
+  .optional();
+
 // Login Form Schema
 export const signInFormSchema = z.object({
   email: z.email({ error: "Email is required" })

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { ChevronDown, PencilLine, Plus, Trash2, TriangleAlert } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { ChevronDown, PencilLine, Plus, Trash2, TriangleAlert, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 import { cn } from '@/lib/utils';
@@ -17,6 +17,7 @@ import {
 
 import { useModulePermission } from '@/hooks/useModulePermission';
 import { BookingsTablesInterface } from '@/lib/definations';
+import CancelBookingDialog from './cancel-booking-dialog';
 
 interface CreateFormMultiProps {
   props?: Record<string, any>;
@@ -29,8 +30,8 @@ interface EditFormMultiProps {
 }
 
 /* === Toast for Permission Denied === */
-const showPermissionToast = () =>
-  toast.custom(
+const showPermissionToast = () => {
+  return toast.custom(
     <div className="flex items-center gap-3 bg-red-500 text-white px-5 py-3 rounded-lg shadow-lg">
       <TriangleAlert className="w-5 h-5 text-white" />
       <span>You don&apos;t have permission.</span>
@@ -39,30 +40,38 @@ const showPermissionToast = () =>
       position: 'top-right',
       duration: 4000,
     }
-  );
+  )};
 
-/* === Row Actions (Edit/Delete) === */
-export function RowActions({ data, props, className }: EditFormMultiProps) {
+
+/* === Row Actions (Edit / Cancel / Delete) === */
+export function RowActions({ data, props = {}, className }: EditFormMultiProps) {
+  const [openCancel, setOpenCancel] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
 
   const { canEdit, canDelete } = useModulePermission();
 
-  const handleEditClick = () => {
-    if (canEdit) {
-      setOpenEdit(true);
-    } else {
-      showPermissionToast();
-    }
-  };
+  /* === Action Handlers === */
+  const handleCancelClick = useCallback(() => {
+  if (canEdit) 
+    setOpenCancel(true);
+  else 
+    showPermissionToast();
+}, [canEdit]);
 
-  const handleDeleteClick = () => {
-    if (canDelete) {
-      setOpenDelete(true);
-    } else {
+  const handleEditClick = useCallback(() => {
+    if (canEdit) 
+      setOpenEdit(true) 
+    else 
       showPermissionToast();
-    }
-  };
+  }, [canEdit]);
+
+  const handleDeleteClick = useCallback(() => {
+    if (canDelete)
+      setOpenDelete(true) 
+    else 
+      showPermissionToast();
+  }, [canDelete]);
 
   return (
     <div className={cn('w-full flex flex-row justify-end items-center', className)}>
@@ -75,10 +84,19 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" className="font-rubik-400 text-xs">
+          {/* === Show Cancel if status is not cancelled or expired === */}
+          {(data.status !== 'cancelled' && data.status !== 'expired') && (
+            <DropdownMenuItem onClick={handleCancelClick}>
+              <X className="mr-2 size-4" />
+              Cancel
+            </DropdownMenuItem>
+          )}
+
           <DropdownMenuItem onClick={handleEditClick}>
             <PencilLine className="mr-2 size-4" />
             Edit
           </DropdownMenuItem>
+
           <DropdownMenuItem variant="destructive" onClick={handleDeleteClick}>
             <Trash2 className="mr-2 size-4" />
             Delete
@@ -86,7 +104,23 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {openEdit && <RoleForm open={openEdit} onOpenChange={setOpenEdit} data={data} {...props} />}
+      {/* === Dialogs for each action === */}
+      {openCancel && (
+        <CancelBookingDialog<BookingsTablesInterface>
+          open={openCancel}
+          onOpenChange={setOpenCancel}
+          data={data}
+          {...props}
+        />
+      )}
+      {openEdit && (
+        <RoleForm
+          open={openEdit}
+          onOpenChange={setOpenEdit}
+          data={data}
+          {...props}
+        />
+      )}
       {openDelete && (
         <DeleteConfirmationDialog<BookingsTablesInterface>
           open={openDelete}
@@ -100,18 +134,18 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
   );
 }
 
-/* === Create New Data Button + Form === */
-export function CreateForm({ props }: CreateFormMultiProps) {
+/* === Create New Record Button + Form === */
+export function CreateForm({ props = {} }: CreateFormMultiProps) {
   const [open, setOpen] = useState(false);
   const { canCreate } = useModulePermission();
 
-  const handleCreateClick = () => {
-    if (canCreate) {
-      setOpen(true);
-    } else {
+  /* === Create Button Click Handler === */
+  const handleCreateClick = useCallback(() => {
+    if (canCreate) 
+      setOpen(true) 
+    else 
       showPermissionToast();
-    }
-  };
+  }, [canCreate]);
 
   return (
     <>
