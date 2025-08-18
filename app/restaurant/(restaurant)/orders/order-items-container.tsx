@@ -139,7 +139,7 @@ const OrderItemsContainer: React.FC<OrderItemsContainerProps> = ({ restaurantTab
   /* === Trigger on table change === */
   useEffect(() => {
     handleTableChange();
-  }, [handleTableChange]);
+  }, [table]);
 
   return (
     <div className="px-2">

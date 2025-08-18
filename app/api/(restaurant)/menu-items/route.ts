@@ -4,9 +4,6 @@ import { getAllMenuItems } from "@/lib/crud-actions/menu-items";
 import { deslugify, mapToLabelValue } from "@/lib/utils";
 import { menuItemFormSchema } from "@/lib/zod-schema/restaurant.zod";
 import { NextRequest, NextResponse } from "next/server"
-
-import path from 'path';
-import fs from 'fs/promises';
 import { uploadImage } from "@/lib/server/helpers/imageUpload";
 
 /* ======================================

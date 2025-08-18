@@ -18,7 +18,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import {
   Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
 } from "@/components/ui/form"
-import { EyeIcon, EyeOffIcon } from "lucide-react"
+import { EyeIcon, EyeOffIcon, Loader } from "lucide-react"
 import { signInFormSchema } from "@/lib/zod-schema"
 import { signIn } from "next-auth/react"
 import toast from "react-hot-toast"
@@ -26,6 +26,7 @@ import { useRouter } from "next/navigation"
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
   const [isVisible, setIsVisible] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter();
 
   const form = useForm<z.infer<typeof signInFormSchema>>({
@@ -38,11 +39,16 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 
   async function onSubmit (values: z.infer<typeof signInFormSchema>) {
     try {
-      const result = await signIn('credentials', {
+      setIsLoading(true)
+      toast.loading("Logging in...", {
+        id: "login-loading",
+      })
+
+    const result = await signIn('credentials', {
       email: values.email,
       password: values.password,
-      redirect: false, // prevent redirect on failure
-      callbackUrl: '/chat',
+      redirect: false,
+      callbackUrl: '/restaurant/dashboard',
     });
 
     if (result?.error) {
@@ -54,12 +60,14 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
       }
     } else if (result?.ok) {
       toast.success(`Successfully logged in. Welcome back!`);
-
-      router.push('/restaurant'); 
+      router.push(result.url || '/restaurant/dashboard'); 
     }
 
     } catch (e) {
       console.log("Error from login page: ", e)
+    } finally {
+      setIsLoading(false)
+      toast.dismiss("login-loading")
     }
   }
 
@@ -153,8 +161,8 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
               />
 
               {/* Submit Button */}
-              <Button type="submit" variant="green" className="w-full max-w-sm mx-auto">
-                Login
+              <Button type="submit" disabled={isLoading} variant="green" className="w-full max-w-sm mx-auto">
+                {isLoading && <Loader className="animate-spin size-4 text-white" />} Login 
               </Button>
 
               {/* Separator */}

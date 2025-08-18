@@ -6,7 +6,7 @@ export type CartItem = {
   menuItemId: number | null;
   menuItemName: string;
   menuItemOptionId: number | null;
-  menuItemOptionName: string;
+  menuItemOptionName: string | null;
   price: number;
   quantity: number;
 };
@@ -22,7 +22,7 @@ export const useOrderCart = () => {
         i.menuItemOptionId === item.menuItemOptionId
     );
 
-    const quantityToAdd = item.quantity ?? 1;
+    const quantityToAdd = item.quantity ?? 1; 
 
     if (existing) {
       return prev.map(i =>

@@ -168,7 +168,7 @@ const GenerateInvoiceDialog = ({ disabled }: { disabled: boolean }) => {
               <p>Subtotal</p> <p>300</p>
             </div>
             <div className="flex flex-row text-neutral-500 justify-between">
-              <p>Discount %</p> <p>10 %</p>
+              <p>Discount %</p> <p>10%</p>
             </div>
             <div className="flex flex-row justify-between">
               <p>Grand Total</p> <p className="text-orange-500">270 PKR</p>

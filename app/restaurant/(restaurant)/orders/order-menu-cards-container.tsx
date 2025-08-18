@@ -31,7 +31,7 @@ const MenuCardsContainer = () => {
   // Track selected options per item
   const [selectedOptions, setSelectedOptions] = useState<Record<number, number | null>>({});
 
-  const handleOptionChange = (menuItemId: number, optionId: number) => {
+  const handleOptionChange = (menuItemId: number, optionId: number | null) => {
     setSelectedOptions(prev => ({ ...prev, [menuItemId]: optionId }));
   };
 
@@ -43,7 +43,7 @@ const MenuCardsContainer = () => {
       menuItemImage: item.image || null,
       menuItemId: item.id || 0,
       menuItemName: item.item,
-      menuItemOptionId: selectedOptionId || null,
+      menuItemOptionId: selectedOption ? selectedOption.option_id : null,
       menuItemOptionName: selectedOption?.option_name ?? '',
       price: selectedOption ? parseFloat(selectedOption.price) : item.price,
     };
@@ -97,8 +97,11 @@ const MenuCardsContainer = () => {
                     price: parseFloat(opt.price),
                   }))}
                   onValueChange={(v) => {
-                    if (!v) return;
-                    handleOptionChange(item.id || 0, parseInt(v));
+                    if (!v) {
+                      handleOptionChange(item.id || 0, null);
+                    } else {
+                      handleOptionChange(item.id || 0, parseInt(v));
+                    }
                   }}
                 />
               ) : (
