@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -20,8 +21,17 @@ export default function Home() {
             </code>
             .
           </li>
-          <li className="tracking-[-.01em]">
+          <li className="tracking-[-.01em] mb-2">
             Save and see your changes instantly.
+          </li>
+          <li className="tracking-[-.01em]">
+            Move to application{" "}
+            <Link href={'http://localhost:3000/restaurant/dashboard'}>
+            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
+              .../restaurant/dashboard
+            </code>
+            </Link>
+            .
           </li>
         </ol>
 

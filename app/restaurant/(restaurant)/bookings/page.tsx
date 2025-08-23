@@ -4,11 +4,11 @@ import useSWR from 'swr';
 import { Loader } from 'lucide-react';
 
 import { DataTable } from '@/components/DataTable/data-table';
-import { BookingsWithTablesInterface, columns } from './columns';
+import { columns } from './columns';
 import { CreateForm } from './table-actions';
 import { useModulePermission } from '@/hooks/useModulePermission';
 import AccessDenied from '@/app/errors/access-control-view/access-denied';
-import { BookingsTablesInterface } from '@/lib/definations';
+import { BookingsWithTablesInterface } from '@/lib/definations';
 
 /* === Data Fetcher === */
 const fetcher = (url: string) => fetch(url).then(res => res.json());

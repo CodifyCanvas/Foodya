@@ -1,99 +1,172 @@
-// User object returned from API
+// === User Interface Definition ===
 export interface User {
-    id?: number;
-    name: string;
-    password: string;
-    email: string;
-    is_active: boolean;
-    role_id: string;
-    role_name: string;
-    created_at: Date;
+  id?: number;
+  name: string;
+  password: string;
+  email: string;
+  is_active: boolean;
+  role_id: string;
+  role_name: string;
+  created_at: Date;
 }
 
-// Permissions assigned to a role for a specific module
+// === Permissions assigned to a role for a specific module (RBAC) ===
 export interface Permissions {
-    id: number,
-    role_id: number,
-    role_name: string,
-    module_id: number,
-    module_name: string,
-    can_view: boolean,
-    can_create: boolean,
-    can_edit: boolean,
-    can_delete: boolean,
+  id: number;
+  role_id: number;
+  role_name: string;
+  module_id: number;
+  module_name: string;
+  can_view: boolean;
+  can_create: boolean;
+  can_edit: boolean;
+  can_delete: boolean;
 }
 
-// Role object used in dropdowns or display
+// === Role object used in dropdowns or display ===
 export interface RoleSelectInput {
-    label: string;
-    value: string;
+  label: string;
+  value: string;
 }
 
-/* === Module Type Definition === */
+// === Module Interface Definition ===
 export interface ModuleInterface {
   id?: number;
   name: string;
   label: string;
 }
 
-/* === Role Type Definition === */
+// === Role Interface Definition ===
 export interface Role {
   id?: number;
   role: string;
 }
 
-/* === Role Type Definition === */
+// === Menu Categories Interface Definition ===
 export interface MenuCategories {
   id?: number;
   name: string;
-  description: string; 
+  description: string;
 }
 
-
-/* === Mune Items Definition === */
+// === Menu Item with Options Interface Definition ===
 export interface ItemWithOptions {
   id?: number;
-  image?: string | null; // Optional image file
+  image?: string | null;
   item: string;
   description: string;
   price: number;
   is_available: boolean;
   category: string;
   category_id: string;
-  options: { option_id: number; option_name: string; price: string; }[];  
-};
-
-// Categories object used in dropdowns or display
-export interface CategoriesSelectInput {
-    label: string;
-    value: string;
+  options: {
+    option_id: number;
+    option_name: string;
+    price: string;
+  }[];
 }
 
-/* === Module Type Definition === */
+// === Categories object used in dropdowns or display ===
+export interface CategoriesSelectInput {
+  label: string;
+  value: string;
+}
+
+// === Restaurant Tables Interface Definition ===
 export interface RestaurantTablesInterface {
   id?: number;
   table_number: string;
   status: 'booked' | 'occupied' | 'available';
 }
 
-/* === Bookings Tables Type Definition === */
+// === Booking Tables Interface Definition ===
 export interface BookingsTablesInterface {
   id: number;
-  tableId: string; 
+  tableId: string;
   tableName: string | null;
   customerName: string;
   advancePaid: string | null;
   status: 'scheduled' | 'booked' | 'completed' | 'processing' | 'expired' | 'cancelled';
-  bookedByUserId: number; 
+  bookedByUserId: number;
   bookedByUserName: string | null;
-  bookedByUserEmail: string | null; 
+  bookedByUserEmail: string | null;
   reservationStart: Date;
-  reservationEnd: Date;  
-  bookingDate: Date;      
+  reservationEnd: Date;
+  bookingDate: Date;
 }
 
-// Categories object used in dropdowns or display
+// === Booking with Tables Interface Definition for fetching from api data ===
+export interface BookingsWithTablesInterface {
+  bookings: BookingsTablesInterface[]
+  tables: TablesSelectInput[]
+}
+
+// === Tables object used in dropdowns or display ===
 export interface TablesSelectInput {
-    label: string;
-    value: string;
+  label: string;
+  value: string;
+}
+
+// === Invoice Page Response Interface ===
+export interface InvoiceResponse {
+  invoice: InvoiceDetail;
+  order: OrderDetail;
+  items: OrderItem[];
+  generatedBy: generatedBy;
+}
+
+// === Order Response From the API (Order Page) ===
+export interface OrderResponse {
+  order?: OrderDetail;
+  items: OrderItem[];
+  booking?: OrderBookingInfo | null;
+}
+
+// === Order Details Interface ===
+export interface OrderDetail {
+  id: number;
+  tableId: number | null;
+  waiterId: number;
+  orderType: 'dine_in' | 'drive_thru' | 'takeaway';
+  status: 'pending' | 'in_progress' | 'completed';
+  description: string | null;
+  createdAt: string;
+}
+
+// === Order Item Interface ===
+export interface OrderItem {
+  id: number;
+  menuItemImage: string | null;
+  menuItemId: number;
+  menuItemName: string;
+  menuItemOptionId: number | null;
+  menuItemOptionName: string | null;
+  quantity: number;
+  price: string;
+}
+
+// === Booking Info included with Order ===
+export interface OrderBookingInfo {
+  customerName: string;
+  advancePaid: string;
+}
+
+// === Invoice Detail Interface ===
+export interface InvoiceDetail {
+  id: number;
+  orderId: number;
+  generatedByUserId: number;
+  customerName: string;
+  subTotalAmount: string;
+  totalAmount: string;
+  discount: string;
+  paymentMethod: 'cash' | 'card' | 'online';
+  isPaid: boolean;
+  createdAt: string;
+}
+
+// === Invoice Generated By User Info ===
+export interface generatedBy {
+  name: string;
+  email: string;
 }

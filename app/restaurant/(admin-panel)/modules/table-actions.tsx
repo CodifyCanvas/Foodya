@@ -88,7 +88,7 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
 
       {openEdit && <RoleForm open={openEdit} onOpenChange={setOpenEdit} data={data} {...props} />}
       {openDelete && (
-        <DeleteConfirmationDialog<Role>
+        <DeleteConfirmationDialog<ModuleInterface>
           open={openDelete}
           onOpenChange={setOpenDelete}
           data={data}

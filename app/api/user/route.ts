@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
-import { checkDuplicate, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions"
-import { getAllUserWithRole, getUserWithRole } from "@/lib/crud-actions/users";
+import { checkDuplicate, insertData, updateData } from "@/lib/crud-actions/general-actions"
+import {  getUserWithRole } from "@/lib/crud-actions/users";
 import { roleFormSchema } from "@/lib/zod-schema"
 import { NextRequest, NextResponse } from "next/server"
 

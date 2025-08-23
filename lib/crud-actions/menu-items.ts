@@ -24,16 +24,16 @@ export const getAllMenuItems = async (
   }
 
   // Start base query
-  let query = db
+  const baseQuery = db
     .select()
     .from(menuItems)
     .leftJoin(menuItemOptions, eq(menuItems.id, menuItemOptions.menu_item_id))
     .leftJoin(menuCategories, eq(menuItems.category_id, menuCategories.id));
 
   // Apply conditions only if there are any
-  if (conditions.length > 0) {
-    query = query.where(and(...conditions));
-  }
+  const query = conditions.length > 0
+    ? baseQuery.where(and(...conditions))
+    : baseQuery;
 
   const items = await query;
 

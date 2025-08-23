@@ -7,7 +7,8 @@ export async function GET() {
     await conn.ping();
     conn.release();
     return NextResponse.json({ message: "Database Connection status is ok" } , {status : 200});
-  } catch (error) {
+  } catch (e) {
+    console.error("[GET /api/db-health] Failed to fetch Database Health: ", e)
     return NextResponse.json({ message: "Database connection failed" }, { status: 500 });
   }
 }

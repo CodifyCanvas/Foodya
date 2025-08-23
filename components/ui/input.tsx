@@ -24,7 +24,7 @@ function Input({
   ),
   minimal: cn(
     "bg-transparent border-0 border-b-0 text-sm px-0 py-1 outline-none w-full transition-all",
-    "focus:border-b focus:border-gray-500", // ← show bottom border only on focus
+    "focus:border-b focus:border-neutral-500", // ← show bottom border only on focus
     "placeholder:text-muted-foreground"
   ),
 }

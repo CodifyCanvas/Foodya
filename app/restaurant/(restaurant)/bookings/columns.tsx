@@ -7,11 +7,6 @@ import { BookingsTablesInterface, TablesSelectInput } from "@/lib/definations"
 import { Badge } from "@/components/ui/badge"
 import { formatDateWithFns } from "@/lib/date-fns"
 
-export interface BookingsWithTablesInterface {
-  bookings: BookingsTablesInterface[]
-  tables: TablesSelectInput[]
-}
-
 /* === Table Columns for Tables === */
 export const columns = (props: { tables: TablesSelectInput[] }): ExtendedColumnDef<BookingsTablesInterface>[] => [
 

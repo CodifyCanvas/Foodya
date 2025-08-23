@@ -21,21 +21,6 @@ export async function getAllOrdersByTable(tableId: number) {
 
   if (!latestOrder) return [];
 
-const tableRecord = await db
-  .select()
-  .from(restaurant_tables)
-  .where(eq(restaurant_tables.id, tableId))
-  .limit(1);
-
-console.log("Table status:", tableRecord[0]?.status);
-
-  const currentBookings = await db
-  .select()
-  .from(bookings)
-  .where(eq(bookings.tableId, tableId));
-
-  console.log("📋 Current bookings for table:", tableId, currentBookings);
-
   // Step 2: Check if there's a paid invoice for this order
   const [invoice] = await db
     .select()

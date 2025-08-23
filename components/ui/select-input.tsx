@@ -14,12 +14,15 @@ import { cn } from '@/lib/utils';
 type Option = {
   label: string;
   value: string;
+  optDisabled?: boolean;
+  optHide?: boolean;
 };
 
 type SelectInputProps = {
   value?: string;
   onChange: (value: string | undefined) => void;
   className?: string;
+  disabled?: boolean;
   onBlur?: () => void;
   name?: string;
   required?: boolean;
@@ -31,6 +34,7 @@ const SelectInput = ({
   value = '',
   onChange,
   className,
+  disabled,
   onBlur,
   name,
   required = false,
@@ -42,6 +46,7 @@ const SelectInput = ({
       value={value ?? ''}
       onValueChange={(val) => onChange(val === '' ? undefined : val)}
       required={required}
+      disabled={disabled}
     >
       <SelectTrigger
         className={cn(
@@ -54,7 +59,7 @@ const SelectInput = ({
       <SelectContent className="font-rubik-400">
         <SelectGroup>
           {options.map((opt) => (
-            <SelectItem key={opt.value} value={opt.value}>
+            <SelectItem key={opt.value} value={opt.value} disabled={opt.optDisabled} hidden={opt.optHide}>
               {opt.label}
             </SelectItem>
           ))}

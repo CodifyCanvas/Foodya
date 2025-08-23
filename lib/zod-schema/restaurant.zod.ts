@@ -50,3 +50,15 @@ export const bookingsTablesFormSchema = z.object({
   reservationStart: z.date({ error: issue => issue.input === undefined ? "Required" : "Invalid date" }),
   reservationEnd: z.date({ error: issue => issue.input === undefined ? "Required" : "Invalid date" }),
 })
+
+// === Invoices Form Schema === 
+export const invoiceFormSchema = z.object({
+  customerName: z.string().max(50, { error: "Whoa, that's a long name! Keep it under 50 characters." }).optional(),
+  paymentMethod: z.enum(["cash", "card", "online"]),
+  orderType: z.enum(["dine_in", "drive_thru", "takeaway"]),
+  subTotalAmount: z.string().max(11, { error: "Hmm, that sub total amount looks off. Please check again." }),
+  discount: z.string().max(11, { error: "Hmm, that discount percentage amount looks off. Please check again." }),
+  totalAmount: z.string().max(11, { error: "Hmm, that total amount looks off. Please check again." }),
+  advancePaid: z.string().max(11, { error: "Hmm, that advance paid amount looks off. Please check again." }),
+  grandTotal: z.string().max(11, { error: "Hmm, that grand total amount looks off. Please check again." }),
+})

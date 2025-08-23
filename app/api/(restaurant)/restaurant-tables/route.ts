@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     // === Insert new restaurant table into DB ===
     await insertData("restaurantTables", { 
       table_number: table_number.trim(), 
-      status: status?.trim().toLowerCase() ?? "available"
+      status: status?.trim() as "booked" | "occupied" | "available"
     })
 
     return NextResponse.json(
@@ -104,7 +104,7 @@ export async function PUT(req: NextRequest) {
     // === Update restaurant table record by ID ===
     await updateData("restaurantTables", "id", id!, {
       table_number: table_number.trim(),
-      status: status?.trim()
+      status: status?.trim() as "booked" | "occupied" | "available"
     })
 
     return NextResponse.json(

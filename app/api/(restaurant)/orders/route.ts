@@ -23,8 +23,6 @@ export async function GET(req: NextRequest) {
 
     const orders = await getAllOrdersByTable(Number(tableParam));
 
-    console.log(`[GET ${path}] Fetched orders for table: ${tableParam} :`, orders);
-
     return NextResponse.json( orders, { status: 200 })
   } catch (error) {
     console.error(`[GET ${path}] Failed to fetch order and its items:`, error)

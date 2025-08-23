@@ -38,7 +38,6 @@ export const getAllBookingsTables = async (): Promise<BookingsTablesInterface[]>
 };
 
 type BookingStatus = 'scheduled' | 'booked' | 'completed' | 'expired' | 'processing' | 'cancelled';
-type TableStatus = 'available' | 'booked' | 'occupied';
 
 export async function syncBookingAndTableStatuses() {
   const now = new Date();
@@ -56,7 +55,7 @@ export async function syncBookingAndTableStatuses() {
 
     const reservationStart = new Date(booking.reservationStart);
     const reservationEnd = new Date(booking.reservationEnd);
-    const tableStatus = table.status as TableStatus;
+    const tableStatus = table.status;
     const bookingStatus = booking.status as BookingStatus;
 
     const thirtyMinutesFromNow = new Date(now.getTime() + 30 * 60 * 1000);
@@ -156,7 +155,7 @@ export async function syncBookingAndTableStatuses() {
       tableStatus === 'available'
     ) {
       // Only update table status to 'booked'
-      if (tableStatus !== 'booked') {
+      if (table.status !== 'booked') {
         await db
           .update(restaurantTables)
           .set({ status: 'booked' })
@@ -224,7 +223,6 @@ export async function updateTableAndBookingStatus(tableId: number, mode: 'check-
       .limit(1);
 
     const booking = activeBookingResult[0];
-    console.log('Booking for check-in:', booking);
 
     // === CASE: Valid booking found → mark it as 'processing' ===
     if (booking) {

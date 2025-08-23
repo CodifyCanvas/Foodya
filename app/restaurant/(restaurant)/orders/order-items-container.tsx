@@ -5,7 +5,6 @@ import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { Trash2 } from 'lucide-react';
 
-/* === UI Components === */
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,11 +12,10 @@ import { ComboboxInput } from '@/components/ui/combobox-input';
 import InputWithPlusMinusButtons from '@/components/custom/input-with-plus-minus-buttons';
 import GenerateInvoiceDialog from './generate-invoice-dialog';
 
-/* === Hooks & Types === */
 import { useOrderCartContext } from '@/hooks/context/OrderCartContext';
 import { CartItem } from '@/hooks/use-order-cart';
 import { RestaurantTablesInterface } from '@/lib/definations';
-import { OrderResponse } from './page';
+import { OrderResponse } from '@/lib/definations';
 import { refreshData } from '@/lib/swr';
 
 interface OrderItemsContainerProps {
@@ -134,7 +132,9 @@ const OrderItemsContainer: React.FC<OrderItemsContainerProps> = ({ restaurantTab
   const discountAmount = (discountValue / 100) * subtotal;
 
   // Final total after advance and discount
-  const total = subtotal - advancePaid - discountAmount;
+  const total = subtotal - discountAmount;
+
+  const grandTotal = total - advancePaid;
 
   /* === Trigger on table change === */
   useEffect(() => {
@@ -255,11 +255,6 @@ const OrderItemsContainer: React.FC<OrderItemsContainerProps> = ({ restaurantTab
             <span>{subtotal.toFixed(2)} PKR</span>
           </p>
 
-          {advancePaid > 0 && (<p className="flex justify-between w-full">
-            <span>Arrear</span>
-            <span>{advancePaid} PKR</span>
-          </p>)}
-
           <div className="flex justify-between items-center w-full">
             <span>Discount %</span>
             <Input
@@ -271,26 +266,47 @@ const OrderItemsContainer: React.FC<OrderItemsContainerProps> = ({ restaurantTab
             />
           </div>
 
+          <p className="flex justify-between w-full">
+            <span>total</span>
+            <span>{total.toFixed(2)} PKR</span>
+          </p>
+
+          {advancePaid > 0 && (<p className="flex justify-between w-full">
+            <span>Arrear</span>
+            <span>{advancePaid} PKR</span>
+          </p>)}
+
           <p className="flex justify-between w-full font-medium mt-2">
-            <span>Total</span>
+            <span>Grand Total</span>
             <span className="text-orange-600">
-              {Math.round(Number(total.toFixed(2)))} PKR
+              {Math.round(Number(grandTotal.toFixed(2)))} PKR
             </span>
           </p>
 
-          {advancePaid > subtotal && (
+          {/* {advancePaid > subtotal && (
             <p className="text-orange-500 text-sm">
-              You&apos;ve overpaid by {(advancePaid - subtotal).toFixed(2)} PKR. We&apos;ll refund the extra.
+              You&apos;ve overpaid by {(advancePaid - subtotal).toFixed(2)} PKR.
             </p>
-          )}
+          )} */}
         </div>
 
         {/* === Action Buttons === */}
         <div className="flex gap-2 w-full px-2 justify-center">
-          <GenerateInvoiceDialog disabled={!cart.length} />
+
+          <GenerateInvoiceDialog
+            disabled={!cart.length}
+            mode="create"
+            data={{
+              cart: cart,
+              footer: { subtotal, discount: discountValue, total, advancePaid, grandTotal},
+              order: orderedMenu?.order,
+              booking: orderedMenu?.booking,
+            }}
+          />
+
           <Button
             className="min-w-1/3"
-            disabled={!table}
+            disabled={!table || cart.length === 0}
             variant="green"
             onClick={handlePlaceOrder}
           >

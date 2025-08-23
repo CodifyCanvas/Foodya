@@ -3,24 +3,15 @@
 import { schema } from "@/lib/drizzle-schema";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
+import { Permissions as PermissionType } from "../definations";
 
-const modules = schema.modules
-const roles = schema.roles
-const permissions = schema.permissions
+// === Tables ===
+const modules = schema.modules;
+const roles = schema.roles;
+const permissions = schema.permissions;
 
-type PermissionDetails = {
-  id: number;
-  role_id: number;
-  role_name: string;
-  module_id: number;
-  module_name: string;
-  can_view: boolean;
-  can_create: boolean;
-  can_edit: boolean;
-  can_delete: boolean;
-};
-
-export const getPermissionsViaRoleId = async (id: number): Promise<PermissionDetails[]> => {
+// === Get permissions assigned to a specific role ID ===
+export const getPermissionsViaRoleId = async (id: number): Promise<PermissionType[]> => {
   const result = await db
     .select({
       id: permissions.id,
@@ -38,5 +29,16 @@ export const getPermissionsViaRoleId = async (id: number): Promise<PermissionDet
     .innerJoin(roles, eq(permissions.role_id, roles.id))
     .innerJoin(modules, eq(permissions.module_id, modules.id));
 
-  return result;
+  // === Normalize result and ensure fallback values ===
+  return result.map((row) => ({
+    id: row.id,
+    role_id: row.role_id ?? 0,
+    role_name: row.role_name,
+    module_id: row.module_id ?? 0,
+    module_name: row.module_name,
+    can_view: row.can_view ?? false,
+    can_create: row.can_create ?? false,
+    can_edit: row.can_edit ?? false,
+    can_delete: row.can_delete ?? false,
+  }));
 };

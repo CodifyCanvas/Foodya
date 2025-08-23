@@ -12,38 +12,6 @@ import OrderItemsContainer from './order-items-container';
 import OrderCategoryTags from './order-category-tags';
 import { OrderCartProvider } from '@/hooks/context/OrderCartContext';
 
-export interface OrderResponse {
-  order: OrderDetail;
-  items: OrderItem[];
-  booking: OrderBookingInfo | null;
-}
-export interface OrderDetail {
-    id: number;
-    tableId: number | null;
-    waiterId: number;
-    orderType: 'dine_In' | 'drive_thru' | 'takeaway';
-    status: 'pending' | 'in_progress' | 'completed';
-    description: string | null;
-    createdAt: string; // or Date if parsed
-}
-
-export interface OrderItem {
-  id: number;
-  menuItemId: number;
-  menuItemImage: string | null;
-  menuItemName: string;
-  menuItemOptionId: number | null;
-  menuItemOptionName: string | null;
-  quantity: number;
-  price: string; // or number, depending on usage
-}
-
-export interface OrderBookingInfo {
-  customerName: string;
-  advancePaid: string;
-}
-
-
 /* === Data Fetcher === */
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
