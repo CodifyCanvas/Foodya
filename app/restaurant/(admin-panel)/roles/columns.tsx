@@ -34,7 +34,7 @@ export const columns = (): ExtendedColumnDef<Role>[] => [
       />
     ),
     cell: ({ row }) => (
-      <div>{row.original.role}</div>
+      <div className="capitalize">{row.original.role}</div>
     ),
   },
 

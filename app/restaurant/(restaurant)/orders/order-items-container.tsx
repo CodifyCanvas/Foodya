@@ -27,6 +27,7 @@ const OrderItemsContainer: React.FC<OrderItemsContainerProps> = ({ restaurantTab
   const [table, setTable] = useState<string>('');
   const [orderedMenu, setOrderedMenu] = useState<OrderResponse>();
   const [discountValue, setDiscountValue] = useState<number>(0);
+  const [invoiceDialogIsOpen, setInvoiceDialogIsOpen] = useState<boolean>(false);
 
   /* === Cart Context === */
   const { cart, updateQuantity, removeItem, clearCart, addItem } = useOrderCartContext();
@@ -51,9 +52,9 @@ const OrderItemsContainer: React.FC<OrderItemsContainerProps> = ({ restaurantTab
         response.items.forEach((item) => {
           const cartItem: CartItem = {
             menuItemImage: item.menuItemImage || null,
-            menuItemId: item.menuItemId,
+            menuItemId: Number(item.menuItemId),
             menuItemName: item.menuItemName,
-            menuItemOptionId: item.menuItemOptionId,
+            menuItemOptionId: Number(item.menuItemOptionId),
             menuItemOptionName: item.menuItemOptionName || '',
             price: parseFloat(item.price),
             quantity: item.quantity,
@@ -293,17 +294,25 @@ const OrderItemsContainer: React.FC<OrderItemsContainerProps> = ({ restaurantTab
         {/* === Action Buttons === */}
         <div className="flex gap-2 w-full px-2 justify-center">
 
-          <GenerateInvoiceDialog
+          {/* === Generate Invoice Buttons === */}
+          <Button
+            className="min-w-1/3"
             disabled={!cart.length}
+            variant="secondary"
+            onClick={() => setInvoiceDialogIsOpen(true)}
+          >
+            Generate Invoice
+          </Button>
+
+          {/* === Generate Invoice Dialog === */}
+          <GenerateInvoiceDialog
+            isOpen={invoiceDialogIsOpen}
+            setIsOpen={setInvoiceDialogIsOpen}
             mode="create"
-            data={{
-              cart: cart,
-              footer: { subtotal, discount: discountValue, total, advancePaid, grandTotal},
-              order: orderedMenu?.order,
-              booking: orderedMenu?.booking,
-            }}
+            data={{ cart: cart, footer: { subtotal, discount: discountValue, total, advancePaid, grandTotal }, order: orderedMenu?.order, booking: orderedMenu?.booking, }}
           />
 
+          {/* === Place OR Update a order Button === */}
           <Button
             className="min-w-1/3"
             disabled={!table || cart.length === 0}
@@ -312,6 +321,8 @@ const OrderItemsContainer: React.FC<OrderItemsContainerProps> = ({ restaurantTab
           >
             {orderedMenu?.order?.id ? 'Update Order' : 'Place Order'}
           </Button>
+
+          {/* === Reset the complete Container Button === */}
           <Button
             className="bg-red-400 hover:bg-red-500"
             size="icon"

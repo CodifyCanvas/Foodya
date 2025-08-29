@@ -142,7 +142,6 @@ export async function POST(req: NextRequest) {
 /* =======================================================
 === [PUT] Update an Existing Menu Item and Its Options ===
 ======================================================= */
-
 export async function PUT(req: NextRequest) {
   try {
     const session = await auth();

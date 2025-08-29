@@ -51,9 +51,9 @@ const bookingsTables = mysqlTable('bookings_tables', {
 const ordersTable = mysqlTable('orders_table', {
   id: int('id').autoincrement().primaryKey(),
   tableId: int('table_id').references(() => restaurantTables.id),
-  waiterId: int('waiter_id').references(() => adminSchema.users.id).notNull(),
+  waiterId: int('waiter_id').references(() => adminSchema.users.id),
   orderType: mysqlEnum('order_type', ['dine_in', 'drive_thru', 'takeaway']).notNull(),
-  status: mysqlEnum(['pending', 'in_progress', 'completed']).notNull().default('pending'),
+  status: mysqlEnum(['pending', 'in_progress', 'completed']).default('pending').notNull(),
   description: varchar('description', { length: 255 }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
@@ -69,7 +69,6 @@ const orderItemsTable = mysqlTable('order_items_table', {
   menuItemOptionName: varchar('menu_item_option_name', { length: 255 }),
   quantity: int('quantity').notNull().default(1),
   price: decimal('price', { precision: 10, scale: 2 }).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 // Invoices Table
@@ -83,7 +82,7 @@ const InvoicesTable = mysqlTable('invoices_table', {
   totalAmount: decimal('total_amount', { precision: 10, scale: 2 }).notNull(),
   advancePaid: decimal('advance_paid', { precision: 10, scale: 2 }).default('0.00'),
   grandTotal: decimal('grand_total',{ precision: 10, scale: 2 }).default('0.00').notNull(),
-  paymentMethod: mysqlEnum('payment_method' ,['cash', 'card', 'online']).notNull().default('cash'),
+  paymentMethod: mysqlEnum('payment_method' ,['cash', 'card', 'online']),
   isPaid: boolean('is_paid').default(false),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });

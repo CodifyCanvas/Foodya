@@ -38,7 +38,7 @@ export const columns = (props: { roles: RoleSelectInput[] }): ExtendedColumnDef<
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
-    cell: ({ row }) => <div>{row.original.name}</div>,
+    cell: ({ row }) => <div className="capitalize">{row.original.name}</div>,
   },
 
   // === Email Column ===
@@ -56,7 +56,7 @@ export const columns = (props: { roles: RoleSelectInput[] }): ExtendedColumnDef<
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Role" filter={props.roles} />
     ),
-    cell: ({ row }) => <div>{row.original.role_name}</div>,
+    cell: ({ row }) => <div className="capitalize">{row.original.role_name}</div>,
   },
 
   // === Status Column (Active/Inactive) ===

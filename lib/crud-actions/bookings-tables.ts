@@ -1,4 +1,4 @@
-// use server';
+'use server';
 
 import { and, desc, eq, gte, lte, or } from "drizzle-orm";
 import { db } from "../db";

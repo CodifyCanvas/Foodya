@@ -38,7 +38,7 @@ export function ComboboxInput({ options, placeholder = "Select a option", onSele
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className="w-full justify-between"
+                    className={`w-full justify-between ${value ? 'text-black' : 'text-neutral-500'} font-rubik-400`}
                 >
                     {value
                         ? options.find((framework) => framework.value === value)?.label

@@ -55,7 +55,7 @@ const ModulesPage = () => {
 
       <div className='w-full min-h-full flex flex-1 flex-col-reverse lg:flex-row gap-2'>
         <div className='w-full lg:w-2/3 min-h-96 rounded-lg p-1'><MenuCardsContainer /></div>
-        <div className='w-full lg:w-1/3 min-h-96 h-fit rounded-lg bg-white p-1'><OrderItemsContainer restaurantTables={tables ?? []} /></div>
+        <div className='w-full lg:w-1/3 min-w-80 min-h-96 h-fit rounded-lg bg-white p-1'><OrderItemsContainer restaurantTables={tables ?? []} /></div>
       </div>
 
     </div>

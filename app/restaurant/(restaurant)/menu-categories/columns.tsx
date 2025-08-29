@@ -45,8 +45,7 @@ export const columns = (): ExtendedColumnDef<MenuCategories>[] => [
       <div>Description</div>
     ),
     cell: ({ row }) => {
-  const description = `${row.original.description}${row.original.description}${row.original.description}${row.original.description}`;
-  // const description = row.original.description;
+  const description = row.original.description;
   const truncated = description.length > 30 
     ? `${description.slice(0, 30)}...` 
     : description;

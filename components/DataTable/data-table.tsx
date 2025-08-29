@@ -29,6 +29,7 @@ import { DataTableViewOptions } from "./data-table-view-options"
 import { Search } from "lucide-react"
 import { DataTableExport } from "./data-table-export"
 import { ExtendedColumnDef } from "@/types/columns.data-table"
+import { ScrollArea, ScrollBar } from "../ui/scroll-area"
 
 interface DataTableProps<TData, TValue> {
   columns: ExtendedColumnDef<TData, TValue>[]
@@ -126,8 +127,9 @@ const defaultVisibility = Object.fromEntries(
         </div>
       </div>
 
-      <div className="border-y" id="table-to-print">
-        <Table>
+      <div className="border-y overflow-x-auto" id="table-to-print">
+        <ScrollArea className="w-[calc(100vw-1rem)] md:w-[calc(100vw-18rem)] overflow-x-auto">
+        <Table className="min-w-full">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -171,6 +173,9 @@ const defaultVisibility = Object.fromEntries(
             )}
           </TableBody>
         </Table>
+
+        <ScrollBar orientation="horizontal" />
+        </ScrollArea>
       </div>
 
       <DataTablePagination table={table} />

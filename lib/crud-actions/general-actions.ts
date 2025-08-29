@@ -1,8 +1,10 @@
 "use server";
+
 import { db } from '@/lib/db'
 import { schema } from '@/lib/drizzle-schema';
 import { asc, eq } from 'drizzle-orm'
 import type { MySqlUpdateSetSource } from 'drizzle-orm/mysql-core'
+import { MySql2Database, MySql2Transaction } from 'drizzle-orm/mysql2';
 
 type Schema = typeof schema
 type TableName = keyof Schema
@@ -21,12 +23,16 @@ export async function getAllData<T extends TableName>(
   return result as Schema[T]["$inferSelect"][];
 }
 
+type DBExecutor = MySql2Database<typeof schema> | MySql2Transaction<typeof schema>;
+
 // ✅ INSERT
 export async function insertData<T extends TableName>(
   tableName: T,                                       // table name 
-  data: Schema[T]['$inferInsert']                     // data in object form 
+  data: Schema[T]['$inferInsert'],                     // data in object form 
+  tx?: DBExecutor,
 ): Promise<{ insertId: number }> {
-  const result = await db.insert(schema[tableName]).values(data).execute();
+  const executor = tx ?? db; // fallback to db if tx is not provided
+  const result = await executor.insert(schema[tableName]).values(data);
   const insertResult = result[0];
   
   return {
@@ -39,12 +45,15 @@ export async function updateData<T extends TableName, K extends ColumnName<T>>(
   tableName: T,                                       // table Name
   columnName: K,                                      // column Name where you check the condition
   columnValue: ColumnValue,                           // value of column for condition
-  values: MySqlUpdateSetSource<Schema[T]>             // data in object form
+  values: MySqlUpdateSetSource<Schema[T]>,            // data in object form
+  tx?: DBExecutor,
 ): Promise<void | { affectedRows: number }> {
 
-  const table = schema[tableName]
-  const column = table[columnName] as any
-  const result = await db.update(table).set(values).where(eq(column, columnValue))
+  const table = schema[tableName];
+  const column = table[columnName] as any;
+  const executor = tx ?? db;
+
+  const result = await executor.update(table).set(values).where(eq(column, columnValue))
 
   const affectedRows = result[0].affectedRows;
 
@@ -57,11 +66,14 @@ export async function updateData<T extends TableName, K extends ColumnName<T>>(
 export async function deleteData<T extends TableName, K extends ColumnName<T>>(
   tableName: T,                                       // table name
   columnName: K,                                      // column Name where you check the condition
-  columnValue: ColumnValue                            // value of column for condition
+  columnValue: ColumnValue,                            // value of column for condition
+  tx?: DBExecutor,
 ): Promise<void> {
   const table = schema[tableName]
   const column = table[columnName] as any
-  await db.delete(table).where(eq(column, columnValue))
+  const executor = tx ?? db;
+
+  await executor.delete(table).where(eq(column, columnValue))
 }
 
 export async function checkDuplicate<T extends TableName, K extends ColumnName<T>>(

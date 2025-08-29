@@ -14,7 +14,7 @@ export const getAllMenuItems = async (
 ): Promise<ItemWithOptions[]> => {
 
   const conditions = [];
-
+  
   if (categoryName) {
     conditions.push(eq(menuCategories.name, categoryName));
   }

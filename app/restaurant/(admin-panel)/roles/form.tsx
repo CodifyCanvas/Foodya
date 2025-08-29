@@ -64,7 +64,7 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
   }, [data, manualReset, form])
 
   /* === Submit Handler === */
-  async function onSubmit(formValues: z.infer<typeof roleFormSchema>) {
+  async function onSubmit(values: z.infer<typeof roleFormSchema>) {
     const API_URL = "/api/role";
     const isEditing = !!data?.id;
 
@@ -73,7 +73,7 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(formValues),
+      body: JSON.stringify(isEditing ? {id : values.id, role: values.role, previousRole: data.role } : values ),
     }
 
     try {

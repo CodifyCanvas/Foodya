@@ -9,11 +9,12 @@ type SwitchInputProps = {
   onChange: (checked: boolean) => void;
   onBlur?: () => void;
   name?: string;
+  id?: string;
   ref?: React.Ref<any>;
   className?: string
 };
 
-const SwitchInput = ({ value, onChange, onBlur, name, ref, className }: SwitchInputProps) => {
+const SwitchInput = ({ value, onChange, onBlur, name, ref, id, className }: SwitchInputProps) => {
   return (
     <div className={className}>
       <div className="relative inline-grid h-7 grid-cols-[1fr_1fr] items-center text-sm font-medium">
@@ -23,6 +24,7 @@ const SwitchInput = ({ value, onChange, onBlur, name, ref, className }: SwitchIn
           onBlur={onBlur}
           name={name}
           ref={ref}
+          id={id}
           className="peer  data-[state=unchecked]:bg-input/50 absolute inset-0 h-[inherit] w-14 [&_span]:z-10 [&_span]:size-6.5 [&_span]:transition-transform [&_span]:duration-300 [&_span]:ease-[cubic-bezier(0.16,1,0.3,1)] [&_span]:data-[state=checked]:translate-x-7 [&_span]:data-[state=checked]:rtl:-translate-x-7"
           aria-label="Switch with permanent icon indicators"
         />

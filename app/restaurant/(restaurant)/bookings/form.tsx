@@ -31,7 +31,7 @@ import toast from 'react-hot-toast'
 import { refreshData } from "@/lib/swr"
 import { BookingsTablesInterface } from "@/lib/definations"
 import { ComboboxInput } from "@/components/ui/combobox-input"
-import { DateTimeRangePicker } from "@/components/custom/date-time-picker"
+import { DateTimeRangePicker } from "@/components/custom/date-duration-picker"
 
 /* === Props Interface === */
 interface FormDialogProps {

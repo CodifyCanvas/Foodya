@@ -1,3 +1,5 @@
+'use server';
+
 import { db } from "@/lib/db"; // your drizzle config
 import { eq, desc, and } from "drizzle-orm";
 import { schema } from "../drizzle-schema";

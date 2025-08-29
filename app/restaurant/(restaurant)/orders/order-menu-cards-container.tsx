@@ -11,6 +11,7 @@ import { useSearchParams } from 'next/navigation';
 import { ItemWithOptions } from '@/lib/definations';
 import { useOrderCartContext } from '@/hooks/context/OrderCartContext';
 import { useState } from 'react';
+import { useSidebar } from '@/components/ui/sidebar';
 
 /* === Fetcher === */
 const fetcher = (url: string) => fetch(url).then(res => res.json());
@@ -18,6 +19,7 @@ const fetcher = (url: string) => fetch(url).then(res => res.json());
 const MenuCardsContainer = () => {
   const searchParams = useSearchParams();
   const { addItem } = useOrderCartContext();
+  const { open: sidebarIsOpen } = useSidebar()
 
   const currentCategory = searchParams.get('category');
 
@@ -68,7 +70,7 @@ const MenuCardsContainer = () => {
   }
 
   return (
-    <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 [grid-auto-rows:minmax(0,auto)]">
+    <div className={`grid gap-3 grid-cols-2 sm:grid-cols-3  ${sidebarIsOpen ? 'md:grid-cols-3 lg:grid-cols-2' : 'lg:grid-cols-3'} xl:grid-cols-4 [grid-auto-rows:minmax(0,auto)]`}>
       {data?.map((item) => (
         <Card key={item.id} className="bg-white justify-between p-2 gap-3">
           <CardContent className="p-0">

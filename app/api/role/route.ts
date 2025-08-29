@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     }
 
     // === Insert New Role into DB ===
-    await insertData("roles", { role: role.trim() })
+    await insertData("roles", { role: role?.trim()?.toLowerCase() })
 
     return NextResponse.json(
       { message: "Role created successfully." },
@@ -90,6 +90,20 @@ export async function PUT(req: NextRequest) {
     // === Validate Input ===
     const parsed = roleFormSchema.parse(body)
     const { id, role } = parsed
+
+    // === Extract and Normalize Previous Role ===
+    const { previousRole } = body
+
+    // === Define Protected System Roles ===
+    const protectedRoles = ["waiter"];
+
+    // === Block Update if Role is Protected ===
+    if (protectedRoles.includes(previousRole?.toLowerCase())) {
+      return NextResponse.json(
+        { message: `The '${previousRole}' role is protected and cannot be modified.` },
+        { status: 403 }
+      )
+    }
 
     // === Update Role by ID ===
     await updateData("roles", "id", id!, { role: role.trim() })

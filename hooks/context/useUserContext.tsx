@@ -11,6 +11,7 @@ import React, {
 } from 'react';
 import useSWR from 'swr';
 import { User, Permissions } from '@/lib/definations';
+import toast from 'react-hot-toast';
 
 // ---- Types ----
 interface ModulePermission {
@@ -56,6 +57,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const fetchPermissions = useCallback(async (role_id: string) => {
   setPermissionsLoading(true); // ⬅️ Start loading
   try {
+    toast.loading("Fetching permissions, please wait...", {
+      id: 'permission-toast'
+    })
     const res = await fetch('/api/permission', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -71,6 +75,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     setPermError(err as Error);
   } finally {
     setPermissionsLoading(false); // ⬅️ Done loading
+    toast.dismiss('permission-toast')
   }
 }, []);
 

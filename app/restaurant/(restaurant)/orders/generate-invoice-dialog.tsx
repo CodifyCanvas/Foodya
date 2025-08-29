@@ -7,32 +7,71 @@ import toast from "react-hot-toast";
 
 import z from "zod";
 import { invoiceFormSchema } from "@/lib/zod-schema/restaurant.zod";
-import { OrderItem } from "@/lib/definations";
+import { InvoiceResponse, OrderItem } from "@/lib/definations";
 
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input"
 import SelectInput from "@/components/ui/select-input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Loader } from "lucide-react";
+import { formatDateWithFns } from "@/lib/date-fns";
+import { cn } from "@/lib/utils";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // --- Props Type ---
 type GenerateInvoiceProps = {
-  disabled: boolean;
   mode: 'create' | 'view';
   data: any; // contains all info (cart, invoice, order, booking, footer etc.)
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
 };
 
-const GenerateInvoiceDialog = ({ disabled, mode, data }: GenerateInvoiceProps) => {
+const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoiceProps) => {
 
   // --- Destructure Incoming Data ---
-  const { order, invoice, booking, items = [], footer, cart = [] } = data || {};
+  const { order, invoice, booking, footer, cart = [], invoiceId } = data || {};
+  const [invoiceDetail, setInvoiceDetail] = useState<InvoiceResponse | null>(null)
+  const [invoicefetching, setInvoicefetching] = useState<boolean>(false)
+  const [enablePrintOnSubmit, setEnablePrintOnSubmit] = useState<boolean>(false)
+  const isViewMode = mode === "view";
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  useEffect(() => {
+    console.log("Generate Invoice\nInvoice Id is Change: ", invoiceId)
+
+    const API_URL = `/api/invoices/${invoiceId}`;
+
+    async function fetchInvoice() {
+      try {
+        setInvoicefetching(true)
+        const response = await fetch(API_URL, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          }
+        })
+        const result = await response.json();
+        console.log("result: ", result)
+        setInvoiceDetail(result)
+
+      } catch (e) {
+        console.error("Unexpected error:", e)
+        toast.error("An unexpected error occurred. Please try again later.")
+      } finally {
+        setInvoicefetching(false)
+      }
+    }
+
+    if (invoiceId) {
+      fetchInvoice()
+    }
+
+  }, [invoiceId])
 
   // --- Compute Menu Items Based on Mode ---
   const menuItems = mode === "view"
-    ? items.map((item: OrderItem) => ({
+    ? (invoiceDetail?.items ?? []).map((item: OrderItem) => ({
       menuItemImage: item.menuItemImage ?? "",
       menuItemId: item.menuItemId ?? 0,
       menuItemName: item.menuItemName,
@@ -47,19 +86,19 @@ const GenerateInvoiceDialog = ({ disabled, mode, data }: GenerateInvoiceProps) =
   const invoiceFooter = useMemo(() => {
     return mode === "view"
       ? {
-        subtotal: parseFloat(invoice?.invoice?.subTotalAmount ?? "0"),
-        discount: parseFloat(invoice?.invoice?.discount ?? "0"),
-        total: parseFloat(invoice?.invoice?.totalAmount ?? "0"),
-        advancePaid: parseFloat(invoice?.invoice?.advancePaid ?? "0"),
-        grandTotal: parseFloat(invoice?.invoice?.grandTotal ?? "0"),
+        subtotal: parseFloat(invoiceDetail?.invoice?.subTotalAmount ?? "0"),
+        discount: parseFloat(invoiceDetail?.invoice?.discount ?? "0"),
+        total: parseFloat(invoiceDetail?.invoice?.totalAmount ?? "0"),
+        advancePaid: parseFloat(invoiceDetail?.invoice?.advancePaid ?? "0"),
+        grandTotal: parseFloat(invoiceDetail?.invoice?.grandTotal ?? "0"),
       }
       : footer;
-  }, [mode, invoice, footer]);
+  }, [mode, invoiceDetail, footer]);
 
   // --- Derive Defaults ---
-  const customerName = mode === "view" ? invoice?.customerName : booking?.customerName ?? "";
-  const selectedOrderType = invoice?.order?.orderType ?? order?.orderType ?? "takeaway";
-  const isDineInHidden = (invoice?.order?.orderType ?? order?.orderType) === "dine_in";
+  const customerName = mode === "view" ? invoiceDetail?.invoice.customerName : booking?.customerName ?? "";
+  const selectedOrderType = invoiceDetail?.order?.orderType ?? order?.orderType ?? "takeaway";
+  const isDineInHidden = (invoiceDetail?.order?.orderType ?? order?.orderType) === "dine_in";
 
   // --- React Hook Form Setup ---
   const form = useForm<z.infer<typeof invoiceFormSchema>>({
@@ -90,8 +129,93 @@ const GenerateInvoiceDialog = ({ disabled, mode, data }: GenerateInvoiceProps) =
     });
   }, [selectedOrderType, invoice, invoiceFooter, customerName, form]);
 
+  function generateSlipHTML() {
+    // Use the invoice data (invoiceDetail or data) to build HTML string
+    // Example (simplified):
+    const slipHtml = `
+      <html>
+        <head>
+          <title>Invoice Slip</title>
+          <style>
+            @page { size: 80mm auto; margin: 5mm; }
+            body { font-family: monospace, monospace; font-size: 12px; padding: 10px; }
+            h1, p { margin: 0; padding: 0; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border-bottom: 1px solid #ddd; padding: 5px 0; text-align: left; }
+          </style>
+        </head>
+        <body style="font-family: monospace, monospace; font-size: 12px; padding: 10px;">
+
+  <h1 style="margin: 0; padding-bottom: 5px;">Foodya Restaurant</h1>
+  <p style="margin: 0 0 10px 0;">Find it, Eat it, Love it</p>
+
+  <h2 style="margin: 0 0 5px 0;">Invoice #${invoiceDetail?.invoice.id ?? "N/A"}</h2>
+
+  <p style="margin: 0 0 5px 0;">Customer: ${customerName ? customerName : "Random"}</p>
+  <p style="margin: 0 0 5px 0;">Order Type: ${selectedOrderType ?? "N/A"}</p>
+  <p style="margin: 0 0 5px 0;">Payment: ${invoiceDetail?.invoice.paymentMethod ?? form.getValues("paymentMethod") ?? "N/A"}</p>
+  <p style="margin: 0 0 5px 0;">Order Date: ${formatDateWithFns(invoiceDetail?.order.createdAt || new Date()) ?? "N/A"}</p>
+  <p style="margin: 0 0 5px 0;">Invoice Date: ${formatDateWithFns(invoiceDetail?.invoice.createdAt || new Date()) ?? "N/A"}</p>
+
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+    <thead>
+      <tr>
+        <th style="border-bottom: 1px solid #000; text-align: left;">Item</th>
+        <th style="border-bottom: 1px solid #000; text-align: right;">Qty</th>
+        <th style="border-bottom: 1px solid #000; text-align: right;">Price</th>
+        <th style="border-bottom: 1px solid #000; text-align: right;">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${(menuItems ?? []).map(item => `
+        <tr>
+          <td style="padding: 4px 0;">${item.menuItemName} ${item.menuItemOptionName ? `(${item.menuItemOptionName})` : ""}</td>
+          <td style="padding: 4px 0; text-align: right;">${item.quantity}</td>
+          <td style="padding: 4px 0; text-align: right;">${parseFloat(item.price).toFixed(2)}</td>
+          <td style="padding: 4px 0; text-align: right;">${(parseFloat(item.price) * item.quantity).toFixed(2)}</td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>
+
+  <p style="margin: 0 0 5px 0;">Subtotal: ${invoiceFooter.subtotal ?? 0}</p>
+  <p style="margin: 0 0 2px 0;">Discount: ${invoiceFooter.discount ?? 0}%</p>
+  <p style="margin: 0 0 2px 0;">Total: ${Math.round(invoiceFooter.total).toFixed(2) ?? 0}</p>
+  <p style="margin: 0 0 10px 0;">Advance Paid: ${invoiceFooter.advancePaid ?? 0}</p>
+
+  <h4 style="margin: 0;">Grand Total: ${Math.round(invoiceFooter.grandTotal ?? 0).toFixed(2)} PKR</h4>
+
+</body>
+      </html>
+    `;
+
+    return slipHtml;
+  }
+
+  function printSlip() {
+    const slipHTML = generateSlipHTML();
+
+    const printWindow = window.open("", "PrintWindow", "width=900,height=600");
+    if (!printWindow) return;
+
+    printWindow.document.write(slipHTML);
+    printWindow.document.close();
+    printWindow.focus();
+
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 300);
+  }
+
   /* === Submit Handler === */
   async function onSubmit(values: z.infer<typeof invoiceFormSchema>) {
+
+    if (isViewMode) {
+      printSlip();
+      return;
+    }
+
     const API_URL = "/api/invoices";
     let payload;
 
@@ -104,8 +228,8 @@ const GenerateInvoiceDialog = ({ disabled, mode, data }: GenerateInvoiceProps) =
           customerName: values.customerName,
           subTotalAmount: values.subTotalAmount,
           discount: values.discount,
-          totalAmount: values.totalAmount,
-          grandTotal: values.grandTotal,
+          totalAmount: Math.round(Number(values.totalAmount)).toFixed(2),
+          grandTotal: Math.round(Number(values.grandTotal)).toFixed(2),
         },
         items: menuItems
       };
@@ -120,9 +244,9 @@ const GenerateInvoiceDialog = ({ disabled, mode, data }: GenerateInvoiceProps) =
           orderType: order.orderType,
           subTotalAmount: values.subTotalAmount,
           discount: values.discount,
-          totalAmount: values.totalAmount,
+          totalAmount: Math.round(Number(values.totalAmount)).toFixed(2),
           advancePaid: values.advancePaid,
-          grandTotal: values.grandTotal,
+          grandTotal: Math.round(Number(values.grandTotal)).toFixed(2),
           paymentMethod: values.paymentMethod,
           customerName: booking?.customerName ?? values.customerName ?? "random",
         },
@@ -157,7 +281,13 @@ const GenerateInvoiceDialog = ({ disabled, mode, data }: GenerateInvoiceProps) =
 
       // Reset form only after successful create
       form.reset()
-      setIsDialogOpen(false);
+
+      if (enablePrintOnSubmit) {
+        printSlip();
+      }
+
+      setIsOpen(false);
+
     } catch (error) {
       console.error("Unexpected error:", error)
       toast.error("An unexpected error occurred. Please try again later.")
@@ -165,29 +295,36 @@ const GenerateInvoiceDialog = ({ disabled, mode, data }: GenerateInvoiceProps) =
   };
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <form>
-        <DialogTrigger asChild>
-          <Button variant="secondary" onClick={() => setIsDialogOpen(true)} disabled={disabled} className='min-w-1/3 cursor-pointer'>
-            {mode == 'create' ? 'Generate Invoice' : 'View Invoice'}
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:min-w-6/7 md:min-w-2.5/3 max-h-[calc(100vh-2rem)] lg:min-w-fit font-rubik-400">
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent className="sm:min-w-6/7 md:min-w-2.5/3 max-h-[calc(100vh-2rem)] min-w-1/2 min-h-1/2 lg:min-w-fit font-rubik-400">
 
+        {invoicefetching ? (
+          // Show loader while invoice is fetching
+          <div className="flex h-full w-full justify-center items-center">
+            <Loader className="animate-spin size-7 text-gray-500" />
+          </div>
+        ) : (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
 
               <DialogHeader>
-                <DialogTitle className="text-lg font-medium">{mode == 'create' ? `Generate Invoice` : `Invoice`}</DialogTitle>
+                <DialogTitle className="text-lg font-medium">
+                  {mode === 'create'
+                    ? "Generate Invoice"
+                    : <>Invoice <span className="text-orange-500">#{invoiceDetail?.invoice.id}</span></>
+                  }
+                </DialogTitle>
                 <DialogDescription className="sr-only">
                   Click on &apos;Confirm & Print&apos; to generate the invoice for the order.
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="flex flex-col gap-2 text-sm">
+
+
+              <div className={`w-full grid gap-4 text-sm items-start ${mode === 'view' ? 'grid-cols-2' : 'grid-cols-1'}`}>
 
                 {/* --- Customer Input Field --- */}
-                <div className="flex flex-row items-center gap-2">
+                <div className="w-full">
                   <FormField
                     control={form.control}
                     name="customerName"
@@ -203,34 +340,7 @@ const GenerateInvoiceDialog = ({ disabled, mode, data }: GenerateInvoiceProps) =
                             {...field}
                             className="w-fit h-10 border-b text-neutral-500"
                             variant="minimal"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* --- Payment Select Field --- */}
-                <div className="flex flex-row items-center gap-2">
-                  <FormField
-                    control={form.control}
-                    name="paymentMethod"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row">
-                        <FormLabel className="font-normal">
-                          Payment:
-                        </FormLabel>
-                        <FormControl>
-                          <SelectInput options={[
-                            { label: 'Cash', value: 'cash' },
-                            { label: 'Card', value: 'card' },
-                            { label: 'Online', value: 'online' }
-                          ]}
-                            value={field.value ?? ""}
-                            className="w-fit border-0 border-b border-gray-300 rounded-none shadow-none focus:ring-0 focus:border-neutral-500"
-                            onChange={field.onChange}
-                            placeholder="Cash, Cred..."
+                            readOnly={isViewMode}
                           />
                         </FormControl>
                         <FormMessage />
@@ -240,7 +350,7 @@ const GenerateInvoiceDialog = ({ disabled, mode, data }: GenerateInvoiceProps) =
                 </div>
 
                 {/* --- Order Type Select Field --- */}
-                <div className="flex flex-row items-center gap-2">
+                <div className="w-full">
                   <FormField
                     control={form.control}
                     name="orderType"
@@ -259,7 +369,7 @@ const GenerateInvoiceDialog = ({ disabled, mode, data }: GenerateInvoiceProps) =
                             className="w-fit border-0 border-b border-gray-300 rounded-none shadow-none focus:ring-0 focus:border-neutral-500"
                             onChange={field.onChange}
                             placeholder="Drive Thru, ..."
-                            disabled={!!order?.orderType}
+                            disabled={!!order?.orderType || isViewMode}
                           />
                         </FormControl>
                         <FormMessage />
@@ -267,6 +377,65 @@ const GenerateInvoiceDialog = ({ disabled, mode, data }: GenerateInvoiceProps) =
                     )}
                   />
                 </div>
+
+
+                {/* --- Payment Select Field --- */}
+                <div className="w-full">
+                  <FormField
+                    control={form.control}
+                    name="paymentMethod"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row">
+                        <FormLabel className="font-normal">
+                          Payment:
+                        </FormLabel>
+                        <FormControl>
+                          <SelectInput options={[
+                            { label: 'Cash', value: 'cash' },
+                            { label: 'Card', value: 'card' },
+                            { label: 'Online', value: 'online' }
+                          ]}
+                            value={field.value ?? ""}
+                            className="w-fit border-0 border-b border-gray-300 rounded-none shadow-none focus:ring-0 focus:border-neutral-500"
+                            onChange={field.onChange}
+                            placeholder="Cash, Cred..."
+                            disabled={isViewMode}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* --- Paid Status --- */}
+                {invoiceDetail?.invoice && <div className="flex w-full flex-row text-neutral-500 justify-start">
+                  <p className="text-black mr-2">Paid: </p>
+                  <p>{invoiceDetail?.invoice.isPaid ? 'Paid' : 'Unpaid'}</p>
+                </div>
+                }
+
+                {/* --- Order Create Date --- */}
+                {invoiceDetail?.order.createdAt && <div className="flex w-full flex-row text-neutral-500 justify-start">
+                  <p className="text-black mr-2">Order Date: </p>
+                  <p>{formatDateWithFns(invoiceDetail?.order.createdAt, { showTime: true })}</p>
+                </div>
+                }
+
+                {/* --- Invoice Create Date --- */}
+                {invoiceDetail?.invoice.createdAt && <div className="flex w-full flex-row text-neutral-500 justify-start">
+                  <p className="text-black mr-2">Invoice Date: </p>
+                  <p>{formatDateWithFns(invoiceDetail?.invoice.createdAt, { showTime: true })}</p>
+                </div>
+                }
+
+                {/* --- Invoice Create By User --- */}
+                {invoiceDetail?.invoice && <div className="flex flex-row w-full col-span-2 text-neutral-500 justify-start">
+                  <p className="text-black mr-2">Invoiced by: </p>
+                  <p>{invoiceDetail?.generatedBy.name}</p>
+                </div>
+                }
+
               </div>
 
               {/* --- Items Table --- */}
@@ -291,7 +460,7 @@ const GenerateInvoiceDialog = ({ disabled, mode, data }: GenerateInvoiceProps) =
                         <TableCell>{product.menuItemName} <span className="text-xs">{product.menuItemOptionName && `(${product.menuItemOptionName})`}</span></TableCell>
                         <TableCell>{product.quantity}</TableCell>
                         <TableCell>{product.price}</TableCell>
-                        <TableCell>{parseFloat(product.price) * product.quantity}</TableCell>
+                        <TableCell>{(parseFloat(product.price) * product.quantity).toFixed(2)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -334,17 +503,38 @@ const GenerateInvoiceDialog = ({ disabled, mode, data }: GenerateInvoiceProps) =
               </div>
 
               {/* --- Dialog Actions --- */}
-              <DialogFooter className="flex-row gap-2">
-                <DialogClose asChild>
-                  <Button variant="outline" onClick={() => setIsDialogOpen(true)} className="w-1/2 sm:w-auto">Cancel</Button>
-                </DialogClose>
-                <Button type="submit" className="w-1/2 sm:w-auto" variant={'green'}>Confirm & Print</Button>
+              <DialogFooter className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                <div hidden={isViewMode} className="flex items-center space-x-2">
+                  <Checkbox
+                    id="enableAutoPrint"
+                    checked={enablePrintOnSubmit}
+                    disabled={isViewMode}
+                    onCheckedChange={(checked) => {
+                      // Convert 'indeterminate' to false or handle as you wish
+                      if (checked === "indeterminate") {
+                        setEnablePrintOnSubmit(false);
+                      } else {
+                        setEnablePrintOnSubmit(checked);
+                      }
+                    }}
+                    className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600 dark:text-foreground"
+                  />
+                  <label htmlFor="enableAutoPrint" className="select-none text-sm">
+                    Auto print on submit
+                  </label>
+                </div>
+                <div className="flex w-full sm:w-auto gap-2">
+                  <DialogClose asChild>
+                    <Button variant="outline" onClick={() => setIsOpen(false)} className="w-1/2 sm:w-auto">Cancel</Button>
+                  </DialogClose>
+                  <Button type="submit" className="w-1/2 min-w-20 sm:w-auto" variant={'green'}>{isViewMode ? 'Print' : 'Confirm & Print'}</Button>
+                </div>
               </DialogFooter>
 
             </form>
           </Form>
-        </DialogContent>
-      </form>
+        )}
+      </DialogContent>
     </Dialog>
   )
 }
