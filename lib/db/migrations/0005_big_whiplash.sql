@@ -1,1 +1,0 @@
-DROP TABLE `bookings_tables`;

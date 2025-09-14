@@ -2,14 +2,14 @@ import { mysqlTable, varchar, int, decimal, boolean, timestamp, datetime, mysqlE
 import { adminSchema } from './admin-panel.schema'
 
 // Menu Categories Table
-const menuCategories = mysqlTable('menu_categories', {
+export const menuCategories = mysqlTable('menu_categories', {
   id: int().autoincrement().primaryKey(),
   name: varchar({ length: 255 }).notNull(),
   description: varchar({ length: 255 }),
 });
 
 // Menu Items Table
-const menuItems = mysqlTable('menu_items', {
+export const menuItems = mysqlTable('menu_items', {
   id: int().autoincrement().primaryKey(),
   image: text(),
   category_id: int().notNull().references(() => menuCategories.id),
@@ -20,7 +20,7 @@ const menuItems = mysqlTable('menu_items', {
 });
 
 // Menu Item Options Table
-const menuItemOptions = mysqlTable('menu_item_options', {
+export const menuItemOptions = mysqlTable('menu_item_options', {
   id: int().autoincrement().primaryKey(),
   menu_item_id: int().notNull().references(() => menuItems.id),
   option_name: varchar({ length: 255 }),
@@ -28,14 +28,14 @@ const menuItemOptions = mysqlTable('menu_item_options', {
 });
 
 // Table Management Table
-const restaurantTables = mysqlTable('restaurant_tables', {
+export const restaurantTables = mysqlTable('restaurant_tables', {
   id: int().autoincrement().primaryKey(),
   table_number: varchar({ length: 50 }).notNull(),
   status: mysqlEnum(['booked', 'occupied', 'available']).notNull().default('available'),
 });
 
 // Bookings Table
-const bookingsTables = mysqlTable('bookings_tables', {
+export const bookingsTables = mysqlTable('bookings_tables', {
   id: int('id').autoincrement().primaryKey(),
   tableId: int('table_id').notNull().references(() => restaurantTables.id),
   customerName: varchar('customer_name', { length: 255 }).notNull(),
@@ -48,7 +48,7 @@ const bookingsTables = mysqlTable('bookings_tables', {
 });
 
 // Orders Table
-const ordersTable = mysqlTable('orders_table', {
+export const ordersTable = mysqlTable('orders_table', {
   id: int('id').autoincrement().primaryKey(),
   tableId: int('table_id').references(() => restaurantTables.id),
   waiterId: int('waiter_id').references(() => adminSchema.users.id),
@@ -59,7 +59,7 @@ const ordersTable = mysqlTable('orders_table', {
 });
 
 // Order Items Table
-const orderItemsTable = mysqlTable('order_items_table', {
+export const orderItemsTable = mysqlTable('order_items_table', {
   id: int('id').autoincrement().primaryKey(),
   menuItemImage: text('menu_item_image'),
   orderId: int('order_id').references(() => ordersTable.id).notNull(),
@@ -72,7 +72,7 @@ const orderItemsTable = mysqlTable('order_items_table', {
 });
 
 // Invoices Table
-const InvoicesTable = mysqlTable('invoices_table', {
+export const InvoicesTable = mysqlTable('invoices_table', {
   id: int('id').autoincrement().primaryKey(),
   orderId: int('order_id').references(() => ordersTable.id).notNull(),
   generatedByUserId: int('generated_by_user_id').references(() => adminSchema.users.id).notNull(),

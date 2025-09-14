@@ -1,25 +1,22 @@
 "use client"
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { Download } from "lucide-react"
 import { Table } from "@tanstack/react-table"
-import * as XLSX from "xlsx"
+import ExcelJS from "exceljs"
+import { saveAs } from 'file-saver';
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 import Image from "next/image"
 import { Icons } from "@/constants"
 
-interface ExportButtonProps<TData> {
+interface ExportButtonProps<TData extends Record<string, any>> {
   table: Table<TData>
 }
 
-export function DataTableExport<TData>({ table }: ExportButtonProps<TData>) {
+export function DataTableExport<TData extends Record<string, any>>({ table }: ExportButtonProps<TData>) {
+
   const data = table.getFilteredRowModel().rows.map((row) => row.original)
 
   const exportCopy = () => {
@@ -28,7 +25,6 @@ export function DataTableExport<TData>({ table }: ExportButtonProps<TData>) {
 
     // Get only the rows visible on the current page (respects pagination and filters)
     const rows = table.getPaginationRowModel().rows;
-
 
     // Exclude columns with id "no-print"
     const columns = table
@@ -44,7 +40,8 @@ export function DataTableExport<TData>({ table }: ExportButtonProps<TData>) {
       if (typeof header === "string") return header.replace(/"/g, '""');
       if (typeof header === "function") {
         try {
-          const result = header({ column: col });
+          // Cast to any to avoid TS errors, since we only want string output
+          const result = (header as any)({ column: col });
           if (typeof result === "string") return result.replace(/"/g, '""');
         } catch { }
       }
@@ -77,41 +74,108 @@ export function DataTableExport<TData>({ table }: ExportButtonProps<TData>) {
       });
   };
 
-
   const exportCSV = () => {
-    const worksheet = XLSX.utils.json_to_sheet(data)
-    const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1")
-    XLSX.writeFile(workbook, "data.csv")
-  }
+    // Get visible columns (excluding actions or hidden columns)
+    const columns = table
+      .getVisibleFlatColumns()
+      .filter((col) => col.id !== "actions")
+      .map((col) => col.id);
 
-  const exportExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(data)
-    const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1")
-    XLSX.writeFile(workbook, "data.xlsx")
-  }
+    if (data.length === 0 || columns.length === 0) return;
 
+    // Prepare CSV rows: header + filtered rows
+    const csvRows = [
+      columns.join(","), // header row with visible columns
+      ...data.map((row) =>
+        columns
+          .map((col) => {
+            const val = row[col];
+            return `"${String(val ?? "").replace(/"/g, '""')}"`
+          })
+          .join(",")
+      ),
+    ];
+
+    const csv = csvRows.join("\n");
+
+    // Download CSV file
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", "data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+
+  const exportExcel = async () => {
+    const columns = table
+      .getVisibleFlatColumns()
+      .filter((col) => col.id !== "actions")
+      .map((col) => ({
+        header: typeof col.columnDef.header === "string" ? col.columnDef.header : col.id,
+        key: col.id,
+        width: 20,
+      }));
+
+    if (data.length === 0 || columns.length === 0) return;
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Sheet1");
+    worksheet.columns = columns;
+
+    data.forEach((row) => {
+      const filteredRow: Record<string, any> = {};
+      columns.forEach((col) => {
+        filteredRow[col.key] = row[col.key];
+      });
+      worksheet.addRow(filteredRow);
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    saveAs(blob, "data.xlsx");
+  };
 
   const exportPDF = () => {
-    const doc = new jsPDF()
+    const doc = new jsPDF();
 
-    doc.setFontSize(18)
-    doc.text("Foodya Restaurant", 14, 20)
+    // Header
+    doc.setFontSize(18);
+    doc.text("Foodya Restaurant", 14, 20);
+    doc.setFontSize(10);
+    doc.text("Find it. Eat it, Love it", 14, 25);
+    doc.setTextColor(100);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 35);
 
-    doc.setFontSize(10)
-    doc.text("Find it. Eat it, Love it", 14, 25)
-    doc.setTextColor(100)
-    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 35)
+    // Get visible columns (excluding "actions")
+    const visibleColumns = table
+      .getVisibleFlatColumns()
+      .filter((col) => col.id !== "actions");
 
-    const columns = Object.keys(data[0] || {})
+    const headers = visibleColumns.map((col) =>
+      typeof col.columnDef.header === "string" ? col.columnDef.header : col.id
+    );
 
-    const rows = data.map((item) =>
-      columns.map((col) => item[col])
-    )
+    const keys = visibleColumns.map((col) => col.id);
 
+    // Prepare data rows with only visible keys
+    const rows = data.map((row) =>
+      keys.map((key) => {
+        const value = row[key];
+        return typeof value === "boolean"
+          ? value ? "Online" : "Offline"
+          : String(value ?? "");
+      })
+    );
+
+    // Generate PDF table
     autoTable(doc, {
-      head: [columns],
+      head: [headers],
       body: rows,
       startY: 42,
       styles: { fontSize: 10 },
@@ -120,10 +184,10 @@ export function DataTableExport<TData>({ table }: ExportButtonProps<TData>) {
         textColor: 255,
       },
       margin: { top: 10 },
-    })
+    });
 
-    doc.save("data.pdf")
-  }
+    doc.save("data.pdf");
+  };
 
   const printTable = () => {
     const original = document.querySelector("#table-to-print table");

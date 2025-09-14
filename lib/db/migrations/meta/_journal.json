@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1753384481713,
-      "tag": "0000_sleepy_retro_girl",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1753518137841,
-      "tag": "0001_medical_oracle",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1753518218452,
-      "tag": "0002_robust_reavers",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1753701108679,
-      "tag": "0003_happy_korath",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1753857367682,
-      "tag": "0004_big_stranger",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1754137495592,
-      "tag": "0005_big_whiplash",
+      "when": 1757786116133,
+      "tag": "0000_wooden_dexter_bennett",
       "breakpoints": true
     }
   ]

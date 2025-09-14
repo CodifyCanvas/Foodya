@@ -5,7 +5,7 @@ import { boolean, int, mysqlTable, timestamp, varchar } from 'drizzle-orm/mysql-
  * USERS TABLE
  * Stores user accounts and links each user to a role.
  */
-const users = mysqlTable('users', {
+export const users = mysqlTable('users', {
   id: int().autoincrement().primaryKey(),                      // Primary key
   name: varchar({ length: 255 }),                              // User's full name (optional)
   email: varchar({ length: 255 }).notNull().unique(),          // Unique email address (required)
@@ -20,7 +20,7 @@ const users = mysqlTable('users', {
  * ROLES TABLE
  * Defines user roles like admin, operator, etc.
  */
-const roles = mysqlTable('roles', {
+export const roles = mysqlTable('roles', {
   id: int().autoincrement().primaryKey(),                      // Primary key
   role: varchar({ length: 255 }).notNull().unique(),           // Role name (e.g., "admin", "user")
 });
@@ -29,7 +29,7 @@ const roles = mysqlTable('roles', {
  * MODULES TABLE
  * Represents application modules or pages, such as User Management, Roles, etc.
  */
-const modules = mysqlTable('modules', {
+export const modules = mysqlTable('modules', {
   id: int().autoincrement().primaryKey(),                      // Primary key
   name: varchar({ length: 255 }).notNull().unique(),           // Technical name of the module (e.g., "users", "roles")
   label: varchar({ length: 255 }),                             // Human-readable name (e.g., "User Management")
@@ -39,7 +39,7 @@ const modules = mysqlTable('modules', {
  * PERMISSIONS TABLE
  * Defines access rights per role per module.
  */
-const permissions = mysqlTable('permissions', {
+export const permissions = mysqlTable('permissions', {
   id: int().autoincrement().primaryKey(),                      // Primary key
   role_id: int().references(() => roles.id),                   // Foreign key to roles
   module_id: int().references(() => modules.id),               // Foreign key to modules
