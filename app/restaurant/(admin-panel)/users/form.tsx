@@ -38,6 +38,7 @@ interface FormDialogProps {
 export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogProps) {
   const [isVisible, setIsVisible] = useState(false)
   const [manualReset, setManualReset] = useState(false)
+  const [submitButtonLoading, setSubmitButtonLoading] = useState<boolean>(false)
 
   { /* === Initialize react-hook-form with Zod validation schema === */ }
   const form = useForm<z.infer<typeof userFormSchema>>({
@@ -83,6 +84,8 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
     }
 
     try {
+      setSubmitButtonLoading(true)
+
       const response = await fetch(API_URL, requestOptions)
       const result = await response.json()
 
@@ -113,6 +116,8 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
     } catch (error) {
       console.error("Unexpected error:", error)
       toast.error("An unexpected error occurred. Please try again later.")
+    } finally {
+      setSubmitButtonLoading(false)
     }
   }
 
@@ -269,7 +274,7 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
               <Button type="button" variant="secondary" onClick={ResetForm}>
                 Reset
               </Button>
-              <Button type="submit" variant="green">
+              <Button type="submit" disabled={submitButtonLoading} variant="green">
                 {data ? "Update" : "Create"}
               </Button>
             </DialogFooter>

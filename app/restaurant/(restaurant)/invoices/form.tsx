@@ -78,6 +78,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
   /* === Local State === */
   const [manualReset, setManualReset] = useState(false)
   const [data, setData] = useState<InvoiceOrderItem | null>(null)
+  const [submitButtonLoading, setSubmitButtonLoading] = useState<boolean>(false)
   const [invoiceFetching, setInvoiceFetching] = useState<boolean>(false)
   const invoiceIdProp = dataProp?.invoiceId ?? 0;
 
@@ -247,6 +248,8 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
     }
 
     try {
+      setSubmitButtonLoading(true)
+
       const response = await fetch(API_URL, requestOptions)
       const result = await response.json()
 
@@ -277,6 +280,8 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
     } catch (error) {
       console.error("Unexpected error:", error)
       toast.error("An unexpected error occurred. Please try again later.")
+    } finally {
+      setSubmitButtonLoading(false)
     }
   }
 
@@ -757,7 +762,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
                 >
                   Reset
                 </Button>
-                <Button type="submit" variant="green" className="min-w-24 sm:w-auto">
+                <Button type="submit"  disabled={submitButtonLoading} variant="green" className="min-w-24 sm:w-auto">
                   {dataProp ? "Update" : "Create"}
                 </Button>
               </div>

@@ -5,7 +5,8 @@ export const poolConnection = mysql.createPool({
   host: process.env.DATABASE_HOST,
   user: process.env.DATABASE_USER,
   database: process.env.DATABASE_NAME,
+  password: process.env.DATABASE_PASSWORD,
   port: process.env.DATABASE_PORT ? Number(process.env.DATABASE_PORT) : 3306,
 });
 
-export const db = drizzle({ client: poolConnection });
+export const db = drizzle(poolConnection);

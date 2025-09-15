@@ -34,7 +34,7 @@ export const columns = ({ refetchPermissions }: { refetchPermissions: () => void
       />
     ),
     cell: ({ row }) => (
-      <div>{row.original.role}</div>
+      <div className="capitalize">{row.original.role}</div>
     ),
   },
 

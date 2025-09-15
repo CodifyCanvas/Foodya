@@ -47,6 +47,7 @@ interface FormDialogProps {
 export function RoleForm({ open, onOpenChange, data, categories }: FormDialogProps) {
   /* === Local State === */
   const [manualReset, setManualReset] = useState(false)
+  const [submitButtonLoading, setSubmitButtonLoading] = useState<boolean>(false)
 
   /* === React Hook Form Setup === */
   const form = useForm<
@@ -126,6 +127,8 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
     }
 
     try {
+      setSubmitButtonLoading(true)
+
       const response = await fetch(API_URL, requestOptions)
       const result = await response.json()
 
@@ -156,6 +159,8 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
     } catch (error) {
       console.error("Unexpected error:", error)
       toast.error("An unexpected error occurred. Please try again later.")
+    } finally {
+      setSubmitButtonLoading(false)
     }
   }
 
@@ -254,7 +259,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
                             <FormControl>
                               <Input
                                 type="text"
-                                placeholder="Enter Category"
+                                placeholder="e.g. Cheeseburger"
                                 {...field}
                                 className="h-10"
                               />
@@ -443,7 +448,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
               <Button type="button" variant="secondary" className="w-24" onClick={() => ResetForm()}>Reset</Button>
 
               {/* === Form Submit Button === */}
-              <Button type="submit" className="w-24" variant="green">{data ? "Update" : "Create"}</Button>
+              <Button type="submit" className="w-24" disabled={submitButtonLoading} variant="green">{data ? "Update" : "Create"}</Button>
             </DialogFooter>
           </form>
         </Form>

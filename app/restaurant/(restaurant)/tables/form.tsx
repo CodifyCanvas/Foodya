@@ -43,6 +43,7 @@ interface FormDialogProps {
 export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
   /* === Local State === */
   const [manualReset, setManualReset] = useState(false)
+  const [submitButtonLoading, setSubmitButtonLoading] = useState<boolean>(false)
 
   /* === React Hook Form Setup === */
   const form = useForm<z.infer<typeof restaurantTablesFormSchema>>({
@@ -79,6 +80,8 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
     }
 
     try {
+      setSubmitButtonLoading(true)
+
       const response = await fetch(API_URL, requestOptions)
       const result = await response.json()
 
@@ -109,6 +112,8 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
     } catch (error) {
       console.error("Unexpected error:", error)
       toast.error("An unexpected error occurred. Please try again later.")
+    } finally {
+      setSubmitButtonLoading(false)
     }
   }
 
@@ -206,7 +211,7 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
               >
                 Reset
               </Button>
-              <Button type="submit" variant="green">
+              <Button type="submit" disabled={submitButtonLoading} variant="green">
                 {data ? "Update" : "Create"}
               </Button>
             </DialogFooter>

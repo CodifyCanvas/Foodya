@@ -3,6 +3,7 @@
 import useSWR from 'swr';
 import { Plus, Loader } from 'lucide-react';
 import Image from 'next/image';
+import React from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardDescription, CardTitle, CardFooter } from '@/components/ui/card';
@@ -28,7 +29,7 @@ const MenuCardsContainer = () => {
     ? `${baseUrl}&category=${encodeURIComponent(currentCategory)}`
     : baseUrl;
 
-  const { data, error, isLoading } = useSWR<ItemWithOptions[]>(fetchUrl, fetcher);
+  const { data = [], error, isLoading } = useSWR<ItemWithOptions[]>(fetchUrl, fetcher);
 
   // Track selected options per item
   const [selectedOptions, setSelectedOptions] = useState<Record<number, number | null>>({});
@@ -70,6 +71,8 @@ const MenuCardsContainer = () => {
   }
 
   return (
+    <>
+    {data.length > 0 ? 
     <div className={`grid gap-3 grid-cols-2 sm:grid-cols-3  ${sidebarIsOpen ? 'md:grid-cols-3 lg:grid-cols-2' : 'lg:grid-cols-3'} xl:grid-cols-4 [grid-auto-rows:minmax(0,auto)]`}>
       {data?.map((item) => (
         <Card key={item.id} className="bg-white justify-between p-2 gap-3">
@@ -116,7 +119,9 @@ const MenuCardsContainer = () => {
           </CardFooter>
         </Card>
       ))}
-    </div>
+    </div> : <p className='w-full text-center'>No Item Found</p>
+}
+    </>
   );
 };
 
