@@ -186,8 +186,82 @@ export interface GeneratedBy {
   email: string;
 }
 
+// === Waiter Dropdown Option Interface ===
 export interface WaiterSelectInput {
   label: string;  
   value: string;          
   role: string | null; 
+}
+
+// === Employee Data Interfaces for Management Module ===
+
+/* === Basic Employee Info for DataTable === */
+export interface EmployeeWithLatestRecord {
+  id: number;
+  image: string | undefined;
+  name: string;
+  CNIC: string;
+  fatherName: string;
+  email: string;
+  phone: string;
+  designation: string | null;
+  shift: string | null;
+  status: 'active' | 'resigned' | 'terminated' | 'rejoined' | null;
+  joinedAt: string | null; // ISO string (from DB); can be null if no record
+}
+
+/* === Personal Info Form Interface === */
+export interface EmployeePersonalInfoInterface {
+  id: number | null;
+  image: string | null;
+  name: string;
+  CNIC: string;
+  fatherName: string;
+  salary: string;
+  email: string;
+  phone: string;
+  createdAt: string;
+}
+
+/* === Employment Record Interface === */
+export interface EmploymentRecordInterface {
+  id: number | null;
+  designation: string;
+  shift: string;
+  status: 'active' | 'resigned' | 'terminated' | 'rejoined'; // e.g., 'active'
+  joinedAt: string;
+  resignedAt: string | null;
+  changeType: 'valid' | 'correction'; // e.g., 'valid'
+  createdAt?: string | Date;
+}
+
+/* === Salary Change Interface === */
+export interface SalaryChangeInterface {
+  id: number | null;
+  previousSalary: number | null;
+  newSalary: number;
+  reason: string | null;
+  changeType: 'initial' | 'raise' | 'promotion' | 'adjustment' | 'correction'; // e.g., 'initial'
+  createdAt?: string | Date;
+}
+
+/* === Combined Full Employee Details (for View/Edit) === */
+export interface EmployeeWithFullDetails {
+  personalInfo: EmployeePersonalInfoInterface
+  employmentRecord: EmploymentRecordInterface[];
+  salaryChanges: SalaryChangeInterface[];
+}
+
+export interface EmployeeCompleteDetailsInterface {
+  id: number;
+  image: string | null;
+  name: string;
+  CNIC: string;
+  fatherName: string;
+  email: string;
+  phone: string;
+  salary: string; // Salary as string e.g., "7000.00"
+  createdAt: string; // ISO Date string
+  employmentRecord: EmploymentRecordInterface[];
+  salaryChanges: SalaryChangeInterface[];
 }

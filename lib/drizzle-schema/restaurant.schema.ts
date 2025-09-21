@@ -87,6 +87,43 @@ export const InvoicesTable = mysqlTable('invoices_table', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// Employees Table
+export const employeesTable = mysqlTable('employees', {
+  id: int('id').autoincrement().primaryKey(),
+  image: text(),
+  name: varchar('name', { length: 50 }).notNull(),
+  CNIC: varchar('cnic', { length: 15 }).notNull(),
+  fatherName: varchar('father_name', { length: 50 }).notNull(),
+  salary: decimal('salary', { precision: 10, scale: 2 }).default('0.00'),
+  email: varchar('email', { length: 100 }).notNull(),
+  phone: varchar('phone', { length: 15 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}); 
+
+// Employment Records Table
+export const employmentRecordsTable = mysqlTable('employment_records', {
+  id: int('id').autoincrement().primaryKey(),
+  employeeId: int('employee_id').references(() => employeesTable.id).notNull(),
+  designation: varchar('designation', { length: 100 }).notNull(),
+  shift: varchar('shift', { length: 100 }).notNull(),
+  status: mysqlEnum('status', ['active', 'resigned', 'terminated', 'rejoined']).default('active').notNull(),
+  joinedAt: datetime('joined_at').notNull(),
+  resignedAt: datetime('resigned_at'),
+  changeType: mysqlEnum('change_type', ['valid', 'correction']).default('valid').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Salary History Table
+export const salaryChangesTable = mysqlTable('salary_changes', {
+  id: int('id').autoincrement().primaryKey(),
+  employeeId: int('employee_id').references(() => employeesTable.id).notNull(),
+  previousSalary: decimal('previous_salary', { precision: 10, scale: 2 }),
+  newSalary: decimal('new_salary', { precision: 10, scale: 2 }).notNull(),
+  reason: text('reason'),
+  changeType: mysqlEnum('change_type', ['initial', 'raise', 'promotion', 'adjustment', 'correction']).default('initial').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 // Export Db Table Schema -> index.ts -> export to app
 export const restaurantSchema = {
   menuCategories,
@@ -97,6 +134,9 @@ export const restaurantSchema = {
   ordersTable,
   orderItemsTable,
   InvoicesTable,
+  employeesTable,
+  employmentRecordsTable,
+  salaryChangesTable,
 };
 
 export type RestaurantSchema = typeof restaurantSchema;

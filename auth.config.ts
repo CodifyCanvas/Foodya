@@ -21,7 +21,7 @@ export const authConfig = {
       }
 
       if (isLoggedIn && isOnLoginPage) {
-        return Response.redirect(new URL('/restaurant', request.nextUrl));
+        return Response.redirect(new URL('/restaurant/dashboard', request.nextUrl));
       }
 
       return true;

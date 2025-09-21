@@ -13,24 +13,45 @@ type DateInputProps = {
   value?: Date | string
   onChange?: (date?: Date | any) => void
   className?: string
+  return?: "date" | "string"
+  now?: boolean
 } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'value' | 'onChange'>
 
 export const DateInput = React.forwardRef<HTMLButtonElement, DateInputProps>(
-  ({ value, onChange, className, ...props }, ref) => {
+  ({ value, onChange, className, return: returnType = "date", now, ...props }, ref) => {
     const [open, setOpen] = React.useState(false);
+
 
     // Convert value to Date if needed
     const dateValue = value instanceof Date ? value : value ? new Date(value) : undefined
 
+    // ✅ Auto-select current date if `now` is true and no `value` was passed
+    React.useEffect(() => {
+      if (now && !value && onChange) {
+        const currentDate = new Date()
+        const returnValue = returnType === "string" ? currentDate.toISOString() : currentDate
+
+        if (onChange.length === 1) {
+          onChange(returnValue)
+        } else {
+          onChange({ target: { value: returnValue } })
+        }
+      }
+    }, [now, value, onChange, returnType])
+
     const handleSelect = (date?: Date) => {
       if (!onChange) return
-      // Detect if onChange expects an event (like RHF)
+
+      const returnValue =
+        returnType === "string" && date ? date.toISOString() : date
+
+      // Support both standard and RHF-style onChange handlers
       if (onChange.length === 1) {
-        onChange(date)
+        onChange(returnValue)
       } else {
-        // Simulate event object if needed
-        onChange({ target: { value: date } })
+        onChange({ target: { value: returnValue } })
       }
+
       setOpen(false)
     }
 

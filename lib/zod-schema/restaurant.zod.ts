@@ -141,3 +141,65 @@ export const invoiceActionFormSchema = z.object({
     waiterId: data.orderType === "dine_in" ? data.waiterId : "",
   };
 });
+
+// === Employee Personal Info Form Schema ===
+export const EmployeePersonalInfoFormSchema = z.object({
+  id: z.union([z.number(), z.string().transform(String)]).optional().nullable(),
+  image: imageSchema,
+  name: z.string().min(1, "Name is required").max(50, "Name must be at most 50 characters"),
+  CNIC: z.string().min(13, "CNIC must be at least 13 digits").max(15, "CNIC must be at most 15 characters"),
+  fatherName: z.string().min(1, "Father name is required").max(50, "Father name must be at most 50 characters"),
+  email: z.email("Invalid email address").max(100, "Email must be at most 100 characters"),
+  phone: z.string().min(10, "Phone number must be at least 10 digits").max(15, "Phone number must be at most 15 characters"),
+});
+
+// === Employment Record Form Schema ===
+export const EmploymentRecordFormSchema = z.object({
+  designation: z.string().min(1, "Designation is required").max(100, "Designation must be at most 100 characters"),
+  shift: z.string().min(1, "Shift is required").max(100, "Shift must be at most 100 characters"),
+  status: z.enum(['active', 'resigned', 'terminated', 'rejoined']),
+  joinedAt: z.string().min(1, "Join date is required"),
+  resignedAt: z.string().nullable(),
+  changeType: z.enum(['valid','correction']),
+}).check((schema) => {
+  const { status, resignedAt} = schema.value;
+
+  if (status === 'resigned' && !resignedAt) {
+    schema.issues.push({
+      code: "custom",
+      message: "Please select the Resign Date",
+      path: ["resignedAt"],
+      input: resignedAt,
+    });
+  }
+
+  if (resignedAt && status !== 'resigned') {
+    schema.issues.push({
+      code: "custom",
+      message: "Please select the option to Resign",
+      path: ["status"],
+      input: status,
+    });
+  }
+});
+
+// === Employee Salary Change Form Schema ===
+export const SalaryChangeFormSchema = z.object({
+  previousSalary: z.string().transform<string | null>((val) => {
+    const num = Number(val);
+    return isNaN(num) || num <= 0 ? null : val;
+  }).nullable(),
+  newSalary: z.string().refine((val) => {
+    const num = Number(val);
+    return !isNaN(num) && num > 0;
+  }, { message: "Value must be a number greater than 0" }),
+  reason: z.string().nullable(),
+  changeType: z.enum(['initial', 'raise', 'promotion', 'adjustment', 'correction']),
+});
+
+// === Full Employee Form Schema ===
+export const FullEmployeeFormSchema = z.object({
+  personalInfo: EmployeePersonalInfoFormSchema,
+  employmentRecord: EmploymentRecordFormSchema,
+  salaryChanges: SalaryChangeFormSchema,
+});
