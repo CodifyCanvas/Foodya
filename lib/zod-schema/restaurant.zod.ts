@@ -247,3 +247,10 @@ export const EmployeeSalaryPostingFormSchema = z.object({
     message: "At least one salary entry is required",
   }),
 });
+
+// === Transaction Category Form Schema ===
+export const TransactionCategoriesFormSchema = z.object({
+  id: z.union([z.number(), z.string().transform(String)]).nullable(),
+  category: z.string({ error: "Category Name is required" }).min(2, { error: "Category Name must be at least 2 characters" }).max(50, { error: "Category Name must not exceed 50 characters" }),
+  description: z.string().max(255, { error: "Description must be less than 255 characters" }).nullable(),
+})

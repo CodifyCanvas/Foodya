@@ -307,3 +307,10 @@ export interface PayrollDialogSalaryRow {
   month: string;
   selected?: boolean
 }
+
+// === Transaction Categories Tables Interface ===
+export interface TransactionCategoriesTablesInterface {
+  id: number;
+  category: string;
+  description: string;
+}

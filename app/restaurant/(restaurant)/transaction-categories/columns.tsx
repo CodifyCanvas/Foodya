@@ -3,10 +3,10 @@
 import { DataTableColumnHeader } from "@/components/DataTable/data-table-column-header"
 import { RowActions } from "./table-actions"
 import { ExtendedColumnDef } from "@/types/columns.data-table"
-import { ModuleInterface } from "@/lib/definations"
+import { TransactionCategoriesTablesInterface } from "@/lib/definations"
 
-/* === Table Columns for Roles === */
-export const columns = (): ExtendedColumnDef<ModuleInterface>[] => [
+/* === Columns for Transaction Categories === */
+export const columns = (): ExtendedColumnDef<TransactionCategoriesTablesInterface>[] => [
   
   // === Id Column ===
   {
@@ -24,34 +24,35 @@ export const columns = (): ExtendedColumnDef<ModuleInterface>[] => [
     ),
   },
 
-  // === Role Column ===
+  // === Category Name Column ===
   {
-    accessorKey: "label",
+    accessorKey: "category",
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title="Label"
+        title="Category"
+        search
       />
     ),
     cell: ({ row }) => (
-      <div className="capitalize">{row.original.label}</div>
+      <div className="capitalize">{row.original.category}</div>
     ),
   },
   
-  // === Role Column ===
+  // === Category Description Column ===
   {
-    accessorKey: "name",
+    accessorKey: "description",
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title="page"
+        title="Description"
       />
     ),
     cell: ({ row }) => (
-      <div className="capitalize">{row.original.name}</div>
+      <div className="capitalize">{row.original.description}</div>
     ),
   },
-
+  
   // === Actions Column ===
   {
     id: "actions",

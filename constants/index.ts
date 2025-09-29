@@ -70,6 +70,7 @@ export const navLink = [
     url: "#",
     icon: Banknote, // Money/finance icon
     items: [
+      { title: 'Transaction Categories', url: '/restaurant/transaction-categories' },
       { title: 'Expenses', url: '/restaurant/expenses' },
       { title: 'Incomes', url: '/restaurant/incomes' },
       { title: 'Reports', url: '/restaurant/reports' },

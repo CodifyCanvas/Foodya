@@ -141,6 +141,13 @@ export const payrollsTable = mysqlTable('payrolls', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// Transaction Categories Management Table
+export const transactionCategoriesTable = mysqlTable('transaction_categories', {
+  id: int('id').autoincrement().primaryKey(),
+  category: varchar('category',{ length: 255 }).notNull(),
+  description: text('description'),
+});
+
 // Export Db Table Schema -> index.ts -> export to app
 export const restaurantSchema = {
   menuCategories,
@@ -154,7 +161,8 @@ export const restaurantSchema = {
   employeesTable,
   employmentRecordsTable,
   salaryChangesTable,
-  payrollsTable
+  payrollsTable,
+  transactionCategoriesTable
 };
 
 export type RestaurantSchema = typeof restaurantSchema;
