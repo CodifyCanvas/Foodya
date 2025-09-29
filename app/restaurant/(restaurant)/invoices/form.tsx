@@ -748,7 +748,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
                 </div>
 
               </div>
-              {/* === Start of Sub Total & Discount & Total & Arears & Grand Total === */}
+              {/* === End of Sub Total & Discount & Total & Arears & Grand Total === */}
 
               <div className="w-full flex flex-row justify-center items-center gap-2 lg:w-auto">
                 <DialogClose asChild>

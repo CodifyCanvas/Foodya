@@ -203,3 +203,47 @@ export const FullEmployeeFormSchema = z.object({
   employmentRecord: EmploymentRecordFormSchema,
   salaryChanges: SalaryChangeFormSchema,
 });
+
+// === Employee Salaries Posting Form Schema ===
+export const EmployeeSalaryPostingFormSchema = z.object({
+  salaries: z.array(
+    z.object({
+      id: z.union([z.number(), z.string().transform(String)]),
+
+      employeeId: z.union([z.number(), z.string().transform(String)]),
+      description: z.string().nullable(),
+
+      basicPay: z.string(),
+      bonus: z.string().transform((val) => (val?.trim() === "" || val == null ? "0.00" : val)),
+      penalty: z.string().transform((val) => (val?.trim() === "" || val == null ? "0.00" : val)),
+      totalPay: z.string(),
+
+      month: z.string().regex(/^(19|20)\d{2}-(0[1-9]|1[0-2])$/, "Month must be in YYYY-MM format (e.g., 2025-08)"), // Month in format YYYY-MM
+      
+      selected: z.boolean(),  // Field to indicate which salaries are selected for payment only
+
+    }).superRefine((row, ctx) => {
+      if (!row.selected) return;
+
+      const fields = [
+        { key: "basicPay", value: row.basicPay, check: (n: number) => n > 0, message: "Basic pay must be a number greater than 0" },
+        { key: "bonus", value: row.bonus, check: (n: number) => n >= 0, message: "Bonus must not be negative" },
+        { key: "penalty", value: row.penalty, check: (n: number) => n >= 0, message: "Penalty must not be negative" },
+        { key: "totalPay", value: row.totalPay, check: (n: number) => n > 0, message: "Total pay must be a number greater than 0" },
+      ];
+
+      for (const field of fields) {
+        const num = Number(field.value);
+        if (isNaN(num) || !field.check(num)) {
+          ctx.addIssue({
+            code: "custom",
+            path: [field.key],
+            message: field.message,
+          });
+        }
+      }
+    })
+  ).min(1, {
+    message: "At least one salary entry is required",
+  }),
+});

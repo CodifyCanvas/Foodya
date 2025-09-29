@@ -1,10 +1,13 @@
 import { auth } from "@/auth";
 import { insertData, updateData } from "@/lib/crud-actions/general-actions";
 import { db } from "@/lib/db";
+import { schema } from "@/lib/drizzle-schema";
 import { EmploymentRecordFormSchema } from "@/lib/zod-schema/restaurant.zod";
+import { desc, eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 const path = '/api/employees/[slug]/employment-records';
+const salaryChangesTable = schema.salaryChangesTable;
 
 /* ================================================= 
   === [POST] Create a New Restaurant Table Entry ===
@@ -42,6 +45,7 @@ export async function POST(req: NextRequest, { params }: { params: { slug: numbe
         tx
       );
 
+
       // If employee is no longer active, clear their current salary
       if (status === "terminated" || status === "resigned") {
         await updateData("employeesTable", "id", employeeId, {
@@ -49,9 +53,22 @@ export async function POST(req: NextRequest, { params }: { params: { slug: numbe
         }, tx);
       }
 
-      return {
-        insertedId: insert.insertId,
-      };
+      /// If employee is active or rejoined, update salary from latest salary record
+      if (status === "active" || status === "rejoined") {
+        const latestSalaryRecord = await tx.select({
+          newSalary: salaryChangesTable.newSalary
+        })
+          .from(salaryChangesTable)
+          .where(eq(salaryChangesTable.employeeId, employeeId))
+          .orderBy(desc(salaryChangesTable.id))
+          .limit(1);
+
+        await updateData("employeesTable", "id", employeeId, {
+          salary: latestSalaryRecord?.[0]?.newSalary ?? null,
+        }, tx);
+      }
+
+      return { insertedId: insert.insertId }
     });
 
     return NextResponse.json(

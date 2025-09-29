@@ -62,6 +62,8 @@ export const fetchEmployee = async (employeeId: number) => {
   }
   // temp end
 
+  console.log("Fetch Employee Func call: ")
+
   // Fetch employee
   const [employee] = await db.select({
     id: employees.id,

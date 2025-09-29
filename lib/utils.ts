@@ -1,5 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import {format, parse } from 'date-fns'
+import numWords from "num-words";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -43,4 +45,19 @@ export function getLastPathSegment(url: string): string {
   const segments = url.split('/').filter(Boolean);
   if (segments.length === 0) return '';
   return segments[segments.length - 1].split('?')[0].split('#')[0].toLowerCase();
+}
+
+export function formatMonthYear(dateString: string) {
+  const parsedDate = parse(dateString, 'yyyy-MM', new Date());
+  return format(parsedDate, 'MMMM yyyy'); // e.g., "April 2025"
+}
+
+// Helper to convert number to capitalized words
+export function toCapitalizedWords(value: number | string): string {
+  const words = numWords(Number(value))
+    .split(" ")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
+    .join(" ");
+
+  return `${words} Rupees`;
 }

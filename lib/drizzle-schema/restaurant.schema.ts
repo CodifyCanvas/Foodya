@@ -124,6 +124,23 @@ export const salaryChangesTable = mysqlTable('salary_changes', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// Payroll Table
+export const payrollsTable = mysqlTable('payrolls', {
+  id: int('id').autoincrement().primaryKey(),
+  employeeId: int('employee_id').references(() => employeesTable.id).notNull(),
+  description: text('description'),
+  basicPay: decimal('basic_pay', { precision: 10, scale: 2 }).notNull(),
+  bonus: decimal('bonus', { precision: 10, scale: 2 }).default('0.00'),
+  penalty: decimal('penalty', { precision: 10, scale: 2 }).default('0.00'),
+  totalPay: decimal('total_pay', { precision: 10, scale: 2 }).notNull(),
+
+  month: varchar('month', { length: 15 }).notNull(),
+  status: mysqlEnum('status', ['pending', 'paid']).default('pending').notNull(),
+  paidAt: timestamp('paid_at'),
+
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 // Export Db Table Schema -> index.ts -> export to app
 export const restaurantSchema = {
   menuCategories,
@@ -137,6 +154,7 @@ export const restaurantSchema = {
   employeesTable,
   employmentRecordsTable,
   salaryChangesTable,
+  payrollsTable
 };
 
 export type RestaurantSchema = typeof restaurantSchema;

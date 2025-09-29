@@ -265,3 +265,45 @@ export interface EmployeeCompleteDetailsInterface {
   employmentRecord: EmploymentRecordInterface[];
   salaryChanges: SalaryChangeInterface[];
 }
+
+// payrolls interface for datatable 
+export interface EmployeesSalaryGeneralDetails {
+  id: number;
+  employeeId: number;
+  employee: string;
+  designation: string;
+  unpaidMonths: string[]; // e.g., ["2025-09", "2025-08"]
+  currentSalary: string;  // stored as string, e.g., "60000.00"
+  prevBalance: number;
+  thisMonth: number;
+  status: "pending" | "paid"; // restrict or widen as needed
+}
+
+export interface PayrollWithEmployeeDetails {
+  id: number;
+  employeeId: number;
+  employeeName: string;
+  employeeDesignation: string | null;
+  description: string | null;
+  basicPay: string; // Using string because MySQL decimal values are returned as strings
+  bonus: string;
+  penalty: string;
+  totalPay: string;
+  month: string; // Format: "YYYY-MM"
+  status: 'pending' | 'paid';
+  paidAt: string | null; // ISO timestamp or null
+  createdAt: string; // ISO timestamp
+}
+
+/* === Payroll Dialog Salary Row Interface === */
+export interface PayrollDialogSalaryRow {
+  id: number | string;
+  employeeId: number | string;
+  description: string | null;
+  basicPay: string;
+  bonus: string;
+  penalty: string;
+  totalPay: string;
+  month: string;
+  selected?: boolean
+}

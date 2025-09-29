@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  ColumnDef,
   ColumnFiltersState,
   flexRender,
   getCoreRowModel,
@@ -115,7 +114,7 @@ const defaultVisibility = Object.fromEntries(
           <Search className='size-4 text-black' />
           <span className='sr-only'>User</span>
         </div>
-        <Input type='text' variant="minimal" placeholder={ filterColumns && filterColumns.length > 0 ? `Search ${effectiveFilterColumns.join(", ")}...` : "Search..." } className='peer w-full border-b ps-9' value={globalFilter} onChange={(e) => setGlobalFilter(e.target.value)} />
+        <Input type='text' variant="minimal" placeholder={ filterColumns && filterColumns.length > 0 ? `Search ${effectiveFilterColumns.slice(0, 3).join(", ")}...` : "Search..." } className='peer w-full capitalize border-b ps-9' value={globalFilter} onChange={(e) => setGlobalFilter(e.target.value)} />
       </div>
         )}
         <div className="flex flex-row items-center gap-2">

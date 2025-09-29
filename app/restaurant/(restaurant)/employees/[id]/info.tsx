@@ -1,4 +1,3 @@
-// === Imports ===
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -177,27 +176,15 @@ const DataTable: React.FC<TableRoundedCornerDemoProps> = ({ columns, value }) =>
 
 // === Value Formatter ===
 const getDisplayValue = (value: any): string => {
-  if (
-    value === null ||
-    value === undefined ||
-    value === '' ||
-    (typeof value === 'number' && isNaN(value))
-  ) {
+  if ( value === null || value === undefined || value === '' || (typeof value === 'number' && isNaN(value))) { 
     return '—';
   }
 
-  const isDateLike =
-    (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(value)) || value instanceof Date;
+  const isDateLike = (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(value)) || value instanceof Date;
 
   if (isDateLike) {
     try {
-      return formatDateWithFns(value, {
-        separator: '-',
-        showTime: false,
-        monthFormat: 'short',
-        yearFormat: 'long',
-        order: ['DD', 'MMM', 'YYYY'],
-      });
+      return formatDateWithFns(value, { separator: '-', showTime: false, monthFormat: 'short', yearFormat: 'long', order: ['DD', 'MMM', 'YYYY'] });
     } catch {
       return 'Invalid date';
     }

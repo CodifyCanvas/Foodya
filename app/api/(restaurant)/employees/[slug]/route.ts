@@ -25,7 +25,7 @@ export async function GET(req: NextRequest, { params }: { params: { slug: number
 
     // === Fetch employee by ID ===
     const employee = await fetchEmployee(employeeId);
-
+    
     if (!employee) {
       return NextResponse.json(
         { error: `Employee with ID ${employeeId} not found.` },

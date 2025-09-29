@@ -73,7 +73,7 @@ export function DynamicOrderItemRow({
             <FormItem className="group relative w-full m-1">
               <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                 <span className="hidden sm:block">Select Menu Item</span>
-  <span className="block sm:hidden">Item</span>
+                <span className="block sm:hidden">Item</span>
               </FormLabel>
               <FormControl>
                 <ComboboxInput
