@@ -1,13 +1,14 @@
 import { auth } from "@/auth"
 import { checkDuplicate, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions"
+import { getAllIncomesWithDetails } from "@/lib/crud-actions/transactions"
 import { TransactionCategoriesFormSchema } from "@/lib/zod-schema/restaurant.zod"
 import { NextRequest, NextResponse } from "next/server"
 
-const path = '/api/transaction-categories'
+const path = '/api/incomes'
 
-/* =====================================================
-  === [GET] Fetch All Transaction Categories from DB ===
-===================================================== */
+/* ==================================================
+  === [GET] Fetch All Income Transactions from DB ===
+================================================== */
 export async function GET() {
   try {
     const session = await auth()
@@ -18,7 +19,7 @@ export async function GET() {
     }
 
     // === Fetch all Transaction Categories ===
-    const data = await getAllData("transactionCategoriesTable")
+    const data = await getAllIncomesWithDetails()
 
     return NextResponse.json(data, { status: 200 })
   } catch (error) {

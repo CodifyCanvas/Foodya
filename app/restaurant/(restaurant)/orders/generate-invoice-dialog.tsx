@@ -34,7 +34,7 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
   const { order, invoice, booking, footer, cart = [], invoiceId } = data || {};
   const [invoiceDetail, setInvoiceDetail] = useState<InvoiceResponse | null>(null)
   const [invoicefetching, setInvoicefetching] = useState<boolean>(false)
-  const [enablePrintOnSubmit, setEnablePrintOnSubmit] = useState<boolean>(false)
+  const [enablePrintOnSubmit, setEnablePrintOnSubmit] = useState<boolean>(true)
   const isViewMode = mode === "view";
 
   useEffect(() => {
@@ -115,6 +115,13 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
     },
   });
 
+  useEffect(() => {
+  if (invoiceDetail) {
+    console.log("Updated invoiceDetail:", invoiceDetail);
+  }
+}, [invoiceDetail]);
+
+
   // --- Reset Form When Dialog Opens ---
   useEffect(() => {
     form.reset({
@@ -129,9 +136,11 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
     });
   }, [selectedOrderType, invoice, invoiceFooter, customerName, form]);
 
-  function generateSlipHTML() {
+  function generateSlipHTML(invoiceId?: number) {
     // Use the invoice data (invoiceDetail or data) to build HTML string
     // Example (simplified):
+
+    const displayInvoiceId = invoiceDetail?.invoice.id ?? invoiceId ?? "N/A";
     const slipHtml = `
       <html>
         <head>
@@ -149,7 +158,7 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
   <h1 style="margin: 0; padding-bottom: 5px;">Foodya Restaurant</h1>
   <p style="margin: 0 0 10px 0;">Find it, Eat it, Love it</p>
 
-  <h2 style="margin: 0 0 5px 0;">Invoice #${invoiceDetail?.invoice.id ?? "N/A"}</h2>
+  <h2 style="margin: 0 0 5px 0;">Invoice #${displayInvoiceId}</h2>
 
   <p style="margin: 0 0 5px 0;">Customer: ${customerName ? customerName : "Random"}</p>
   <p style="margin: 0 0 5px 0;">Order Type: ${selectedOrderType ?? "N/A"}</p>
@@ -167,7 +176,7 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
       </tr>
     </thead>
     <tbody>
-      ${(menuItems ?? []).map(item => `
+      ${(menuItems ?? []).map((item: any) => `
         <tr>
           <td style="padding: 4px 0;">${item.menuItemName} ${item.menuItemOptionName ? `(${item.menuItemOptionName})` : ""}</td>
           <td style="padding: 4px 0; text-align: right;">${item.quantity}</td>
@@ -192,8 +201,8 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
     return slipHtml;
   }
 
-  function printSlip() {
-    const slipHTML = generateSlipHTML();
+  function printSlip(invoiceId?: number) {
+    const slipHTML = generateSlipHTML(invoiceId);
 
     const printWindow = window.open("", "PrintWindow", "width=900,height=600");
     if (!printWindow) return;
@@ -225,6 +234,7 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
         order: {
           orderType: values.orderType,
           paymentMethod: values.paymentMethod,
+          isPaid: true,
           customerName: values.customerName,
           subTotalAmount: values.subTotalAmount,
           discount: values.discount,
@@ -240,6 +250,7 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
         invoice: {
           orderId: order.id,
           tableId: order.tableId,
+          isPaid: true,
           generatedByUserId: order.waiterId,
           orderType: order.orderType,
           subTotalAmount: values.subTotalAmount,
@@ -282,8 +293,9 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
       // Reset form only after successful create
       form.reset()
 
+
       if (enablePrintOnSubmit) {
-        printSlip();
+        printSlip(result.invoiceId);
       }
 
       setIsOpen(false);
@@ -510,7 +522,6 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
                     checked={enablePrintOnSubmit}
                     disabled={isViewMode}
                     onCheckedChange={(checked) => {
-                      // Convert 'indeterminate' to false or handle as you wish
                       if (checked === "indeterminate") {
                         setEnablePrintOnSubmit(false);
                       } else {

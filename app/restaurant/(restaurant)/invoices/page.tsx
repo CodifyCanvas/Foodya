@@ -9,6 +9,7 @@ import { CreateForm } from './table-actions';
 import { useModulePermission } from '@/hooks/useModulePermission';
 import AccessDenied from '@/app/errors/access-control-view/access-denied';
 import { InvoiceWithMenuItemsAndTablesInterface } from '@/lib/definations';
+import ServiceUnavailable from '@/app/errors/service-unavailable';
 
 /* === Fetcher Function === */
 const fetcher = (url: string) => fetch(url).then(res => res.json());
@@ -38,22 +39,22 @@ const InvoicePage = () => {
     return <AccessDenied />;
   }
 
+  if (error) {
+    console.error(error);
+    return <ServiceUnavailable title='Service Unavailable' description='Please try again later or check your connection.' />;
+  }
+
   return (
     <div className="bg-white rounded-lg min-h-[50vh] flex flex-col">
       <h3 className="text-3xl font-medium text-start px-4 pt-3 text-emerald-600">Manage Invoices</h3>
 
-      {error ? (
-        <div className="text-center text-destructive py-4 font-medium">
-          Failed to load data
-        </div>
-      ) : (
-        <DataTable
-          columns={columns({ menuItems: invoices?.menuItems ?? [], tables: invoices?.tables ?? [], waiters: invoices?.waiters ?? [] })}
-          data={invoices?.invoices ?? []}
-          // filterColumns={['name']}
-          createComponent={<CreateForm props={{ menuItems: invoices?.menuItems ?? [],  tables: invoices?.tables ?? [], waiters: invoices?.waiters ?? [] }} />}
-        />
-      )}
+      <DataTable
+        columns={columns({ menuItems: invoices?.menuItems ?? [], tables: invoices?.tables ?? [], waiters: invoices?.waiters ?? [] })}
+        data={invoices?.invoices ?? []}
+        // filterColumns={['name']}
+        createComponent={<CreateForm props={{ menuItems: invoices?.menuItems ?? [], tables: invoices?.tables ?? [], waiters: invoices?.waiters ?? [] }} />}
+      />
+
     </div>
   );
 };

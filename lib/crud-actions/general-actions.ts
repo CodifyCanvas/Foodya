@@ -47,7 +47,7 @@ export async function updateData<T extends TableName, K extends ColumnName<T>>(
   columnValue: ColumnValue,                           // value of column for condition
   values: MySqlUpdateSetSource<Schema[T]>,            // data in object form
   tx?: DBExecutor,
-): Promise<void | { affectedRows: number }> {
+): Promise<{ affectedRows: number }> {
 
   const table = schema[tableName];
   const column = table[columnName] as any;
@@ -57,6 +57,7 @@ export async function updateData<T extends TableName, K extends ColumnName<T>>(
 
   const affectedRows = result[0].affectedRows;
 
+  console.log(result)
   return { 
     affectedRows: affectedRows
   }

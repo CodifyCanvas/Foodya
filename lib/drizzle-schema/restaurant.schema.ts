@@ -146,6 +146,20 @@ export const transactionCategoriesTable = mysqlTable('transaction_categories', {
   id: int('id').autoincrement().primaryKey(),
   category: varchar('category',{ length: 255 }).notNull(),
   description: text('description'),
+  locked: boolean('locked').default(false),
+});
+
+// Transactions Management Table
+export const transactionsTable = mysqlTable('transactions', {
+  id: int('id').autoincrement().primaryKey(),
+  title: varchar('title',{ length: 255 }).notNull(),
+  amount: decimal('amount', { precision: 10, scale: 2 }).notNull(),
+  categoryId: int('category_id').references(() => transactionCategoriesTable.id).notNull(),
+  type: mysqlEnum('type', ['debit', 'credit']).notNull(),
+
+  sourceType: mysqlEnum('source_type', ['invoice', 'payroll', 'manual', 'other']).default('other').notNull(),
+  sourceId: int('source_id'),
+  createdAt: timestamp('created_at').defaultNow().notNull()
 });
 
 // Export Db Table Schema -> index.ts -> export to app
@@ -162,7 +176,8 @@ export const restaurantSchema = {
   employmentRecordsTable,
   salaryChangesTable,
   payrollsTable,
-  transactionCategoriesTable
+  transactionCategoriesTable,
+  transactionsTable
 };
 
 export type RestaurantSchema = typeof restaurantSchema;

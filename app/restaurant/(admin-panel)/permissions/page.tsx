@@ -9,6 +9,7 @@ import { useModulePermission } from '@/hooks/useModulePermission';
 import AccessDenied from '@/app/errors/access-control-view/access-denied';
 import { Role } from '@/lib/definations';
 import { useUserContext } from '@/hooks/context/useUserContext';
+import ServiceUnavailable from '@/app/errors/service-unavailable';
 
 /* === Data Fetcher === */
 const fetcher = (url: string) => fetch(url).then(res => res.json());
@@ -40,6 +41,11 @@ const PermissionsPage = () => {
     return <AccessDenied />;
   }
 
+  if (error) {
+    console.error(error);
+    return <ServiceUnavailable title='Service Unavailable' description='Please try again later or check your connection.' />;
+  }
+
   return (
     <div className="bg-white rounded-lg min-h-[50vh] flex flex-col">
       {/* Page Header */}
@@ -47,18 +53,12 @@ const PermissionsPage = () => {
         Permissions
       </h3>
 
-      {/* Error or Data Table */}
-      {error ? (
-        <div className="text-center text-destructive py-4 font-medium">
-          Failed to load data
-        </div>
-      ) : (
-        <DataTable
-          columns={columns({ refetchPermissions })}
-          data={permissions ?? []}
-          filterColumns={['role']}
-        />
-      )}
+      <DataTable
+        columns={columns({ refetchPermissions })}
+        data={permissions ?? []}
+        filterColumns={['role']}
+      />
+
     </div>
   );
 };

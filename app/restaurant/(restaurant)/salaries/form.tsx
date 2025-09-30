@@ -277,7 +277,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp }: FormDialogProps
                     </TooltipTrigger>
                     {footerDetails.totalBalance !== null && footerDetails.totalBalance !== undefined && (
                       <TooltipContent className="text-sm max-w-xs text-center">
-                        <p>{toCapitalizedWords(footerDetails.totalBalance)}</p>
+                        <p>{toCapitalizedWords(footerDetails.totalBalance ?? 0)}</p>
                       </TooltipContent>
                     )}
                   </Tooltip>

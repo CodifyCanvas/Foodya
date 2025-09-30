@@ -8,6 +8,7 @@ import { columns, UsersWithRolesResponse } from './columns';
 import { CreateForm } from './table-actions';
 import { useModulePermission } from '@/hooks/useModulePermission';
 import AccessDenied from '@/app/errors/access-control-view/access-denied';
+import ServiceUnavailable from '@/app/errors/service-unavailable';
 
 /* === SWR Fetcher === */
 const fetcher = (url: string) => fetch(url).then(res => res.json());
@@ -35,6 +36,11 @@ const UsersPage = () => {
     return <AccessDenied />;
   }
 
+  if (error) {
+    console.error(error);
+    return <ServiceUnavailable title='Service Unavailable' description='Please try again later or check your connection.' />;
+  }
+
   return (
     <div className="bg-white rounded-lg min-h-[50vh] flex flex-col">
       {/* Page Header */}
@@ -42,19 +48,15 @@ const UsersPage = () => {
         Users
       </h3>
 
-      {/* Data Table or States */}
-      {error ? (
-        <div className="text-center py-4 text-red-500">Failed to load data</div>
-      ) : (
-        <DataTable
-          columns={columns({ roles: data?.roles ?? [] })}
-          data={data?.users ?? []}
-          filterColumns={['email', 'name']}
-          createComponent={
-            <CreateForm props={{ roles: data?.roles ?? [] }} />
-          }
-        />
-      )}
+      <DataTable
+        columns={columns({ roles: data?.roles ?? [] })}
+        data={data?.users ?? []}
+        filterColumns={['email', 'name']}
+        createComponent={
+          <CreateForm props={{ roles: data?.roles ?? [] }} />
+        }
+      />
+
     </div>
   );
 };

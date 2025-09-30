@@ -7,7 +7,8 @@ dotenv.config();
 // === Import Dependencies ===
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
-import * as schema from '@/lib/drizzle-schema/admin-panel.schema';
+import { schema } from '@/lib/drizzle-schema/';
+// import * as schema from '@/lib/drizzle-schema/admin-panel.schema';
 import { and, eq } from 'drizzle-orm';
 import { navLink } from '@/constants';
 
@@ -135,6 +136,41 @@ async function main() {
         console.log(`✅ Permissions granted for module: ${mod.name}`);
       } else {
         console.log(`ℹ️ Permissions already set for module: ${mod.name}`);
+      }
+    }
+
+    // === Step 5: Seed Constant Transaction Categories ===
+    const transactionCategories = [{
+      id: 1,
+      category: "salary",
+      description: "Monthly salary payments to employees",
+    }, {
+      id: 2,
+      category: "invoice",
+      description: "Transactions generated from customer invoices",
+    }, {
+      id: 3,
+      category: "others",
+      description: "Miscellaneous or uncategorized payments",
+    }];
+
+    for (const { id, category, description } of transactionCategories) {
+      const [existingCategory] = await seedDb
+        .select()
+        .from(schema.transactionCategoriesTable)
+        .where(eq(schema.transactionCategoriesTable.category, category));
+
+      if (!existingCategory) {
+        await seedDb.insert(schema.transactionCategoriesTable).values({
+          id,
+          category,
+          description,
+          locked: true,
+        });
+
+        console.log(`✅ Transaction category inserted: ${category}`);
+      } else {
+        console.log(`ℹ️ Transaction category already exists: ${category}`);
       }
     }
 

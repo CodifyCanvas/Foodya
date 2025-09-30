@@ -51,7 +51,7 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
     const { slug } = await params;
     if (slug !== 'create') {
       return NextResponse.json(
-        { message: "Invalid API endpoint. Please verify the URL and try again." },
+        { error: "Invalid API endpoint. Please verify the URL and try again." },
         { status: 400 }
       );
     }
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
     const duplicate = await checkDuplicate("InvoicesTable", "orderId", parsed.orderId);
     if (duplicate) {
       return NextResponse.json(
-        { message: "This order id is already in use." },
+        { error: "This order id is already in use." },
         { status: 409 }
       );
     }
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
 
     // === Return success response with invoice ID === 
     return NextResponse.json(
-      { message: "Invoice created successfully.", NewinvoiceId: newInvoiceId },
+      { message: "Invoice created successfully.", invoiceId: newInvoiceId },
       { status: 201 }
     );
 

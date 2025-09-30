@@ -9,6 +9,7 @@ import { CreateForm } from './table-actions'
 import { useModulePermission } from '@/hooks/useModulePermission'
 import AccessDenied from '@/app/errors/access-control-view/access-denied'
 import { EmployeeWithLatestRecord } from '@/lib/definations'
+import ServiceUnavailable from '@/app/errors/service-unavailable'
 
 /* === Data Fetcher Function === */
 const fetcher = (url: string) => fetch(url).then(res => res.json())
@@ -39,6 +40,11 @@ const Page = () => {
     return <AccessDenied />
   }
 
+  if (error) {
+    console.error(error);
+    return <ServiceUnavailable title='Service Unavailable' description='Please try again later or check your connection.' />;
+  }
+
   return (
     <div className="bg-white rounded-lg min-h-[50vh] flex flex-col">
       {/* === Page Header === */}
@@ -46,19 +52,13 @@ const Page = () => {
         Employees Management
       </h3>
 
-      {/* === Data Table or Error Message === */}
-      {error ? (
-        <div className="text-center text-destructive py-4 font-medium">
-          Failed to load data
-        </div>
-      ) : (
-        <DataTable
-          columns={columns()}
-          data={data ?? []}
-          filterColumns={[]}
-          createComponent={<CreateForm />}
-        />
-      )}
+      <DataTable
+        columns={columns()}
+        data={data ?? []}
+        filterColumns={[]}
+        createComponent={<CreateForm />}
+      />
+
     </div>
   )
 }

@@ -5,6 +5,7 @@ import { db } from "../db";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { format } from "date-fns";
 import { PayrollDialogSalaryRow } from "../definations";
+import { insertData } from "./general-actions";
 
 // DataTable Interface [id, employee, Designation, unpaid months, Current Salary, Prev. Balance,  This Month, Status, action [edit, view]]
 
@@ -188,31 +189,40 @@ export async function markUnpaidPayrollsAsPaid(salaries: PayrollDialogSalaryRow[
   if (!salaries || salaries.length === 0) return false;
 
   await db.transaction(async (tx) => {
-    await Promise.all(
-      salaries.map((salary) =>
-        tx
-          .update(payrollsTable)
-          .set({
-            basicPay: salary.basicPay,
-            bonus: salary.bonus,
-            penalty: salary.penalty,
-            totalPay: salary.totalPay,
-            description: salary.description,
-            
-            paidAt: sql`CURRENT_TIMESTAMP`,   // Use MySQL current timestamp
-            status: "paid",
-          })
-          .where(
-            and(
-              eq(payrollsTable.id, Number(salary.id)),
-              eq(payrollsTable.employeeId, Number(salary.employeeId)),
-              eq(payrollsTable.month, salary.month)
-            )
+    for (const salary of salaries) {
+      // === Update payroll record ===
+      await tx.update(payrollsTable)
+        .set({
+          basicPay: salary.basicPay,
+          bonus: salary.bonus,
+          penalty: salary.penalty,
+          totalPay: salary.totalPay,
+          description: salary.description,
+
+          paidAt: sql`CURRENT_TIMESTAMP`,
+          status: "paid",
+        })
+        .where(
+          and(
+            eq(payrollsTable.id, Number(salary.id)),
+            eq(payrollsTable.employeeId, Number(salary.employeeId)),
+            eq(payrollsTable.month, salary.month)
           )
-      )
-    );
+        );
+
+      // === Insert transaction record for payroll payment ===
+      await insertData("transactionsTable", {
+        categoryId: 1,
+        title: 'Salary Payment to Employee',
+        amount: salary.totalPay,
+        type: 'debit',
+        sourceType: 'payroll',
+        sourceId: Number(salary.employeeId),
+      }, tx);
+    }
   });
 
   return true;
 }
+
 

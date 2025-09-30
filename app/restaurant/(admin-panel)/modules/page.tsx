@@ -9,6 +9,7 @@ import { CreateForm } from './table-actions';
 import { useModulePermission } from '@/hooks/useModulePermission';
 import AccessDenied from '@/app/errors/access-control-view/access-denied';
 import { ModuleInterface } from '@/lib/definations';
+import ServiceUnavailable from '@/app/errors/service-unavailable';
 
 /* === Data Fetcher === */
 const fetcher = (url: string) => fetch(url).then(res => res.json());
@@ -34,6 +35,11 @@ const ModulesPage = () => {
     return <AccessDenied />;
   }
 
+  if (error) {
+    console.error(error);
+    return <ServiceUnavailable title='Service Unavailable' description='Please try again later or check your connection.' />;
+  }
+
   return (
     <div className="bg-white rounded-lg min-h-[50vh] flex flex-col">
       {/* Page Header */}
@@ -41,19 +47,13 @@ const ModulesPage = () => {
         Modules
       </h3>
 
-      {/* Data or Error */}
-      {error ? (
-        <div className="text-center text-destructive py-4 font-medium">
-          Failed to load data
-        </div>
-      ) : (
-        <DataTable
-          columns={columns()}
-          data={modules ?? []}
-          filterColumns={['name']}
-          createComponent={<CreateForm />}
-        />
-      )}
+      <DataTable
+        columns={columns()}
+        data={modules ?? []}
+        filterColumns={['name']}
+        createComponent={<CreateForm />}
+      />
+
     </div>
   );
 };

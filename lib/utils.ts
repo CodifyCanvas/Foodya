@@ -53,11 +53,24 @@ export function formatMonthYear(dateString: string) {
 }
 
 // Helper to convert number to capitalized words
-export function toCapitalizedWords(value: number | string): string {
-  const words = numWords(Number(value))
+export function toCapitalizedWords(value: number | string | null | undefined): string {
+  if (value === null || value === undefined) return "Zero Rupees";
+
+  const numericValue = Number(value);
+
+  if (isNaN(numericValue)) return "Invalid Amount";
+
+  const isNegative = numericValue < 0;
+  const absoluteValue = Math.abs(numericValue);
+
+  const wordString = numWords(absoluteValue);
+
+  if (!wordString || typeof wordString !== 'string') return "Zero Rupees";
+
+  const words = wordString
     .split(" ")
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 
-  return `${words} Rupees`;
+  return `${isNegative ? 'Negative ' : ''}${words} Rupees`;
 }

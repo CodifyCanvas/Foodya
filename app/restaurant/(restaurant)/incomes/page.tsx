@@ -4,27 +4,24 @@ import useSWR from 'swr';
 import { Loader } from 'lucide-react';
 
 import { DataTable } from '@/components/DataTable/data-table';
-import { columns, menuItemsFromRoute } from './columns';
+import { columns } from './columns';
 import { CreateForm } from './table-actions';
 import { useModulePermission } from '@/hooks/useModulePermission';
 import AccessDenied from '@/app/errors/access-control-view/access-denied';
+import { TransactionCategoriesTablesInterface } from '@/lib/definations';
 import ServiceUnavailable from '@/app/errors/service-unavailable';
 
-/* === Fetcher Function === */
+/* === Data Fetcher === */
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-const RolesPage = () => {
-  // Use permission hook
+const ModulesPage = () => {
+  // Use the custom permission hook
   const { canView, loading: permLoading } = useModulePermission();
 
-  // Fetch roles data from API
-  const {
-    data,
-    error,
-    isLoading: rolesLoading,
-  } = useSWR<menuItemsFromRoute>('/api/menu-items', fetcher);
+  // Fetch Transaction Categories data
+  const { data: modules, error, isLoading: dataLoading } = useSWR<TransactionCategoriesTablesInterface[]>('/api/transaction-categories', fetcher);
 
-  const isLoading = permLoading || rolesLoading;
+  const isLoading = permLoading || dataLoading;
 
   if (isLoading) {
     return (
@@ -37,7 +34,7 @@ const RolesPage = () => {
   if (!canView) {
     return <AccessDenied />;
   }
-
+  
   if (error) {
     console.error(error);
     return <ServiceUnavailable title='Service Unavailable' description='Please try again later or check your connection.' />;
@@ -45,17 +42,19 @@ const RolesPage = () => {
 
   return (
     <div className="bg-white rounded-lg min-h-[50vh] flex flex-col">
-      <h3 className="text-3xl font-medium text-start px-4 pt-3 text-emerald-600">Menu Items</h3>
+      {/* Page Header */}
+      <h3 className="text-3xl font-medium text-start px-4 pt-3 text-emerald-600">
+        Incomes
+      </h3>
 
-      <DataTable
-        columns={columns({ categories: data?.categories ?? [] })}
-        data={data?.menuItems ?? []}
-        filterColumns={['category', "item"]}
-        createComponent={<CreateForm props={{ categories: data?.categories ?? [] }} />}
-      />
-
+        <DataTable
+          columns={columns()}
+          data={modules ?? []}
+          filterColumns={[]}
+          createComponent={<CreateForm />}
+        />
     </div>
   );
 };
 
-export default RolesPage;
+export default ModulesPage;

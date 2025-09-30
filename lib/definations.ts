@@ -313,4 +313,5 @@ export interface TransactionCategoriesTablesInterface {
   id: number;
   category: string;
   description: string;
+  locked: boolean
 }
