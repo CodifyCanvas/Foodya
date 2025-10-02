@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import { useModulePermission } from '@/hooks/useModulePermission';
-import { TransactionCategoriesTablesInterface } from '@/lib/definations';
+import { TransactionsTablesInterface } from '@/lib/definations';
 
 interface CreateFormMultiProps {
   props?: Record<string, any>;
@@ -24,7 +24,7 @@ interface CreateFormMultiProps {
 
 interface EditFormMultiProps {
   props?: Record<string, any>;
-  data: TransactionCategoriesTablesInterface;
+  data: TransactionsTablesInterface;
   className?: string;
 }
 
@@ -45,6 +45,8 @@ const showPermissionToast = () =>
 export function RowActions({ data, props, className }: EditFormMultiProps) {
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
+
+  const isLocked = data.sourceType === 'invoice' || data.sourceType === 'payroll';
 
   const { canEdit, canDelete } = useModulePermission();
 
@@ -74,12 +76,12 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
           </Button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent title={data.locked ? "Category is locked" : ""} align="end" className="font-rubik-400 text-xs">
-          <DropdownMenuItem disabled={data.locked} onClick={handleEditClick}>
+        <DropdownMenuContent title={isLocked ? "Transaction is locked" : ""} align="end" className="font-rubik-400 text-xs">
+          <DropdownMenuItem disabled={isLocked} onClick={handleEditClick}>
             <PencilLine className="mr-2 size-4" />
             Edit
           </DropdownMenuItem>
-          <DropdownMenuItem variant="destructive" disabled={data.locked} onClick={handleDeleteClick}>
+          <DropdownMenuItem variant="destructive" disabled={isLocked} onClick={handleDeleteClick}>
             <Trash2 className="mr-2 size-4" />
             Delete
           </DropdownMenuItem>
@@ -88,7 +90,7 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
 
       {openEdit && <RoleForm open={openEdit} onOpenChange={setOpenEdit} data={data} {...props} />}
       {openDelete && (
-        <DeleteConfirmationDialog<TransactionCategoriesTablesInterface>
+        <DeleteConfirmationDialog<TransactionsTablesInterface>
           open={openDelete}
           onOpenChange={setOpenDelete}
           data={data}

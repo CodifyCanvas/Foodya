@@ -160,9 +160,9 @@ export const EmploymentRecordFormSchema = z.object({
   status: z.enum(['active', 'resigned', 'terminated', 'rejoined']),
   joinedAt: z.string().min(1, "Join date is required"),
   resignedAt: z.string().nullable(),
-  changeType: z.enum(['valid','correction']),
+  changeType: z.enum(['valid', 'correction']),
 }).check((schema) => {
-  const { status, resignedAt} = schema.value;
+  const { status, resignedAt } = schema.value;
 
   if (status === 'resigned' && !resignedAt) {
     schema.issues.push({
@@ -219,7 +219,7 @@ export const EmployeeSalaryPostingFormSchema = z.object({
       totalPay: z.string(),
 
       month: z.string().regex(/^(19|20)\d{2}-(0[1-9]|1[0-2])$/, "Month must be in YYYY-MM format (e.g., 2025-08)"), // Month in format YYYY-MM
-      
+
       selected: z.boolean(),  // Field to indicate which salaries are selected for payment only
 
     }).superRefine((row, ctx) => {
@@ -251,6 +251,18 @@ export const EmployeeSalaryPostingFormSchema = z.object({
 // === Transaction Category Form Schema ===
 export const TransactionCategoriesFormSchema = z.object({
   id: z.union([z.number(), z.string().transform(String)]).nullable(),
-  category: z.string({ error: "Category Name is required" }).min(2, { error: "Category Name must be at least 2 characters" }).max(50, { error: "Category Name must not exceed 50 characters" }),
+  category: z.string().min(2, { error: "Category Name must be at least 2 characters" }).max(50, { error: "Category Name must not exceed 50 characters" }),
   description: z.string().max(255, { error: "Description must be less than 255 characters" }).nullable(),
+})
+
+// === Income/expense Transaction Form Schema ===
+export const TransactionFormSchema = z.object({
+  id: z.union([z.number(), z.string().transform(String)]).nullable(),
+  title: z.string().min(2, "Title is Required and must be at least 6 characters").max(100, "Title must not exceed 100 characters"),
+  description: z.string().max(250, "Description must not exceed 250 characters").nullable(),
+  amount: z.union([z.number(), z.string().transform(String)]).refine((val) => {
+    const num = Number(val);
+    return !isNaN(num) && num > 0;
+  }, { message: "Value must be a number greater than 0" }),
+  category: z.string().min(1, "Category is required"),
 })

@@ -3,56 +3,89 @@
 import { DataTableColumnHeader } from "@/components/DataTable/data-table-column-header"
 import { RowActions } from "./table-actions"
 import { ExtendedColumnDef } from "@/types/columns.data-table"
-import { TransactionCategoriesTablesInterface } from "@/lib/definations"
+import { TablesSelectInput, TransactionsTablesInterface } from "@/lib/definations"
+import { formatDateWithFns } from "@/lib/date-fns"
 
-/* === Columns for Transaction Categories === */
-export const columns = (): ExtendedColumnDef<TransactionCategoriesTablesInterface>[] => [
-  
+/* === Columns for Income Transactions === */
+export const columns = (props: { categories: TablesSelectInput[] }): ExtendedColumnDef<TransactionsTablesInterface>[] => [
+
   // === Id Column ===
   {
     accessorKey: "id",
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title="#"
+        title="TID"
         className="ml-2 md:ml-5"
         search
       />
     ),
     cell: ({ row }) => (
-      <div className="pl-3 md:pl-5">{row.index + 1}</div>
+      <div className="pl-3 md:pl-5">{row.original.id}</div>
     ),
   },
 
-  // === Category Name Column ===
+  // === Transaction Title Column ===
+  {
+    accessorKey: "title",
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title="Title"
+        search
+      />
+    ),
+    cell: ({ row }) => (
+      <div className="capitalize">{row.original.title}</div>
+    ),
+  },
+
+  // === Transaction Category Name Column ===
   {
     accessorKey: "category",
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
         title="Category"
-        search
+        filter={props.categories}
       />
     ),
     cell: ({ row }) => (
       <div className="capitalize">{row.original.category}</div>
     ),
   },
-  
-  // === Category Description Column ===
+
+  // === Transaction Amount Column ===
   {
-    accessorKey: "description",
+    accessorKey: "amount",
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title="Description"
+        title="Amount"
       />
     ),
     cell: ({ row }) => (
-      <div className="capitalize">{row.original.description}</div>
+      <div className="capitalize">{row.original.amount}</div>
     ),
   },
-  
+
+  // === Transaction Date Column ===
+  {
+    accessorKey: "createdAt",
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title="Date"
+      />
+    ),
+    cell: ({ row }) => (
+      <div className="capitalize">{formatDateWithFns(row.original.createdAt, { showTime: true })}</div>
+    ),
+    meta: {
+      title: 'Date'
+    }
+  },
+
   // === Actions Column ===
   {
     id: "actions",
@@ -64,6 +97,7 @@ export const columns = (): ExtendedColumnDef<TransactionCategoriesTablesInterfac
     cell: ({ row }) => (
       <RowActions
         data={row.original}
+        props={{ categories: props.categories }}
         className="pr-3 md:pr-5"
       />
     ),

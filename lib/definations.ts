@@ -63,11 +63,11 @@ export interface ItemWithOptions {
 }
 
 // === Menu Item with Options Interface Definition ===
-export interface MenuItemOptions {  
-    option_id: number;
-    option_name: string;
-    price: string;
-  
+export interface MenuItemOptions {
+  option_id: number;
+  option_name: string;
+  price: string;
+
 }
 
 // === Categories object used in dropdowns or display ===
@@ -129,7 +129,7 @@ export interface OrderResponse {
 // === Order Details Interface ===
 export interface OrderDetail {
   id: number;
-  tableId:  string | null;
+  tableId: string | null;
   waiterId: string | null;
   orderType: 'dine_in' | 'drive_thru' | 'takeaway';
   status: 'pending' | 'in_progress' | 'completed';
@@ -188,9 +188,9 @@ export interface GeneratedBy {
 
 // === Waiter Dropdown Option Interface ===
 export interface WaiterSelectInput {
-  label: string;  
-  value: string;          
-  role: string | null; 
+  label: string;
+  value: string;
+  role: string | null;
 }
 
 // === Employee Data Interfaces for Management Module ===
@@ -314,4 +314,19 @@ export interface TransactionCategoriesTablesInterface {
   category: string;
   description: string;
   locked: boolean
+}
+
+// === Transaction Tables Interface ===
+export interface TransactionsTablesInterface {
+  id: number;
+  title: string;
+  description: string | null;
+  amount: string;
+  categoryId: number;
+  category: string | null;
+  categoryDescription: string | null;
+  type: 'credit' | 'debit';
+  sourceType: string;
+  sourceId: number | null;
+  createdAt: string;
 }

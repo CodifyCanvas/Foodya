@@ -1,7 +1,8 @@
 import { auth } from "@/auth"
-import { checkDuplicate, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions"
+import { getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions"
 import { getAllIncomesWithDetails } from "@/lib/crud-actions/transactions"
-import { TransactionCategoriesFormSchema } from "@/lib/zod-schema/restaurant.zod"
+import { mapToLabelValue } from "@/lib/utils"
+import { TransactionFormSchema } from "@/lib/zod-schema/restaurant.zod"
 import { NextRequest, NextResponse } from "next/server"
 
 const path = '/api/incomes'
@@ -18,10 +19,13 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    // === Fetch all Transaction Categories ===
+    // === Fetch all Transactions & Categories ===
     const data = await getAllIncomesWithDetails()
+    const rawCategories = await getAllData("transactionCategoriesTable")
 
-    return NextResponse.json(data, { status: 200 })
+    const categories = mapToLabelValue(rawCategories, { label: 'category', value: 'id' })
+
+    return NextResponse.json({ transactions: data, categories }, { status: 200 })
   } catch (error) {
     console.error(`[GET ${path}] Failed to fetch transaction categories:`, error)
 
@@ -32,9 +36,9 @@ export async function GET() {
   }
 }
 
-/* ===================================================== 
-  === [POST] Create a New Transaction Category Entry ===
-===================================================== */
+/* =================================================== 
+  === [POST] Create a New Income Transaction Entry ===
+=================================================== */
 export async function POST(req: NextRequest) {
   try {
     const session = await auth()
@@ -47,42 +51,36 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
 
     // === Validate request body using Zod schema ===
-    const parsed = TransactionCategoriesFormSchema.parse(body)
-    const { category, description } = parsed
+    const parsed = TransactionFormSchema.parse(body)
+    const { title, category, amount, description } = parsed
 
-    // === Check for duplicate Category Name ===
-    const duplicate = await checkDuplicate("transactionCategoriesTable", "category", category)
-
-    if (duplicate) {
-      return NextResponse.json(
-        { error: "This Category Name is already in use." },
-        { status: 409 }
-      )
-    }
-
-    // === Insert new Transaction Category into DB ===
-    await insertData("transactionCategoriesTable", {
-      category: category.trim().toLowerCase(),
-      description: description?.trim(),
+    // === Insert new Income Transaction into DB ===
+    await insertData("transactionsTable", {
+      title: title?.trim(),
+      categoryId: Number(category?.trim()),
+      amount: amount?.toString().trim(),
+      type: 'credit',
+      sourceType: 'manual',
+      description: description?.trim() ?? null,
     })
 
     return NextResponse.json(
-      { message: "Category created successfully." },
+      { message: "Income added successfully." },
       { status: 201 }
     )
   } catch (error) {
-    console.error(`[POST ${path}] Transaction Category creation failed:`, error)
+    console.error(`[POST ${path}] transaction income creation failed:`, error)
 
     return NextResponse.json(
-      { error: "An unexpected error occurred while creating the transaction category. Please try again later." },
+      { error: "An unexpected error occurred while creating the income transaction. Please try again later." },
       { status: 500 }
     )
   }
 }
 
-/* ====================================================
-  === [PUT] Update an Existing Transaction Category ===
-==================================================== */
+/* ==================================================
+  === [PUT] Update an Existing Transaction Income ===
+================================================== */
 export async function PUT(req: NextRequest) {
   try {
     const session = await auth()
@@ -95,24 +93,26 @@ export async function PUT(req: NextRequest) {
     const body = await req.json()
 
     // === Validate input data using Zod schema ===
-    const parsed = TransactionCategoriesFormSchema.parse(body)
-    const { id, category, description } = parsed
+    const parsed = TransactionFormSchema.parse(body)
+    const { id, title, category, amount, description } = parsed
 
-    // === Update Transaction Category record by ID ===
-    await updateData("transactionCategoriesTable", "id", id!, {
-      category: category.trim().toLowerCase(),
-      description: description?.trim(),
+    // === Update Income Transaction record by ID ===
+    await updateData("transactionsTable", "id", id!, {
+      title: title?.trim(),
+      categoryId: Number(category?.trim()),
+      amount: amount?.toString().trim(),
+      description: description?.trim() ?? null,
     })
 
     return NextResponse.json(
-      { message: "Category updated successfully." },
+      { message: "Income updated successfully." },
       { status: 202 }
     )
   } catch (error) {
-    console.error(`[PUT ${path}] transaction category update failed:`, error)
+    console.error(`[PUT ${path}] transaction income update failed:`, error)
 
     return NextResponse.json(
-      { error: "An unexpected error occurred while updating the transaction category. Please try again later." },
+      { error: "An unexpected error occurred while updating the income transaction. Please try again later." },
       { status: 500 }
     )
   }

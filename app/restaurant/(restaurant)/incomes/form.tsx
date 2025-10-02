@@ -25,33 +25,36 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { TransactionCategoriesFormSchema } from "@/lib/zod-schema/restaurant.zod"
+import { TransactionFormSchema } from "@/lib/zod-schema/restaurant.zod"
 
 import toast from 'react-hot-toast'
 import { refreshData } from "@/lib/swr"
-import { TransactionCategoriesTablesInterface } from "@/lib/definations"
+import { TransactionsTablesInterface } from "@/lib/definations"
 import { Textarea } from "@/components/ui/textarea"
+import SelectInput from "@/components/ui/select-input"
 
 /* === Props Interface === */
 interface FormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  data: TransactionCategoriesTablesInterface | null
+  data: TransactionsTablesInterface | null
   [key: string]: any
 }
 
-export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
+export function RoleForm({ open, onOpenChange, data, categories }: FormDialogProps) {
   /* === Local State === */
   const [manualReset, setManualReset] = useState(false)
   const [submitButtonLoading, setSubmitButtonLoading] = useState<boolean>(false)
 
   /* === React Hook Form Setup === */
-  const form = useForm<z.infer<typeof TransactionCategoriesFormSchema>>({
-    resolver: zodResolver(TransactionCategoriesFormSchema),
+  const form = useForm<z.infer<typeof TransactionFormSchema>>({
+    resolver: zodResolver(TransactionFormSchema),
     defaultValues: {
       id: null,
+      title: '',
       category: "",
-      description: '',
+      amount: "0",
+      description: null,
     },
   })
 
@@ -60,15 +63,17 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
     if (!manualReset && data) {
       form.reset({
         id: data.id ?? null,
-        category: data.category ?? "",
-        description: data.description ?? '',
+        description: data.description ?? null,
+        category: String(data.categoryId) ?? "",
+        title: data.title ?? '',
+        amount: data.amount ?? '',
       })
     }
   }, [data, manualReset, form])
 
   /* === Submit Handler === */
-  async function onSubmit(formValues: z.infer<typeof TransactionCategoriesFormSchema>) {
-    const API_URL = "/api/transaction-categories";
+  async function onSubmit(formValues: z.infer<typeof TransactionFormSchema>) {
+    const API_URL = "/api/incomes";
     const isEditing = !!data?.id;
 
     const requestOptions = {
@@ -87,20 +92,20 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
 
       {/* === Show warning toast for duplicate/409 error === */ }
       if (result.status === 409) {
-        toast.error(result?.message ?? "Duplicate value found.");
+        toast.error(result?.error ?? "Duplicate value found.");
         return;
       }
 
       if (!response.ok) {
         toast.error(result?.error ?? (isEditing
-          ? "Category can't be updated. Please try again."
-          : "Category can't be created. Please try again."))
+          ? "Income can't be updated. Please try again."
+          : "Income can't be created. Please try again."))
         return
       }
 
       toast.success(result?.message ?? (isEditing
-        ? "Category updated successfully."
-        : "New category created successfully."))
+        ? "Income updated successfully."
+        : "New income created successfully."))
 
       // Reset form only after successful create
       if (!isEditing) {
@@ -122,8 +127,10 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
     setManualReset(true)
     form.reset({
       id: data?.id ?? null,
+      description: null,
       category: "",
-      description: "",
+      title: '',
+      amount: '0',
     })
   }
 
@@ -135,7 +142,7 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
 
             {/* === Dialog Header === */}
             <DialogHeader className="p-6 pb-0">
-              <DialogTitle>{data ? "Edit Transaction Category" : "Create Transaction Category"}</DialogTitle>
+              <DialogTitle>{data ? "Edit Income" : "Add Income"}</DialogTitle>
               <DialogDescription className="sr-only">
                 Create or Update your Transaction Category
               </DialogDescription>
@@ -144,22 +151,21 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
             {/* === Scrollable Form Area === */}
             <ScrollArea className="flex flex-col justify-between overflow-hidden p-3">
 
-              {/* === Transaction Category Name Field === */}
+              {/* === Transaction Title Field === */}
               <div className="w-full py-2">
                 <FormField
                   control={form.control}
-                  name="category"
+                  name="title"
                   render={({ field }) => (
-                    <FormItem className="group relative w-auto sm:max-w-sm m-1">
+                    <FormItem className="group relative w-full m-1">
                       <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
-                        Name
+                        Title
                       </FormLabel>
                       <FormControl>
                         <Input
                           type="text"
-                          placeholder="Enter Category Name"
                           {...field}
-                          className="h-10"
+                          className="h-10 w-full"
                         />
                       </FormControl>
                       <FormMessage />
@@ -168,7 +174,55 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
                 />
               </div>
 
-              {/* === Transaction Category Description Input Field === */}
+              {/* === Transaction Category Name Select Field === */}
+              <div className="w-full py-2">
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem className="group relative w-auto sm:max-w-sm m-1">
+                      <FormLabel htmlFor="select_category_incomes_form" className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                        Select Category
+                      </FormLabel>
+                      <FormControl>
+                        <SelectInput options={categories}
+                          value={field.value ?? ""}
+                          className="w-full rounded-lg"
+                          onChange={field.onChange}
+                          placeholder="Salary, Invoice, ..."
+                          id="select_category_incomes_form"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* === Transaction Amount Input Field === */}
+              <div className="w-full py-2">
+                <FormField
+                  control={form.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem className="group relative w-full m-1">
+                      <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                        Amount
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          className="h-10 w-full"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* === Transaction Description Input Field === */}
               <div className="w-full py-2">
                 <FormField
                   control={form.control}
@@ -176,7 +230,7 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
                   render={({ field }) => (
                     <FormItem className="group relative w-auto sm:max-w-sm m-1">
                       <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
-                        Description
+                        Description (optional)
                       </FormLabel>
                       <FormControl>
                         <Textarea

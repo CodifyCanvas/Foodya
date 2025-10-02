@@ -153,6 +153,7 @@ export const transactionCategoriesTable = mysqlTable('transaction_categories', {
 export const transactionsTable = mysqlTable('transactions', {
   id: int('id').autoincrement().primaryKey(),
   title: varchar('title',{ length: 255 }).notNull(),
+  description: text('description'),
   amount: decimal('amount', { precision: 10, scale: 2 }).notNull(),
   categoryId: int('category_id').references(() => transactionCategoriesTable.id).notNull(),
   type: mysqlEnum('type', ['debit', 'credit']).notNull(),

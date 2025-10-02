@@ -1,4 +1,5 @@
-import { parseISO, format } from 'date-fns';
+import { parseISO } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 
 type DateFormatPart = 'DD' | 'MM' | 'MMM' | 'YYYY';
 
@@ -8,10 +9,11 @@ interface FormatDateOptions {
   monthFormat?: 'short' | 'long';
   yearFormat?: 'short' | 'long';
   order?: DateFormatPart[];
+  timeZone?: string; // NEW: optional timezone, default to UTC
 }
 
 /**
- * Formats a given ISO date string or Date object into a custom format.
+ * Formats a given ISO date string or Date object into a custom format using a specific timezone.
  */
 export function formatDateWithFns(
   isoDateString: string | Date,
@@ -19,12 +21,9 @@ export function formatDateWithFns(
 ): string {
   let date: Date;
 
-  // ✅ Handle both string and Date inputs
   if (typeof isoDateString === 'string') {
-    try {
-      date = parseISO(isoDateString);
-      if (isNaN(date.getTime())) throw new Error();
-    } catch {
+    date = parseISO(isoDateString);
+    if (isNaN(date.getTime())) {
       throw new Error('Invalid ISO date string.');
     }
   } else if (isoDateString instanceof Date) {
@@ -39,6 +38,7 @@ export function formatDateWithFns(
     monthFormat = 'short',
     yearFormat = 'short',
     order = ['DD', 'MMM', 'YYYY'],
+    timeZone = 'UTC',
   } = options || {};
 
   const formatMap: Record<DateFormatPart, string> = {
@@ -49,11 +49,11 @@ export function formatDateWithFns(
   };
 
   const dateFormatString = order.map(part => formatMap[part]).join(separator);
-  let result = format(date, dateFormatString);
+  let result = formatInTimeZone(date, timeZone, dateFormatString);
 
   if (showTime) {
-    const timeFormat = 'h:mm a'; // 12-hour time with AM/PM
-    result += ` ${format(date, timeFormat)}`;
+    const timeFormat = 'h:mm a'; // 12-hour with AM/PM
+    result += ` ${formatInTimeZone(date, timeZone, timeFormat)}`;
   }
 
   return result;

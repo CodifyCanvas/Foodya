@@ -8,18 +8,23 @@ import { columns } from './columns';
 import { CreateForm } from './table-actions';
 import { useModulePermission } from '@/hooks/useModulePermission';
 import AccessDenied from '@/app/errors/access-control-view/access-denied';
-import { TransactionCategoriesTablesInterface } from '@/lib/definations';
+import { TransactionsTablesInterface, TablesSelectInput } from '@/lib/definations';
 import ServiceUnavailable from '@/app/errors/service-unavailable';
 
 /* === Data Fetcher === */
 const fetcher = (url: string) => fetch(url).then(res => res.json());
+
+interface TransactionsResponseInterface {
+  transactions: TransactionsTablesInterface[]
+  categories: TablesSelectInput[]
+}
 
 const ModulesPage = () => {
   // Use the custom permission hook
   const { canView, loading: permLoading } = useModulePermission();
 
   // Fetch Transaction Categories data
-  const { data: modules, error, isLoading: dataLoading } = useSWR<TransactionCategoriesTablesInterface[]>('/api/transaction-categories', fetcher);
+  const { data, error, isLoading: dataLoading } = useSWR<TransactionsResponseInterface>('/api/incomes', fetcher);
 
   const isLoading = permLoading || dataLoading;
 
@@ -48,10 +53,10 @@ const ModulesPage = () => {
       </h3>
 
         <DataTable
-          columns={columns()}
-          data={modules ?? []}
+          columns={columns({categories: data?.categories ?? [] })}
+          data={data?.transactions ?? []}
           filterColumns={[]}
-          createComponent={<CreateForm />}
+          createComponent={<CreateForm props={{ categories: data?.categories ?? [] }} />}
         />
     </div>
   );
