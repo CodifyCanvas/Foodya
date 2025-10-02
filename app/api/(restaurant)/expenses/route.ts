@@ -5,10 +5,10 @@ import { mapToLabelValue } from "@/lib/utils"
 import { TransactionFormSchema } from "@/lib/zod-schema/restaurant.zod"
 import { NextRequest, NextResponse } from "next/server"
 
-const path = '/api/incomes'
+const path = '/api/expenses'
 
 /* ==================================================
-  === [GET] Fetch All Income Transactions from DB ===
+  === [GET] Fetch All Expense Transactions from DB ===
 ================================================== */
 export async function GET() {
   try {
@@ -20,24 +20,24 @@ export async function GET() {
     }
 
     // === Fetch all Transactions & Categories ===
-    const data = await getAllTransactionsWithDetails('credit')
+    const data = await getAllTransactionsWithDetails('debit')
     const rawCategories = await getAllData("transactionCategoriesTable")
 
     const categories = mapToLabelValue(rawCategories, { label: 'category', value: 'id' })
 
     return NextResponse.json({ transactions: data, categories }, { status: 200 })
   } catch (error) {
-    console.error(`[GET ${path}] Failed to fetch income transactions:`, error)
+    console.error(`[GET ${path}] Failed to fetch expense transactions:`, error)
 
     return NextResponse.json(
-      { error: "Failed to fetch income transactions. Please try again later." },
+      { error: "Failed to fetch expense transactions. Please try again later." },
       { status: 500 }
     )
   }
 }
 
 /* =================================================== 
-  === [POST] Create a New Income Transaction Entry ===
+  === [POST] Create a New Expense Transaction Entry ===
 =================================================== */
 export async function POST(req: NextRequest) {
   try {
@@ -54,33 +54,33 @@ export async function POST(req: NextRequest) {
     const parsed = TransactionFormSchema.parse(body)
     const { title, category, amount, description } = parsed
 
-    // === Insert new Income Transaction into DB ===
+    // === Insert new Expense Transaction into DB ===
     await insertData("transactionsTable", {
       title: title?.trim(),
       categoryId: Number(category?.trim()),
       amount: amount?.toString().trim(),
-      type: 'credit',
+      type: 'debit',
       sourceType: 'manual',
       description: description?.trim() ?? null,
     })
 
     return NextResponse.json(
-      { message: "Income added successfully." },
+      { message: "Expense added successfully." },
       { status: 201 }
     )
   } catch (error) {
-    console.error(`[POST ${path}] transaction income creation failed:`, error)
+    console.error(`[POST ${path}] transaction expense creation failed:`, error)
 
     return NextResponse.json(
-      { error: "An unexpected error occurred while creating the income transaction. Please try again later." },
+      { error: "An unexpected error occurred while creating the expense transaction. Please try again later." },
       { status: 500 }
     )
   }
 }
 
-/* ==================================================
-  === [PUT] Update an Existing Transaction Income ===
-================================================== */
+/* ===================================================
+  === [PUT] Update an Existing Transaction Expense ===
+=================================================== */
 export async function PUT(req: NextRequest) {
   try {
     const session = await auth()
@@ -96,7 +96,7 @@ export async function PUT(req: NextRequest) {
     const parsed = TransactionFormSchema.parse(body)
     const { id, title, category, amount, description } = parsed
 
-    // === Update Income Transaction record by ID ===
+    // === Update Expense Transaction record by ID ===
     await updateData("transactionsTable", "id", id!, {
       title: title?.trim(),
       categoryId: Number(category?.trim()),
@@ -105,14 +105,14 @@ export async function PUT(req: NextRequest) {
     })
 
     return NextResponse.json(
-      { message: "Income updated successfully." },
+      { message: "Expense updated successfully." },
       { status: 202 }
     )
   } catch (error) {
-    console.error(`[PUT ${path}] transaction income update failed:`, error)
+    console.error(`[PUT ${path}] transaction expense update failed:`, error)
 
     return NextResponse.json(
-      { error: "An unexpected error occurred while updating the income transaction. Please try again later." },
+      { error: "An unexpected error occurred while updating the expense transaction. Please try again later." },
       { status: 500 }
     )
   }

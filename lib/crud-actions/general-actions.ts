@@ -56,8 +56,7 @@ export async function updateData<T extends TableName, K extends ColumnName<T>>(
   const result = await executor.update(table).set(values).where(eq(column, columnValue))
 
   const affectedRows = result[0].affectedRows;
-
-  console.log(result)
+  
   return { 
     affectedRows: affectedRows
   }
