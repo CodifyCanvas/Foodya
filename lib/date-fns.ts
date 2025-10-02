@@ -5,6 +5,7 @@ type DateFormatPart = 'DD' | 'MM' | 'MMM' | 'YYYY';
 
 interface FormatDateOptions {
   showTime?: boolean;
+  showSeconds?: boolean;
   separator?: '-' | '/' | '.' | ',';
   monthFormat?: 'short' | 'long';
   yearFormat?: 'short' | 'long';
@@ -34,6 +35,7 @@ export function formatDateWithFns(
 
   const {
     showTime = false,
+    showSeconds = false,
     separator = '-',
     monthFormat = 'short',
     yearFormat = 'short',
@@ -52,7 +54,7 @@ export function formatDateWithFns(
   let result = formatInTimeZone(date, timeZone, dateFormatString);
 
   if (showTime) {
-    const timeFormat = 'h:mm a'; // 12-hour with AM/PM
+    const timeFormat = showSeconds ? 'h:mm:ss a' : 'h:mm a'; // 12-hour with AM/PM
     result += ` ${formatInTimeZone(date, timeZone, timeFormat)}`;
   }
 

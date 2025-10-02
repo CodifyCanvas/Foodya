@@ -78,7 +78,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp }: FormDialogProps
     toast.loading("Fetching Employee Payrolls...", { id: 'fetching-payrolls-toast' });
 
     try {
-      const response = await fetch(`/api/payrolls/${dataProp.employeeId}`);
+      const response = await fetch(`/api/payrolls/employee/${dataProp.employeeId}`);
       const result = await response.json();
 
       setSalariesData(result);
@@ -131,7 +131,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp }: FormDialogProps
 
   /* === Submit Handler === */
   async function onSubmit(formValues: z.infer<typeof EmployeeSalaryPostingFormSchema>) {
-    const API_URL = `/api/payrolls/${dataProp.employeeId}`;
+    const API_URL = `/api/payrolls/employee/${dataProp.employeeId}`;
 
     // Only keep selected salaries
     const filtered = {

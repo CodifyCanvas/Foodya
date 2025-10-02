@@ -217,12 +217,44 @@ export async function markUnpaidPayrollsAsPaid(salaries: PayrollDialogSalaryRow[
         amount: salary.totalPay,
         type: 'debit',
         sourceType: 'payroll',
-        sourceId: Number(salary.employeeId),
+        sourceId: Number(salary.id),
       }, tx);
     }
   });
 
   return true;
+}
+
+export async function fetchPayrollWithDetail(payrollId: number) {
+
+  const [payroll] = await db
+    .select({
+      id: payrollsTable.id,
+
+      employeeImage: employeesTable.image,
+      employeeId: payrollsTable.employeeId,
+      employeeName: employeesTable.name,
+      employeeCNIC: employeesTable.CNIC,
+      employeeEmail: employeesTable.email,
+
+      basicPay: payrollsTable.basicPay,
+      bonus: payrollsTable.bonus,
+      penalty: payrollsTable.penalty,
+      totalPay: payrollsTable.totalPay,
+      description: payrollsTable.description,
+      month: payrollsTable.month,
+      status: payrollsTable.status,
+      paidAt: payrollsTable.paidAt,
+    })
+    .from(payrollsTable)
+    .leftJoin(employeesTable, eq(employeesTable.id, payrollsTable.employeeId))
+    .where(
+      and(
+        eq(payrollsTable.id, payrollId),
+      )
+    ).orderBy(desc(payrollsTable.id));
+
+  return payroll ?? {};
 }
 
 

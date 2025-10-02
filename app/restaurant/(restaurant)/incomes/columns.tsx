@@ -5,6 +5,7 @@ import { RowActions } from "./table-actions"
 import { ExtendedColumnDef } from "@/types/columns.data-table"
 import { TablesSelectInput, TransactionsTablesInterface } from "@/lib/definations"
 import { formatDateWithFns } from "@/lib/date-fns"
+import TransactionTitleCell from "@/components/custom/dialogs/transaction-title-cell"
 
 /* === Columns for Income Transactions === */
 export const columns = (props: { categories: TablesSelectInput[] }): ExtendedColumnDef<TransactionsTablesInterface>[] => [
@@ -29,15 +30,14 @@ export const columns = (props: { categories: TablesSelectInput[] }): ExtendedCol
   {
     accessorKey: "title",
     header: ({ column }) => (
+      
       <DataTableColumnHeader
         column={column}
         title="Title"
         search
       />
     ),
-    cell: ({ row }) => (
-      <div className="capitalize">{row.original.title}</div>
-    ),
+    cell: ({ row }) => <TransactionTitleCell row={row.original} />,
   },
 
   // === Transaction Category Name Column ===

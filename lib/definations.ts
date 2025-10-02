@@ -330,3 +330,20 @@ export interface TransactionsTablesInterface {
   sourceId: number | null;
   createdAt: string;
 }
+
+export interface EmployeePayrollInterface {
+  id: number;
+  employeeImage: string | null;
+  employeeId: number;
+  employeeName: string;
+  employeeCNIC: string;
+  employeeEmail: string;
+  basicPay: string; 
+  bonus: string;
+  penalty: string;
+  totalPay: string;
+  description: string;
+  month: string; 
+  status: 'paid' | 'pending';
+  paidAt: string;
+}

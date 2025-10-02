@@ -1,16 +1,14 @@
 "use server";
 
 import { auth } from "@/auth";
-import { checkDuplicate } from "@/lib/crud-actions/general-actions";
-import { upsertInvoiceOrderItemsTx } from "@/lib/crud-actions/invoices";
 import { fetchEmployeeUnpaidPayrolls, markUnpaidPayrollsAsPaid } from "@/lib/crud-actions/payrolls";
-import { EmployeeSalaryPostingFormSchema, invoiceActionFormSchema } from "@/lib/zod-schema/restaurant.zod";
+import { EmployeeSalaryPostingFormSchema } from "@/lib/zod-schema/restaurant.zod";
 import { NextRequest, NextResponse } from "next/server";
 
 /* =================================================================
   === [GET] Fetch Specific Employee All pending Payrolls from DB ===
 ================================================================= */
-const path = '/api/payrolls/[slug]'
+const path = '/api/payrolls/employee/[slug]'
 export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: number }>}) {
   try {
     const session = await auth();
@@ -25,7 +23,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
 
     if (isNaN(slug)) {
       return NextResponse.json(
-        { error: "Invalid employee payroll ID. Please verify the ID and try again." },
+        { error: "Invalid employee ID. Please verify the ID and try again." },
         { status: 400 }
       );
     }
@@ -34,10 +32,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
 
     return NextResponse.json(invoice, { status: 200 });
   } catch (error) {
-    console.error(`[GET ${path}] Failed to fetch order and its items:`, error);
+    console.error(`[GET ${path}] Failed to fetch Employee Unpaid Payrolls:`, error);
 
     return NextResponse.json(
-      { error: "Failed to fetch order and items. Please try again later." },
+      { error: "Failed to fetch Employee Unpaid Payrolls. Please try again later." },
       { status: 500 }
     );
   }
@@ -80,7 +78,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
 
   } catch (error) {
     // === Catch and log any unexpected errors === 
-    console.error(`[POST [${path}] Invoice creation failed:`, error);
+    console.error(`[POST [${path}] Employee salary creation failed:`, error);
     return NextResponse.json(
       { error: "An unexpected error occurred while creating the order & invoice. Please try again later.", },
       { status: 500 }
