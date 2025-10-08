@@ -48,9 +48,16 @@ export function getLastPathSegment(url: string): string {
 }
 
 export function formatMonthYear(dateString: string) {
-  const parsedDate = parse(dateString, 'yyyy-MM', new Date());
-  return format(parsedDate, 'MMMM yyyy'); // e.g., "April 2025"
+  // Extract first 7 chars for "yyyy-MM"
+  const monthStr = dateString.slice(0, 7);
+  const parsedDate = parse(monthStr, 'yyyy-MM', new Date());
+  return format(parsedDate, 'MMMM yyyy');
 }
+
+// Helper to validate YYYY-MM format (basic)
+export const isValidMonthYear = (value: string): boolean => {
+  return /^\d{4}-(0[1-9]|1[0-2])$/.test(value);
+};
 
 // Helper to convert number to capitalized words
 export function toCapitalizedWords(value: number | string | null | undefined): string {

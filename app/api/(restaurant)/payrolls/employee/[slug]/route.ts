@@ -28,7 +28,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
       );
     }
 
-    const invoice = await fetchEmployeeUnpaidPayrolls(slug);
+    const invoice = await fetchEmployeeUnpaidPayrolls(slug, 'pending');
 
     return NextResponse.json(invoice, { status: 200 });
   } catch (error) {

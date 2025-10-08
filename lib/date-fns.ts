@@ -40,7 +40,7 @@ export function formatDateWithFns(
     monthFormat = 'short',
     yearFormat = 'short',
     order = ['DD', 'MMM', 'YYYY'],
-    timeZone = 'UTC',
+    timeZone = 'Asia/Karachi',
   } = options || {};
 
   const formatMap: Record<DateFormatPart, string> = {

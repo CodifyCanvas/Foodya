@@ -301,10 +301,11 @@ export interface PayrollDialogSalaryRow {
   employeeId: number | string;
   description: string | null;
   basicPay: string;
-  bonus: string;
-  penalty: string;
+  bonus: string | null;
+  penalty: string | null;
   totalPay: string;
   month: string;
+  paidAt?: string | null;
   selected?: boolean
 }
 

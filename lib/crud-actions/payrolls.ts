@@ -2,12 +2,10 @@
 
 import { schema } from "@/lib/drizzle-schema";
 import { db } from "../db";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, gte, lte, sql } from "drizzle-orm";
 import { format } from "date-fns";
 import { PayrollDialogSalaryRow } from "../definations";
 import { insertData } from "./general-actions";
-
-// DataTable Interface [id, employee, Designation, unpaid months, Current Salary, Prev. Balance,  This Month, Status, action [edit, view]]
 
 const payrollsTable = schema.payrollsTable;
 const employeesTable = schema.employeesTable;
@@ -162,7 +160,27 @@ export async function refreshPayrolls() {
   return { success: true };
 }
 
-export async function fetchEmployeeUnpaidPayrolls(employeeId: number) {
+export async function fetchEmployeeUnpaidPayrolls( employeeId: number, status: 'pending' | 'paid' | 'all' = 'all', from?: string, to?: string) {
+  
+  // Base condition: filter by employee ID
+  const baseConditions = [eq(payrollsTable.employeeId, employeeId)];
+
+  console.warn("⚠️ call fetchEmployeeUnpaidPayrolls funtion ")
+
+  // Add status filter unless 'all' is specified
+  if (status !== 'all') {
+    baseConditions.push(eq(payrollsTable.status, status));
+  }
+
+  // Add month range filters if provided
+  if (from) {
+    baseConditions.push(gte(payrollsTable.month, from));
+  }
+  if (to) {
+    baseConditions.push(lte(payrollsTable.month, to));
+  }
+
+  // [=== Execute Query ===]
   const payrolls = await db
     .select({
       id: payrollsTable.id,
@@ -173,16 +191,59 @@ export async function fetchEmployeeUnpaidPayrolls(employeeId: number) {
       penalty: payrollsTable.penalty,
       totalPay: payrollsTable.totalPay,
       month: payrollsTable.month,
+      paidAt: payrollsTable.paidAt,
+      status: payrollsTable.status,
     })
     .from(payrollsTable)
-    .where(
-      and(
-        eq(payrollsTable.employeeId, employeeId),
-        eq(payrollsTable.status, 'pending')
-      )
-    ).orderBy(desc(payrollsTable.id));
+    .where(and(...baseConditions))
+    .orderBy(desc(payrollsTable.id));
 
-  return payrolls;
+  // Convert 'paidAt' dates to ISO string or null if missing
+  return payrolls.map((p) => ({
+    ...p,
+    paidAt: p.paidAt ? p.paidAt.toISOString() : null,
+  }));
+}
+
+export async function getEmployeePayrollSummary(employeeId: number) {
+  console.warn("⚠️ getEmployeePayrollSummary function called");
+
+  // === Fetch Payroll Records for the Employee ===
+  const payrollRecords = await db
+    .select({
+      totalPay: payrollsTable.totalPay,
+      status: payrollsTable.status,
+    })
+    .from(payrollsTable)
+    .where(eq(payrollsTable.employeeId, employeeId))
+    .orderBy(desc(payrollsTable.id));
+
+  // === Initialize Summary Totals ===
+  let paidAmountTotal = 0;
+  let pendingAmountTotal = 0;
+  let paidMonthCount = 0;
+  let unpaidMonthCount = 0;
+
+  // === Process Each Payroll Record ===
+  for (const record of payrollRecords) {
+    const totalPay = parseFloat(record.totalPay.toString());
+
+    if (record.status === 'paid') {
+      paidAmountTotal += totalPay;
+      paidMonthCount++;
+    } else if (record.status === 'pending') {
+      pendingAmountTotal += totalPay;
+      unpaidMonthCount++;
+    }
+  }
+
+  // === Return Formatted Payroll Summary ===
+  return {
+    totalAmountPaid: paidAmountTotal.toFixed(2),         // e.g. "12000.00"
+    totalAmountPending: pendingAmountTotal.toFixed(2),
+    totalPaidMonths: paidMonthCount.toString(),          // e.g. "6"
+    totalUnpaidMonths: unpaidMonthCount.toString(), 
+  };
 }
 
 export async function markUnpaidPayrollsAsPaid(salaries: PayrollDialogSalaryRow[]) {
