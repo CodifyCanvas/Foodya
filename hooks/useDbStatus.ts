@@ -4,11 +4,26 @@
 import useSWR from "swr";
 import { useRouter } from "next/navigation";
 
+
+
+/**
+ * === Represents a custom error returned when DB connection fails. ===
+ */
 type DbError = {
     message: string;
     status: number;
 };
 
+
+
+/**
+ * === Fetcher function for SWR to check DB health endpoint. ===
+ * 
+ * @param {string} url - The API endpoint to check.
+ * @returns - Resolves if the response is OK, else throws a custom error.
+ * 
+ * @throws {DbError} - Custom error with status and message when fetch fails.
+ */
 const fetcher = async (url: string) => {
     const res = await fetch(url);
 
@@ -24,7 +39,17 @@ const fetcher = async (url: string) => {
     return res.json();
 };
 
-export function useDbCheck() {
+
+
+/**
+ * === React hook to monitor the database connection status using SWR. ===
+ *
+ * - Automatically redirects to a custom error page if the DB is unreachable.
+ * - Disables revalidation on focus and background refresh.
+ *
+ * @returns {void}
+ */
+export function useDbCheck(): void {
     const router = useRouter();
 
     const { error } = useSWR("/api/db-health", fetcher, {
@@ -35,7 +60,8 @@ export function useDbCheck() {
     if (error) {
         // Ensure we handle both status and message
         const msg = encodeURIComponent(error.message || "Unknown error");
-        const status = error.status || 500;
+        const status = error.status || 503;
+        
         router.push(`/errors/database?msg=${msg}&status=${status}`);
     }
 }

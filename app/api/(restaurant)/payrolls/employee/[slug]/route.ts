@@ -1,86 +1,94 @@
-"use server";
-
 import { auth } from "@/auth";
 import { fetchEmployeeUnpaidPayrolls, markUnpaidPayrollsAsPaid } from "@/lib/crud-actions/payrolls";
 import { EmployeeSalaryPostingFormSchema } from "@/lib/zod-schema/restaurant.zod";
 import { NextRequest, NextResponse } from "next/server";
 
-/* =================================================================
-  === [GET] Fetch Specific Employee All pending Payrolls from DB ===
-================================================================= */
-const path = '/api/payrolls/employee/[slug]'
-export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: number }>}) {
+
+
+const path = '/api/payrolls/employee/[slug]';
+
+
+
+/* ==================================================================
+=== [GET] Fetch All Unpaid Payrolls for a Specific Employee by ID ===
+================================================================== */
+export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: number }> }) {
   try {
     const session = await auth();
     const userId = session?.user.id;
 
+    // === Authenticate User ===
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    // === Validate slug parameter === 
+    // === Extract and Validate Employee ID ===
     const { slug } = await params;
 
-    if (isNaN(slug)) {
+    if (!slug || isNaN(slug)) {
       return NextResponse.json(
-        { error: "Invalid employee ID. Please verify the ID and try again." },
+        { error: "Invalid employee ID provided. Please check and try again." },
         { status: 400 }
       );
     }
 
-    const invoice = await fetchEmployeeUnpaidPayrolls(slug, 'pending');
+    // === Fetch Unpaid Payrolls for the Given Employee ===
+    const unpaidPayrolls = await fetchEmployeeUnpaidPayrolls(slug, 'pending');
 
-    return NextResponse.json(invoice, { status: 200 });
+    return NextResponse.json(unpaidPayrolls, { status: 200 });
   } catch (error) {
-    console.error(`[GET ${path}] Failed to fetch Employee Unpaid Payrolls:`, error);
+    console.error(`[GET ${path}] Failed to fetching unpaid payrolls:`, error);
 
     return NextResponse.json(
-      { error: "Failed to fetch Employee Unpaid Payrolls. Please try again later." },
+      { error: "Something went wrong while fetching payrolls. Please try again later." },
       { status: 500 }
     );
   }
 }
 
-/* ========================================
-=== [POST] Mark Unpaid Payrolls as Paid ===
-========================================= */
-export async function POST(req: NextRequest, { params }: { params: Promise<{ slug: number }>}) {
+
+
+/* =========================================================
+=== [POST] Mark All Unpaid Payrolls as Paid for Employee ===
+========================================================= */
+export async function POST(req: NextRequest, { params }: { params: Promise<{ slug: number }> }) {
   try {
     const session = await auth();
     const userId = Number(session?.user.id);
 
+    // === Authenticate User ===
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    // === Validate slug parameter === 
+    // === Extract and Validate Employee ID ===
     const { slug } = await params;
 
-    if (isNaN(slug)) {
+    if (!slug || isNaN(slug)) {
       return NextResponse.json(
-        { error: "Invalid employee payroll ID. Please verify the ID and try again." },
+        { error: "Invalid employee ID. Please verify and try again." },
         { status: 400 }
       );
     }
 
-    // === Parse and validate request body === 
+    // === Parse and Validate Request Body using Zod ===
     const body = await req.json();
     const { salaries } = EmployeeSalaryPostingFormSchema.parse(body);
-    
-   // === Execute payroll update inside a single transaction ===
+
+    // === Mark Payrolls as Paid ===
     const update = await markUnpaidPayrollsAsPaid(salaries);
 
     // === Return success response ===
     return NextResponse.json(
-      { message: "Salaries created successfully." , posted: update},
+      { message: "Salaries recorded successfully.", posted: update },
       { status: 201 }
     );
 
   } catch (error) {
-    // === Catch and log any unexpected errors === 
-    console.error(`[POST [${path}] Employee salary creation failed:`, error);
+    console.error(`[POST [${path}] Payroll update failed:`, error);
+
     return NextResponse.json(
-      { error: "An unexpected error occurred while creating the order & invoice. Please try again later.", },
+      { error: "We couldn't process the salary update. Please try again or contact support.", },
       { status: 500 }
     );
   }

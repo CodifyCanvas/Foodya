@@ -6,40 +6,42 @@ import { menuItemFormSchema } from "@/lib/zod-schema/restaurant.zod";
 import { NextRequest, NextResponse } from "next/server"
 import { uploadImage } from "@/lib/server/helpers/imageUpload";
 
-/* ======================================
-  === [GET] Fetch All Menu and Its items from DB ===
-========================================= */
-const apipath = '/api/menu-items'
+
+
+const path = '/api/menu-items';
+
+
+
+/*==================================================
+=== [GET] Fetch Menu Items (Optionally Filtered) ===
+================================================= */
 export async function GET(req: NextRequest) {
   try {
     const session = await auth();
     const userId = session?.user.id;
 
+    // === Authenticate User ===
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    // Query parameters
+    // === Extract Query Parameters ===
     const categoryParam = req.nextUrl.searchParams.get("category");
     const fetchCategoriesParam = req.nextUrl.searchParams.get("fetch_categories");
     const onlyAvailableParam = req.nextUrl.searchParams.get("only_available");
 
-    // Default: onlyAvailable = false unless explicitly set to "true"
     const onlyAvailable = onlyAvailableParam === "true";
-
-    // Default: fetchCategories = true unless explicitly set to "false"
     const fetchCategories = fetchCategoriesParam !== "false";
-
     const categoryName = categoryParam ? deslugify(categoryParam) : undefined;
 
-    // Fetch menu items
+    // === Fetch Menu Items ===
     const menuItems = await getAllMenuItems(categoryName, onlyAvailable);
 
     if (!fetchCategories) {
       return NextResponse.json(menuItems, { status: 200 });
     }
 
-    // Fetch and map categories
+    // === Fetch Categories if Required ===
     const rawCategories = await getAllData("menuCategories");
     const categories = mapToLabelValue(rawCategories, {
       value: "id",
@@ -49,14 +51,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ menuItems, categories }, { status: 200 });
 
   } catch (error) {
-    console.error(`[GET ${apipath}] Failed to fetch:`, error);
+    console.error(`[GET ${path}] Failed to fetch Menu Items:`, error);
 
     return NextResponse.json(
-      { error: "Failed to fetch menu items. Please try again later." },
+      { error: "Something went wrong while fetching menu items. Please try again." },
       { status: 500 }
     );
   }
 }
+
 
 
 /* ========================================
@@ -67,42 +70,49 @@ export async function POST(req: NextRequest) {
     const session = await auth();
     const userId = session?.user.id;
 
+    // === Authenticate User ===
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    // ✅ Parse multipart form
+    // === Parse Form Data ===
     const formData = await req.formData();
     const jsonData = formData.get("data");
     const image = formData.get("image") as File | null;
 
     if (typeof jsonData !== "string") {
-      return NextResponse.json({ error: "Invalid form data" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid form submission. Please try again." }, { status: 400 });
     }
 
-    // ✅ Parse and validate Zod data
+    // === Validate Data using Zod ===
     let parsed;
     try {
       parsed = menuItemFormSchema.parse(JSON.parse(jsonData));
     } catch (err) {
-      return NextResponse.json({ error: "Validation failed", details: err }, { status: 400 });
+      console.error(`[POST ${path}] Validation failed:`, err);
+      return NextResponse.json({ error: "Form validation failed. Please check all fields.", details: err }, { status: 400 });
     }
 
     const { item, description, category_id, is_available, price, options } = parsed;
 
-    // ✅ Upload image using helper
+    // === Upload Profile Image (If Any) ===
     let imagePath: string | null = null;
     if (image && image instanceof File) {
-      imagePath = await uploadImage(image, "menu_items"); // 👈 Use helper
+      try {
+        imagePath = await uploadImage(image, "menu_items"); // <- use helper
+      } catch (err) {
+        console.error(`[POST ${path}] Image upload failed:`, err);
+        return NextResponse.json({ error: "We couldn't upload the image. Please try again." }, { status: 500 });
+      }
     }
 
-    // ✅ Check for duplicates
+    // === Check for Duplicate Item ===
     const duplicate = await checkDuplicate("menuItems", "name", item);
     if (duplicate) {
-      return NextResponse.json({ message: "This item is already in use." }, { status: 409 });
+      return NextResponse.json({ error: "This item name is already taken." }, { status: 409 });
     }
 
-    // ✅ Insert menu item
+    // === Insert Menu Item ===
     const result = await insertData("menuItems", {
       name: item.trim(),
       image: imagePath,
@@ -114,7 +124,7 @@ export async function POST(req: NextRequest) {
 
     const itemId = result.insertId;
 
-    // ✅ Insert options
+    // === Insert Item Options if Any ===
     if (options && options.length > 0 && itemId) {
       const optionInsertPromises = options.map((opt) =>
         insertData("menuItemOptions", {
@@ -126,12 +136,13 @@ export async function POST(req: NextRequest) {
       await Promise.all(optionInsertPromises);
     }
 
-    return NextResponse.json({ message: "Menu item created successfully." }, { status: 201 });
+    return NextResponse.json({ message: "Menu item created successfully!" }, { status: 201 });
 
   } catch (error) {
-    console.error("Menu item creation failed:", error);
+    console.error(`[POST ${path}] Menu Item Creation Failed:`, error);
+
     return NextResponse.json(
-      { error: "Unexpected error while creating menu item." },
+      { error: "Something went wrong while creating the menu item. Please try again later." },
       { status: 500 }
     );
   }
@@ -139,53 +150,55 @@ export async function POST(req: NextRequest) {
 
 
 
-/* =======================================================
-=== [PUT] Update an Existing Menu Item and Its Options ===
-======================================================= */
+/* ====================================================
+=== [PUT] Update Existing Menu Item and Its Options ===
+==================================================== */
 export async function PUT(req: NextRequest) {
   try {
     const session = await auth();
     const userId = session?.user.id;
 
+    // === Authenticate User ===
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
+    // === Parse Form Data ===
     const formData = await req.formData();
-
     const jsonData = formData.get("data");
     const file = formData.get("image") as File | null;
 
     if (!jsonData || typeof jsonData !== "string") {
-      return NextResponse.json({ error: "Invalid data format" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid form submission. Please try again." }, { status: 400 });
     }
 
-    // Parse and validate using Zod
+    // === Validate with Zod ===
     let parsed;
     try {
       parsed = menuItemFormSchema.parse(JSON.parse(jsonData));
     } catch (err) {
-      return NextResponse.json({ error: "Validation failed", details: err }, { status: 400 });
+      console.error(`[PUT ${path}] Validation failed:`, err);
+      return NextResponse.json({ error: "Form validation failed. Please check all fields.", details: err }, { status: 400 });
     }
 
     const { id, item, description, category_id, is_available, price, options } = parsed;
 
     if (!id) {
-      return NextResponse.json({ message: "Item ID is required." }, { status: 400 });
+      return NextResponse.json({ error: "Missing menu item ID." }, { status: 400 });
     }
 
-    // ✅ Upload image if new one provided
+    // === Upload Profile Image (If Any) ===
     let imagePath: string | undefined = undefined;
     if (file && file instanceof File) {
       try {
-        imagePath = await uploadImage(file, "menu_items");
+        imagePath = await uploadImage(file, "menu_items"); // <- use helper
       } catch (err) {
-        console.error("Image upload failed:", err);
-        return NextResponse.json({ error: "Image upload failed." }, { status: 500 });
+        console.error(`[PUT ${path}] Image upload failed:`, err);
+        return NextResponse.json({ error: "We couldn't upload the image. Please try again." }, { status: 500 });
       }
     }
 
-    // ✅ Update base menu item details
+    // === Update Menu Item ===
     await updateData("menuItems", "id", id, {
       name: item.trim(),
       description: description?.trim(),
@@ -195,29 +208,28 @@ export async function PUT(req: NextRequest) {
       ...(imagePath && { image: imagePath }), // Only update image if new one is provided
     });
 
-    // ✅ Delete existing options
+    // === Replace Item Options ===
     await deleteData("menuItemOptions", "menu_item_id", id);
-
-    // ✅ Insert new options if any
-    if (options && options.length > 0) {
-      const optionInsertPromises = options.map((item) =>
-        insertData("menuItemOptions", {
-          menu_item_id: Number(id),
-          option_name: item.option_name,
-          price: item.price.toFixed(2),
-        })
+    if (options?.length) {
+      await Promise.all(
+        options.map(opt =>
+          insertData("menuItemOptions", {
+            menu_item_id: Number(id),
+            option_name: opt.option_name,
+            price: opt.price.toFixed(2),
+          })
+        )
       );
-      await Promise.all(optionInsertPromises);
     }
 
     return NextResponse.json({ message: "Menu item updated successfully." }, { status: 202 });
+
   } catch (error) {
-    console.error(`[PUT /api/menu-items] menu item update failed:`, error);
+    console.error(`[PUT ${path}] menu item update failed:`, error);
+
     return NextResponse.json(
-      { error: "An unexpected error occurred while updating the menu item." },
+      { error: "Something went wrong while updating the item. Please try again later." },
       { status: 500 }
     );
   }
 }
-
-

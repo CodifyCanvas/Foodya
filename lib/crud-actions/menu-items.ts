@@ -1,18 +1,29 @@
 'use server';
+
 import { eq, and } from "drizzle-orm";
 import { db } from "../db";
 import { schema } from "../drizzle-schema";
 import { ItemWithOptions } from "../definations";
 
+
+
+// === Drizzle table schemas ===
 const menuItems = schema.menuItems
 const menuItemOptions = schema.menuItemOptions
 const menuCategories = schema.menuCategories;
 
-export const getAllMenuItems = async (
-  categoryName?: string,
-  onlyAvailable: boolean = false
-): Promise<ItemWithOptions[]> => {
 
+
+/**
+ * Fetch all menu items with their options and categories.
+ *
+ * @param categoryName - Optional category name to filter menu items.
+ * @param onlyAvailable - Whether to return only available items.
+ * @returns {Promise<ItemWithOptions[]>} List of structured menu items with options.
+ */
+export const getAllMenuItems = async (categoryName?: string, onlyAvailable: boolean = false): Promise<ItemWithOptions[]> => {
+
+  // === Build dynamic conditions ===
   const conditions = [];
   
   if (categoryName) {
@@ -23,20 +34,21 @@ export const getAllMenuItems = async (
     conditions.push(eq(menuItems.is_available, true));
   }
 
-  // Start base query
+  // === Start base query with joins ===
   const baseQuery = db
     .select()
     .from(menuItems)
     .leftJoin(menuItemOptions, eq(menuItems.id, menuItemOptions.menu_item_id))
     .leftJoin(menuCategories, eq(menuItems.category_id, menuCategories.id));
 
-  // Apply conditions only if there are any
+  // === Apply conditions if present ===
   const query = conditions.length > 0
     ? baseQuery.where(and(...conditions))
     : baseQuery;
 
   const items = await query;
 
+  // === Map to hold and group items with their options ===
   const itemMap = new Map<number, ItemWithOptions>();
 
   for (const row of items) {
@@ -44,6 +56,7 @@ export const getAllMenuItems = async (
     const option = row.menu_item_options;
     const category = row.menu_categories;
 
+    // === If item not already in map, add base structure ===
     if (!itemMap.has(item.id)) {
       itemMap.set(item.id, {
         id: item.id,
@@ -58,6 +71,7 @@ export const getAllMenuItems = async (
       });
     }
 
+    // === Add option if available ===
     if (option) {
       itemMap.get(item.id)!.options.push({
         option_id: option.id,
@@ -67,8 +81,6 @@ export const getAllMenuItems = async (
     }
   }
 
+  // === Return all items grouped and structured ===
   return Array.from(itemMap.values());
 };
-
-
-

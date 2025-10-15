@@ -1,4 +1,53 @@
-// === User Interface Definition ===
+// ========================
+// === GENERIC / OTHERS ===
+// ========================
+
+
+
+/**
+ * Interface for role objects used in dropdowns or UI selects.
+ */
+export interface RoleSelectInput {
+  label: string;
+  value: string;
+}
+
+
+
+/**
+ * Interface for categories used in dropdowns or display.
+ */
+export interface CategoriesSelectInput {
+  label: string;
+  value: string;
+}
+
+
+
+/**
+ * Interface for tables used in dropdowns or display.
+ */
+export interface TablesSelectInput {
+  label: string;
+  value: string;
+}
+
+
+
+/**
+ * Interface for waiter dropdown options.
+ */
+export interface WaiterSelectInput {
+  label: string;
+  value: string;
+  role: string | null;
+}
+
+
+
+/**
+ * Generic user interface definition.
+ */
 export interface User {
   id?: number;
   name: string;
@@ -10,7 +59,32 @@ export interface User {
   created_at: Date;
 }
 
-// === Permissions assigned to a role for a specific module (RBAC) ===
+
+
+/**
+ * Role Interface Definition
+ */
+export interface Role {
+  id?: number;
+  role: string;
+}
+
+
+
+/**
+ * Module Interface Definition
+ */
+export interface ModuleInterface {
+  id?: number;
+  name: string;
+  label: string;
+}
+
+
+
+/**
+ * Permissions assigned to a role for a specific module (RBAC - Role Based Access Control).
+ */
 export interface Permissions {
   id: number;
   role_id: number;
@@ -23,33 +97,37 @@ export interface Permissions {
   can_delete: boolean;
 }
 
-// === Role object used in dropdowns or display ===
-export interface RoleSelectInput {
-  label: string;
-  value: string;
-}
 
-// === Module Interface Definition ===
-export interface ModuleInterface {
-  id?: number;
-  name: string;
-  label: string;
-}
 
-// === Role Interface Definition ===
-export interface Role {
-  id?: number;
-  role: string;
-}
+// =========================
+// === MENU / RESTAURANT ===
+// =========================
 
-// === Menu Categories Interface Definition ===
+/**
+ * Menu Categories Interface Definition
+ */
 export interface MenuCategories {
   id?: number;
   name: string;
   description: string;
 }
 
-// === Menu Item with Options Interface Definition ===
+
+
+/**
+ * Menu Item Options Interface
+ */
+export interface MenuItemOptions {
+  option_id: number;
+  option_name: string;
+  price: string;
+}
+
+
+
+/**
+ * Menu Item with Options Interface Definition
+ */
 export interface ItemWithOptions {
   id?: number;
   image?: string | null;
@@ -62,28 +140,26 @@ export interface ItemWithOptions {
   options: MenuItemOptions[];
 }
 
-// === Menu Item with Options Interface Definition ===
-export interface MenuItemOptions {
-  option_id: number;
-  option_name: string;
-  price: string;
 
-}
 
-// === Categories object used in dropdowns or display ===
-export interface CategoriesSelectInput {
-  label: string;
-  value: string;
-}
-
-// === Restaurant Tables Interface Definition ===
+/**
+ * Restaurant Tables Interface Definition
+ */
 export interface RestaurantTablesInterface {
   id?: number;
   table_number: string;
   status: 'booked' | 'occupied' | 'available';
 }
 
-// === Booking Tables Interface Definition ===
+
+
+// ===============================
+// === BOOKINGS / RESERVATIONS ===
+// ===============================
+
+/**
+ * Booking Tables Interface Definition
+ */
 export interface BookingsTablesInterface {
   id: number;
   tableId: string;
@@ -99,45 +175,24 @@ export interface BookingsTablesInterface {
   bookingDate: Date;
 }
 
-// === Booking with Tables Interface Definition for fetching from api data ===
+
+
+/**
+ * Booking with Tables Interface for fetching combined booking and table data.
+ */
 export interface BookingsWithTablesInterface {
-  bookings: BookingsTablesInterface[]
-  tables: TablesSelectInput[]
+  bookings: BookingsTablesInterface[];
+  tables: TablesSelectInput[];
 }
 
-// === Tables object used in dropdowns or display ===
-export interface TablesSelectInput {
-  label: string;
-  value: string;
-}
 
-// === Invoice Page Response Interface ===
-export interface InvoiceResponse {
-  invoice: InvoiceDetail;
-  order: OrderDetail;
-  items: OrderItem[];
-  generatedBy: GeneratedBy;
-}
+// =======================
+// === ORDER / INVOICE ===
+// =======================
 
-// === Order Response From the API (Order Page) ===
-export interface OrderResponse {
-  order?: OrderDetail;
-  items: OrderItem[];
-  booking?: OrderBookingInfo | null;
-}
-
-// === Order Details Interface ===
-export interface OrderDetail {
-  id: number;
-  tableId: string | null;
-  waiterId: string | null;
-  orderType: 'dine_in' | 'drive_thru' | 'takeaway';
-  status: 'pending' | 'in_progress' | 'completed';
-  description: string | null;
-  createdAt: string;
-}
-
-// === Order Item Interface ===
+/**
+ * Order Item Interface
+ */
 export interface OrderItem {
   id: number;
   menuItemImage: string | null;
@@ -149,13 +204,47 @@ export interface OrderItem {
   price: string;
 }
 
-// === Booking Info included with Order ===
+
+
+/**
+ * Booking Info included with Order
+ */
 export interface OrderBookingInfo {
   customerName: string;
   advancePaid: string;
 }
 
-// === Invoice Detail Interface ===
+
+
+/**
+ * Order Details Interface
+ */
+export interface OrderDetail {
+  id: number;
+  tableId: string | null;
+  waiterId: string | null;
+  orderType: 'dine_in' | 'drive_thru' | 'takeaway';
+  status: 'pending' | 'in_progress' | 'completed';
+  description: string | null;
+  createdAt: string;
+}
+
+
+
+/**
+ * Order Response From the API (Order Page)
+ */
+export interface OrderResponse {
+  order?: OrderDetail;
+  items: OrderItem[];
+  booking?: OrderBookingInfo | null;
+}
+
+
+
+/**
+ * Invoice Detail Interface
+ */
 export interface InvoiceDetail {
   id: number;
   orderId: number;
@@ -171,34 +260,53 @@ export interface InvoiceDetail {
   createdAt: string;
 }
 
-// === Invoice with Menu-Items Response ===
+
+
+/**
+ * Invoice Page Response Interface - detailed invoice with order, items, and user info
+ */
+export interface InvoiceResponse {
+  invoice: InvoiceDetail;
+  order: OrderDetail;
+  items: OrderItem[];
+  generatedBy: GeneratedBy;
+}
+
+
+
+/**
+ * Invoice with Menu-Items and Tables Response Interface
+ */
 export interface InvoiceWithMenuItemsAndTablesInterface {
   invoices: InvoiceDetail[];
   menuItems: ItemWithOptions[];
   tables: TablesSelectInput[];
-  waiters: WaiterSelectInput[]
+  waiters: WaiterSelectInput[];
 }
 
-// === Invoice Generated By User Info ===
+
+
+/**
+ * Invoice Generated By User Info Interface
+ */
 export interface GeneratedBy {
   id: number;
   name: string;
   email: string;
 }
 
-// === Waiter Dropdown Option Interface ===
-export interface WaiterSelectInput {
-  label: string;
-  value: string;
-  role: string | null;
-}
 
-// === Employee Data Interfaces for Management Module ===
 
-/* === Basic Employee Info for DataTable === */
+// ====================
+// === EMPLOYEE / HR MANAGEMENT ===
+// ====================
+
+/**
+ * Basic Employee Info for DataTable
+ */
 export interface EmployeeWithLatestRecord {
   id: number;
-  image: string | undefined;
+  image: string | undefined | null;
   name: string;
   CNIC: string;
   fatherName: string;
@@ -207,10 +315,14 @@ export interface EmployeeWithLatestRecord {
   designation: string | null;
   shift: string | null;
   status: 'active' | 'resigned' | 'terminated' | 'rejoined' | null;
-  joinedAt: string | null; // ISO string (from DB); can be null if no record
+  joinedAt: string | null; // ISO string or null if no record
 }
 
-/* === Personal Info Form Interface === */
+
+
+/**
+ * Personal Info Form Interface
+ */
 export interface EmployeePersonalInfoInterface {
   id: number | null;
   image: string | null;
@@ -223,35 +335,78 @@ export interface EmployeePersonalInfoInterface {
   createdAt: string;
 }
 
-/* === Employment Record Interface === */
+
+
+/**
+ * Employment Record Interface
+ */
 export interface EmploymentRecordInterface {
   id: number | null;
   designation: string;
   shift: string;
-  status: 'active' | 'resigned' | 'terminated' | 'rejoined'; // e.g., 'active'
+  status: 'active' | 'resigned' | 'terminated' | 'rejoined'; 
   joinedAt: string;
   resignedAt: string | null;
-  changeType: 'valid' | 'correction'; // e.g., 'valid'
+  changeType: 'valid' | 'correction'; 
   createdAt?: string | Date;
 }
 
-/* === Salary Change Interface === */
+
+
+/**
+ * Salary Change Interface
+ */
 export interface SalaryChangeInterface {
   id: number | null;
   previousSalary: number | null;
   newSalary: number;
   reason: string | null;
-  changeType: 'initial' | 'raise' | 'promotion' | 'adjustment' | 'correction'; // e.g., 'initial'
+  changeType: 'initial' | 'raise' | 'promotion' | 'adjustment' | 'correction';
   createdAt?: string | Date;
 }
 
-/* === Combined Full Employee Details (for View/Edit) === */
+
+
+/**
+ * Combined Full Employee Details for View/Edit
+ */
 export interface EmployeeWithFullDetails {
-  personalInfo: EmployeePersonalInfoInterface
+  personalInfo: EmployeePersonalInfoInterface;
   employmentRecord: EmploymentRecordInterface[];
   salaryChanges: SalaryChangeInterface[];
 }
 
+
+
+/**
+ * Summary of payroll information for an employee.
+ */
+export interface PayrollSummary {
+  totalAmountPaid: string;
+  totalAmountPending: string;
+  totalPaidMonths: string;
+  totalUnpaidMonths: string;
+}
+
+
+
+/**
+ * Props for payroll table actions component, including payroll summary,
+ * employee details, and salary records.
+ */
+export interface PayrollTableActionsProps {
+  data: {
+    payrollSummary: PayrollSummary;
+    employee: EmployeeCompleteDetailsInterface;
+    salaries: PayrollDialogSalaryRow[];
+  };
+}
+
+
+
+/**
+ * Complete Employee Details Interface (flat)
+ */
 export interface EmployeeCompleteDetailsInterface {
   id: number;
   image: string | null;
@@ -260,13 +415,21 @@ export interface EmployeeCompleteDetailsInterface {
   fatherName: string;
   email: string;
   phone: string;
-  salary: string; // Salary as string e.g., "7000.00"
-  createdAt: string; // ISO Date string
+  salary: string; // e.g., "7000.00"
+  createdAt: string; // ISO date string
   employmentRecord: EmploymentRecordInterface[];
   salaryChanges: SalaryChangeInterface[];
 }
 
-// payrolls interface for datatable 
+
+
+// ===================================
+// === PAYROLL / SALARY MANAGEMENT ===
+// ===================================
+
+/**
+ * Payroll details for datatable summary
+ */
 export interface EmployeesSalaryGeneralDetails {
   id: number;
   employeeId: number;
@@ -276,26 +439,35 @@ export interface EmployeesSalaryGeneralDetails {
   currentSalary: string;  // stored as string, e.g., "60000.00"
   prevBalance: number;
   thisMonth: number;
-  status: "pending" | "paid"; // restrict or widen as needed
+  status: "pending" | "paid";
 }
 
+
+
+/**
+ * Payroll record with employee details
+ */
 export interface PayrollWithEmployeeDetails {
   id: number;
   employeeId: number;
   employeeName: string;
   employeeDesignation: string | null;
   description: string | null;
-  basicPay: string; // Using string because MySQL decimal values are returned as strings
+  basicPay: string;
   bonus: string;
   penalty: string;
   totalPay: string;
-  month: string; // Format: "YYYY-MM"
+  month: string; // "YYYY-MM"
   status: 'pending' | 'paid';
   paidAt: string | null; // ISO timestamp or null
   createdAt: string; // ISO timestamp
 }
 
-/* === Payroll Dialog Salary Row Interface === */
+
+
+/**
+ * Payroll Dialog Salary Row Interface
+ */
 export interface PayrollDialogSalaryRow {
   id: number | string;
   employeeId: number | string;
@@ -306,18 +478,30 @@ export interface PayrollDialogSalaryRow {
   totalPay: string;
   month: string;
   paidAt?: string | null;
-  selected?: boolean
+  selected?: boolean;
 }
 
-// === Transaction Categories Tables Interface ===
+
+
+// =================================
+// === TRANSACTIONS / FINANCIALS ===
+// =================================
+
+/**
+ * Transaction Categories Tables Interface
+ */
 export interface TransactionCategoriesTablesInterface {
   id: number;
   category: string;
   description: string;
-  locked: boolean
+  locked: boolean;
 }
 
-// === Transaction Tables Interface ===
+
+
+/**
+ * Transactions Tables Interface
+ */
 export interface TransactionsTablesInterface {
   id: number;
   title: string;
@@ -332,6 +516,11 @@ export interface TransactionsTablesInterface {
   createdAt: string;
 }
 
+
+
+/**
+ * Employee Payroll Interface (per month)
+ */
 export interface EmployeePayrollInterface {
   id: number;
   employeeImage: string | null;
@@ -347,4 +536,55 @@ export interface EmployeePayrollInterface {
   month: string; 
   status: 'paid' | 'pending';
   paidAt: string;
+}
+
+
+
+// ====================
+// === REPORTS PAGE ===
+// ====================
+
+/**
+ * Metric Card Interface used in the reports page (e.g., dashboard summary).
+ */
+export interface ReportsMetricCard {
+  title: string;
+  value: string;
+  change?: string;
+  currency?: boolean;
+  trend?: string;
+  description: string;
+}
+
+
+
+/**
+ * Represents one entry in the financial chart
+ * Can be per-day (month view) or per-month (year view).
+ */
+export interface FinancialChartDataEntry {
+  date: string;
+  income: string;           // Income amount for that date
+  expense: string;          // Expense amount for that date
+}
+
+
+
+/**
+ * Summary totals for the chart (bottom section)
+ */
+export interface FinancialChartSummary {
+  incomes: string;          // Total incomes
+  expense: string;          // Total expenses
+  revenue: string;          // Incomes - Expenses
+}
+
+
+
+/**
+ * Final response object from API for financial reports chart
+ */
+export interface FinancialChartResponse {
+  data: FinancialChartDataEntry[];  // Chart data entries
+  summary: FinancialChartSummary;   // Totals summary
 }

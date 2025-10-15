@@ -14,23 +14,11 @@ import { formatDateWithFns } from '@/lib/date-fns';
 import {
   EmployeeCompleteDetailsInterface,
   PayrollDialogSalaryRow,
+  PayrollSummary,
+  PayrollTableActionsProps,
 } from '@/lib/definations';
 
-// === Types ===
-interface PayrollSummary {
-  totalAmountPaid: string;
-  totalAmountPending: string;
-  totalPaidMonths: string;
-  totalUnpaidMonths: string;
-}
 
-interface PayrollTableActionsProps {
-  data: {
-    payrollSummary: PayrollSummary;
-    employee: EmployeeCompleteDetailsInterface;
-    salaries: PayrollDialogSalaryRow[];
-  };
-}
 
 // === Definition ===
 // Provides filter controls and payroll statement printing for an employee's payroll table.

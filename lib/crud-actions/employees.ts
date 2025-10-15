@@ -3,25 +3,44 @@
 import { schema } from "@/lib/drizzle-schema";
 import { db } from "../db";
 import { desc, eq } from "drizzle-orm";
-import { EmployeeCompleteDetailsInterface } from "../definations";
+import { EmployeeCompleteDetailsInterface, EmployeeWithLatestRecord } from "../definations";
 
+
+
+// === Drizzle table schemas ===
 const employees = schema.employeesTable;
 const employmentRecords = schema.employmentRecordsTable;
 const employeeSalaryChangesRecord = schema.salaryChangesTable;
 
-export const getAllEmployeesWithLatestRecord = async () => {
-  // Fetch all employees
-  const employeesList = await db.select({
-    id: employees.id,
-    image: employees.image,
-    name: employees.name,
-    CNIC: employees.CNIC,
-    fatherName: employees.fatherName,
-    email: employees.email,
-    phone: employees.phone,
-  }).from(employees);
 
-  // Fetch latest employment records for all employees in parallel
+
+/**
+ * === Get All Employees with Their Latest Employment Record ===
+ *
+ * - Fetches basic employee information from the `employeesTable`.
+ * - For each employee, it queries the most recent employment record (based on `id` DESC).
+ * - Combines the two into a single enriched object per employee.
+ * - Uses `Promise.all` for parallel fetching of records to improve performance.
+ *
+ * @returns {Promise<EmployeeWithLatestRecord[]>}
+ *          A list of employees, each with their latest designation, shift, status, and join date.
+ */
+export const getAllEmployeesWithLatestRecord = async (): Promise<EmployeeWithLatestRecord[]> => {
+
+  // === Step 1: Fetch base employee data ===
+  const employeesList = await db
+    .select({
+      id: employees.id,
+      image: employees.image,
+      name: employees.name,
+      CNIC: employees.CNIC,
+      fatherName: employees.fatherName,
+      email: employees.email,
+      phone: employees.phone,
+    })
+    .from(employees);
+
+  // === Step 2: For each employee, fetch their latest employment record ===
   const employeesWithRecords = await Promise.all(
     employeesList.map(async (emp) => {
       const latestRecord = await db.select({
@@ -30,58 +49,63 @@ export const getAllEmployeesWithLatestRecord = async () => {
         status: employmentRecords.status,
         joinedAt: employmentRecords.joinedAt,
       })
-      .from(employmentRecords)
-      .where(eq(employmentRecords.employeeId, emp.id))
-      .orderBy(desc(employmentRecords.id))
-      .limit(1)
-      .then(results => results[0] || null);
+        .from(employmentRecords)
+        .where(eq(employmentRecords.employeeId, emp.id))
+        .orderBy(desc(employmentRecords.id)) // <- Most recent record first
+        .limit(1)
+        .then(results => results[0] || null);
 
+      // === Merge base info with latest record ===
       return {
         ...emp,
         designation: latestRecord?.designation ?? null,
         shift: latestRecord?.shift ?? null,
         status: latestRecord?.status ?? null,
-        joinedAt: latestRecord?.joinedAt ?? null,
+        joinedAt: latestRecord?.joinedAt.toISOString() ?? null,
       };
     })
   );
 
+  // === Step 3: Return final enriched list ===
   return employeesWithRecords;
 };
 
 
-// 🧠 Temporary dev cache
-const devCache: Record<number, EmployeeCompleteDetailsInterface> = {}; // temporary
 
-export const fetchEmployee = async (employeeId: number) => {
+/**
+ * === Fetch Complete Employee Details by ID ===
+ *
+ * - Retrieves core employee data from `employeesTable`.
+ * - Fetches all employment records, ordered by latest first.
+ * - Fetches all salary changes, ordered by latest first.
+ * - Normalizes fields like dates and salary numbers for UI consumption.
+ *
+ * @param {number} employeeId - ID of the employee to fetch.
+ * @returns {Promise<EmployeeCompleteDetailsInterface | null>}
+ *          A complete employee object with employment history & salary changes, or null if not found.
+ */
+export const fetchEmployee = async (employeeId: number): Promise<EmployeeCompleteDetailsInterface | null> => {
 
-  // temp begin
-  // ✅ Return from cache in dev
-  if (process.env.NODE_ENV === 'development' && devCache[employeeId]) {
-    return devCache[employeeId];
-  }
-  // temp end
-
-  console.log("Fetch Employee Func call: ")
-
-  // Fetch employee
-  const [employee] = await db.select({
-    id: employees.id,
-    image: employees.image,
-    name: employees.name,
-    CNIC: employees.CNIC,
-    fatherName: employees.fatherName,
-    email: employees.email,
-    phone: employees.phone,
-    salary: employees.salary,
-    createdAt: employees.createdAt,
-  })
+  // === Step 1: Fetch main employee record ===
+  const [employee] = await db
+    .select({
+      id: employees.id,
+      image: employees.image,
+      name: employees.name,
+      CNIC: employees.CNIC,
+      fatherName: employees.fatherName,
+      email: employees.email,
+      phone: employees.phone,
+      salary: employees.salary,
+      createdAt: employees.createdAt,
+    })
     .from(employees)
     .where(eq(employees.id, employeeId));
 
+  // === Return null if employee doesn't exist ===
   if (!employee) return null;
 
-  // Fetch employment records
+  // === Step 2: Fetch all employment records (latest first) ===
   const employmeeRecords = await db
     .select({
       id: employmentRecords.id,
@@ -97,7 +121,7 @@ export const fetchEmployee = async (employeeId: number) => {
     .where(eq(employmentRecords.employeeId, employeeId))
     .orderBy(desc(employmentRecords.id));
 
-  // Fetch salary changes
+  // === Step 3: Fetch all salary change history (latest first) ===
   const salaryChanges = await db
     .select({
       id: employeeSalaryChangesRecord.id,
@@ -111,7 +135,7 @@ export const fetchEmployee = async (employeeId: number) => {
     .where(eq(employeeSalaryChangesRecord.employeeId, employeeId))
     .orderBy(desc(employeeSalaryChangesRecord.id));
 
-  // Normalize employment records
+  // === Step 4: Normalize employment records ===
   const normalizedEmploymentRecords = employmeeRecords.map((record) => ({
     id: record.id,
     designation: record.designation,
@@ -123,7 +147,7 @@ export const fetchEmployee = async (employeeId: number) => {
     createdAt: record.createdAt,
   }));
 
-  // Normalize salary changes
+  // === Step 5: Normalize salary change history ===
   const normalizedSalaryChanges = salaryChanges.map((change) => ({
     id: change.id,
     previousSalary: change.previousSalary ? parseFloat(change.previousSalary) : null,
@@ -133,10 +157,10 @@ export const fetchEmployee = async (employeeId: number) => {
     createdAt: change.createdAt,
   }));
 
-  // Final normalized employee object
-  const normalized = {
+  // === Step 6: Combine and return normalized object ===
+  const normalizedEmployee: EmployeeCompleteDetailsInterface = {
     id: employee.id ?? null,
-    image: employee.image ?? null, // Assume file upload elsewhere
+    image: employee.image ?? null,
     name: employee.name,
     CNIC: employee.CNIC,
     fatherName: employee.fatherName,
@@ -148,17 +172,5 @@ export const fetchEmployee = async (employeeId: number) => {
     salaryChanges: normalizedSalaryChanges,
   };
 
-  // temp begin
-  // 🧠 Cache result in dev
-  if (process.env.NODE_ENV === 'development') {
-    devCache[employeeId] = normalized;
-  }
-  // temp end
-
-  return normalized;
+  return normalizedEmployee;
 };
-
-
-
-
-

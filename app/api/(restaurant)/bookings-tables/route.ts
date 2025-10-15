@@ -7,61 +7,74 @@ import { mapToLabelValue } from "@/lib/utils"
 import { bookingsTablesFormSchema } from "@/lib/zod-schema/restaurant.zod"
 import { NextRequest, NextResponse } from "next/server"
 
+
+
 const path = '/api/bookings-tables'
 
-/* ======================================
-  === [GET] Fetch All Reservations from DB ===
-========================================= */
+
+
+/* ======================================================
+  === [GET] Fetch All Reservations and Tables from DB ===
+====================================================== */
 export async function GET() {
   try {
-    const session = await auth()
+    const session = await auth();
     const userId = session?.user.id
 
+    // === Check Authentication ===
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    await syncBookingAndTableStatuses()
-    const data = await getAllBookingsTables()
-    const rawTables = await getAllData("restaurantTables")
+    // === Sync Table Statuses Before Fetching ===
+    await syncBookingAndTableStatuses();
 
-    const tables = mapToLabelValue(rawTables, { label: 'table_number', value: 'id' })
+    const bookings = await getAllBookingsTables();
+    const rawTables = await getAllData("restaurantTables");
 
-    return NextResponse.json({ tables: tables, bookings: data }, { status: 200 })
+    const tables = mapToLabelValue(rawTables, { label: 'table_number', value: 'id' });
+
+    // === Return Tables and Bookings ===
+    return NextResponse.json({ tables: tables, bookings }, { status: 200 });
+
   } catch (error) {
-    console.error(`[GET ${path}] Failed to fetch tables:`, error)
+    console.error(`[GET ${path}] Failed to fetch data:`, error);
 
     return NextResponse.json(
-      { error: "Failed to fetch bookings. Please try again later." },
+      { error: "We couldn't load the bookings right now. Please try again later." },
       { status: 500 }
-    )
+    );
   }
 }
 
-/* ================================================= 
-  === [POST] Create a New Reservation Table Entry ===
-================================================= */
+
+
+/* ======================================================== 
+  === [POST] Create a New Reservation in Bookings Table ===
+======================================================== */
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth()
+    const session = await auth();
     const userId = session?.user.id
 
+    // === Check Authentication ===
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    const rawBody = await req.json()
+    // === Parse and Prepare Body ===
+    const rawBody = await req.json();
     const body = {
       ...rawBody,
       reservationStart: new Date(rawBody.reservationStart),
       reservationEnd: new Date(rawBody.reservationEnd),
     }
 
-    // Validate request body using Zod schema
-    const parsed = bookingsTablesFormSchema.parse(body)
+    // === Validate Body with Zod Schema ===
+    const parsed = bookingsTablesFormSchema.parse(body);
     const { tableId, customerName, reservationStart, reservationEnd, advancePaid } = parsed
 
-    // === Insert New Restaurant Table into DB ===
+    // === Insert Reservation Into DB ===
     await insertData("bookingsTables", {
       bookedByUserId: Number(userId),
       tableId: Number(tableId.trim()),
@@ -69,35 +82,39 @@ export async function POST(req: NextRequest) {
       reservationStart: new Date(reservationStart),
       reservationEnd: new Date(reservationEnd),
       advancePaid: advancePaid,
-    })
+    });
 
     return NextResponse.json(
-      { message: "Table created successfully." },
+      { message: "Reservation created successfully." },
       { status: 201 }
-    )
+    );
   } catch (error) {
-    console.error(`[POST ${path}] reservation creation failed:`, error)
+    console.error(`[POST ${path}] Failed to create reservation:`, error);
 
     return NextResponse.json(
-      { error: "An unexpected error occurred while creating the reservation. Please try again later." },
+      { error: "Something went wrong while saving the reservation. Please check your input and try again." },
       { status: 500 }
-    )
+    );
   }
-} 
+}
 
-/* ================================================
-  === [PUT] Update an Existing Reservation Table ===
-================================================ */
+
+
+/* =============================================================
+  === [PUT] Update an Existing Reservation by Reservation ID ===
+============================================================= */
 export async function PUT(req: NextRequest) {
   try {
-    const session = await auth()
+    const session = await auth();
     const userId = session?.user.id
 
+    // === Check Authentication ===
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    const rawBody = await req.json()
+    // === Parse and Prepare Body ===
+    const rawBody = await req.json();
     const body = {
       ...rawBody,
       reservationStart: new Date(rawBody.reservationStart),
@@ -105,42 +122,44 @@ export async function PUT(req: NextRequest) {
     }
 
     // === Validate Input ===
-    const parsed = bookingsTablesFormSchema.parse(body)
+    const parsed = bookingsTablesFormSchema.parse(body);
     const { id, tableId, customerName, reservationStart, reservationEnd, advancePaid } = parsed
 
-    // === Update Table by ID ===
+    // === Update Reservation ===
     await updateData("bookingsTables", "id", id!, {
       bookedByUserId: Number(userId),
       tableId: Number(tableId.trim()),
       customerName: customerName.trim(),
-      reservationStart: new Date(reservationStart),
-      reservationEnd: new Date(reservationEnd),
-      advancePaid: advancePaid,
-    })
+      reservationStart,
+      reservationEnd,
+      advancePaid,
+    });
 
     return NextResponse.json(
       { message: "Reservation updated successfully." },
       { status: 202 }
-    )
+    );
   } catch (error) {
-    console.error(`[PUT ${path}] Reservation update failed:`, error)
+    console.error(`[PUT ${path}] Failed to update reservation:`, error);
 
     return NextResponse.json(
-      { error: "An unexpected error occurred while updating the Reservation. Please try again later." },
+      { error: "Unable to update the reservation. Please try again or contact support if the issue persists." },
       { status: 500 }
-    )
+    );
   }
 }
 
-/* =============================================
-  === [PATCH] Update Status of Booking Table ===
-============================================= */
+
+
+/* ===================================================
+  === [PATCH] Update the Status of a Booking Table ===
+=================================================== */
 export async function PATCH(req: NextRequest) {
   try {
-    /* === Session & Authorization === */
     const session = await auth();
     const userId = session?.user.id;
 
+    // === Check Authentication ===
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
@@ -151,7 +170,7 @@ export async function PATCH(req: NextRequest) {
 
     if (!id) {
       return NextResponse.json(
-        { error: "Reservation ID is missing." },
+        { error: "Missing reservation ID." },
         { status: 400 }
       );
     }
@@ -160,19 +179,16 @@ export async function PATCH(req: NextRequest) {
     await updateData("bookingsTables", "id", id, { status });
 
     return NextResponse.json(
-      { message: "Marked as Cancelled successfully." },
+      { message: "Reservation status updated successfully." },
       { status: 202 }
     );
+
   } catch (error) {
-    console.error(`[PATCH ${path}] Reservation update failed:`, error);
+    console.error(`[PATCH ${path}] Failed to update status:`, error);
 
     return NextResponse.json(
-      {
-        error:
-          "An unexpected error occurred while updating the reservation. Please try again later.",
-      },
+      { error: "We couldn't update the reservation status. Please try again in a few moments." },
       { status: 500 }
     );
   }
 }
-

@@ -3,20 +3,36 @@ import { twMerge } from "tailwind-merge"
 import {format, parse } from 'date-fns'
 import numWords from "num-words";
 
+
+
+/**
+ * Combines multiple Tailwind CSS classes and merges conflicting classes intelligently.
+ * Uses clsx for conditional merging and tailwind-merge for Tailwind-specific merging.
+ * 
+ * @param inputs - An array of class names or conditional class expressions.
+ * @returns A single merged string of class names.
+ */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-type MappingKeys = {
-  label: string;
-  value: string;
-  badge?: string | null;
-};
 
-export function mapToLabelValue<T extends Record<string, any>>(
-  data: T[],
-  keys: MappingKeys
-): { label: string; value: string; badge?: string | null }[] {
+
+/**
+ * Maps an array of objects to a new array with keys renamed to label, value, and optionally badge.
+ * Useful for normalizing data to a common format for UI components (e.g., dropdowns).
+ * 
+ * @param data - Array of objects to map.
+ * @param keys - Object specifying keys to extract and rename.
+ * @returns Array of objects with `label`, `value`, and optional `badge` fields.
+ */
+export function mapToLabelValue<
+  T,
+  L extends keyof T,
+  V extends keyof T,
+  B extends keyof T | undefined = undefined
+>( data: T[], keys: { label: L; value: V; badge?: B; }): { label: string; value: string; badge?: string | null }[] {
+
   return data.map((item) => {
     const mappedItem: { label: string; value: string; badge?: string | null } = {
       label: String(item[keys.label]),
@@ -24,7 +40,8 @@ export function mapToLabelValue<T extends Record<string, any>>(
     };
 
     if (keys.badge) {
-      mappedItem.badge = item[keys.badge] != null ? String(item[keys.badge]) : null;
+      const badgeValue = item[keys.badge];
+      mappedItem.badge = badgeValue != null ? String(badgeValue) : null;
     }
 
     return mappedItem;
@@ -32,21 +49,57 @@ export function mapToLabelValue<T extends Record<string, any>>(
 }
 
 
-// Slugify: lowercase, trim, replace spaces with hyphens, encode URI components but keep &
+
+/**
+ * Converts a string into a URL-friendly slug.
+ * Lowercases, trims, replaces spaces with hyphens,
+ * encodes URI components but keeps ampersands (&) intact.
+ * 
+ * @param text - The input string to slugify.
+ * @returns A URL-friendly slug string.
+ */
 export const slugify = (text: string) =>
   encodeURIComponent(text.trim().toLowerCase().replace(/\s+/g, '-')).replace(/%26/g, '&');
 
-// Deslugify: lowercase, trim, replace hyphens with spaces, decode URI components, keep &
+
+
+/**
+ * Converts a slug back into a readable string.
+ * Lowercases, trims, replaces hyphens with spaces,
+ * decodes URI components, keeping ampersands (&) intact.
+ * 
+ * @param slug - The slug string to deslugify.
+ * @returns A human-readable string.
+ */
 export const deslugify = (slug: string) =>
   decodeURIComponent(slug.trim().toLowerCase().replace(/-/g, ' '));
 
-// Get last segments into the url (like: '/app/page/roles' -> 'roles') and remove 'roles?q=hello' to 'roles'
+
+
+/**
+ * Extracts the last path segment from a URL, excluding query parameters and hash fragments.
+ * Converts the result to lowercase.
+ * 
+ * Example: '/app/page/roles?q=hello' => 'roles'
+ * 
+ * @param url - The full URL or path string.
+ * @returns The last path segment as a lowercase string.
+ */
 export function getLastPathSegment(url: string): string {
   const segments = url.split('/').filter(Boolean);
   if (segments.length === 0) return '';
   return segments[segments.length - 1].split('?')[0].split('#')[0].toLowerCase();
 }
 
+
+
+/**
+ * Formats a date string in 'YYYY-MM' format into a readable "Month Year" string.
+ * Example: '2025-10' => 'October 2025'
+ * 
+ * @param dateString - A date string starting with 'YYYY-MM'.
+ * @returns A formatted string showing full month name and year.
+ */
 export function formatMonthYear(dateString: string) {
   // Extract first 7 chars for "yyyy-MM"
   const monthStr = dateString.slice(0, 7);
@@ -54,12 +107,40 @@ export function formatMonthYear(dateString: string) {
   return format(parsedDate, 'MMMM yyyy');
 }
 
-// Helper to validate YYYY-MM format (basic)
+
+
+/**
+ * Formats a Date object into a 'YYYY-MM' string.
+ * Example: new Date(2025, 8) => '2025-09'
+ * 
+ * @param date - A JavaScript Date object.
+ * @returns A string in 'YYYY-MM' format. e.g., 2025-09.
+ */
+export function formatMonth(date: Date): string {
+  return format(date, "yyyy-MM");
+}
+
+
+
+/**
+ * Validates whether a string matches the 'YYYY-MM' format with valid months (01-12).
+ * 
+ * @param value - The string to validate.
+ * @returns True if valid month-year format, false otherwise.
+ */
 export const isValidMonthYear = (value: string): boolean => {
   return /^\d{4}-(0[1-9]|1[0-2])$/.test(value);
 };
 
-// Helper to convert number to capitalized words
+
+
+/**
+ * Converts a number or numeric string into capitalized English words and appends "Rupees".
+ * Handles negative numbers, zero, null/undefined and invalid inputs.
+ * 
+ * @param value - Number, string, null, or undefined input.
+ * @returns The amount in capitalized words followed by "Rupees", or appropriate fallback string.
+ */
 export function toCapitalizedWords(value: number | string | null | undefined): string {
   if (value === null || value === undefined) return "Zero Rupees";
 
@@ -80,4 +161,19 @@ export function toCapitalizedWords(value: number | string | null | undefined): s
     .join(" ");
 
   return `${isNegative ? 'Negative ' : ''}${words} Rupees`;
+}
+
+
+
+/**
+ * Returns the current year and month in 'YYYY-MM' format.
+ * Suitable as a default value for HTML <input type="month" /> elements.
+ * 
+ * @returns Current year and month string formatted as 'YYYY-MM'.
+ */
+export function getCurrentMonthValue(): string {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, "0")
+  return `${year}-${month}` // Format: "YYYY-MM"
 }

@@ -4,20 +4,26 @@ import { getPermissionsViaRoleId } from "@/lib/crud-actions/permission";
 import { permissionsFormSchema } from "@/lib/zod-schema";
 import { NextRequest, NextResponse } from "next/server";
 
+
+
 const path = "/api/permission";
 
-/* =======================================================
-  [GET] Return all roles (used as part of permissions view)
-========================================================== */
+
+
+/* =====================================================
+=== [GET] Return All Roles (Used in Permission View) ===
+===================================================== */
 export async function GET() {
   try {
-    const session = await auth()
-    const userId = session?.user.id
+    const session = await auth();
+    const userId = session?.user.id;
 
+    // === Authenticate User ===
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
+    // === Fetch all roles from the database ===
     const roles = await getAllData("roles");
 
     return NextResponse.json(roles, { status: 200 });
@@ -25,54 +31,52 @@ export async function GET() {
     console.error(`[GET ${path}] Failed to fetch roles:`, error);
 
     return NextResponse.json(
-      { error: "Failed to fetch roles. Please try again later." },
+      { error: "We couldn't load the roles right now. Please try again in a moment." },
       { status: 500 }
     );
   }
 }
 
-/* =======================================================
-  [POST] Fetch permissions for a role (used on modal open)
-========================================================== */
+
+
+/* =============================================================
+=== [POST] Fetch permissions for a role (used on modal open) ===
+============================================================= */
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth()
-    const userId = session?.user.id
+    const session = await auth();
+    const userId = session?.user.id;
 
+    // === Authenticate User ===
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
+    // === Parse Request Body ===
     const { id } = await req.json();
 
     // === Validate input ===
     if (!id) {
       return NextResponse.json(
-        { message: "Role id is missing; cannot fetch permissions." },
+        { error: "Oops! We couldn't find the role. Please try again." },
         { status: 404 }
       );
     }
 
-    // === Fetch role's current permissions ===
+    // === Fetch current permissions for the selected role ===
     const existingPermissions = await getPermissionsViaRoleId(Number(id));
 
-    // === Fetch all modules in the system ===
+    // === Fetch all modules ===
     const allModules = await getAllData("modules");
 
     // === Create a map of existing permissions for quick lookup ===
     const permissionMap = new Map<number, typeof existingPermissions[0]>();
     existingPermissions.forEach((perm) => permissionMap.set(perm.module_id, perm));
 
-    // === Combine modules with their permissions (or defaults) ===
+    // === Combine permissions with module list ===
     const combined = allModules.map((mod) => {
-      // If permission exists for this module, use it
-      if (permissionMap.has(mod.id)) {
-        return permissionMap.get(mod.id);
-      }
-
-      // Otherwise, return default permission structure
-      return {
-        id: 0, // Means not saved yet
+      return permissionMap.get(mod.id) || {
+        id: 0, // <- Unsaved permission have id '0'
         role_id: Number(id),
         role_name: "",
         module_id: mod.id,
@@ -86,33 +90,37 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(combined, { status: 202 });
   } catch (error) {
-    console.error(`[POST ${path}] Permission fetch failed:`, error);
+    console.error(`[POST ${path}] Permissions fetch failed:`, error);
 
     return NextResponse.json(
-      { error: "An unexpected error occurred while fetching permissions." },
+      { error: "Something went wrong while loading permissions. Please try again." },
       { status: 500 }
     );
   }
 }
 
-/* =============================================
-  [PUT] Update or insert permissions for a role
-============================================= */
+
+
+/* ==================================================
+=== [PUT] Update or Insert Permissions for a Role ===
+================================================== */
 export async function PUT(req: NextRequest) {
   try {
-    const session = await auth()
-    const userId = session?.user.id
+    const session = await auth();
+    const userId = session?.user.id;
 
+    // === Authenticate User ===
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
+    // === Parse Request Body ===
     const body = await req.json();
 
-    // === Validate incoming data using Zod schema ===
+    // === Validate Body with Zod ===
     const parsed = permissionsFormSchema.parse(body);
 
-    // === Perform updates and inserts in parallel ===
+    // === Insert or Update permissions accordingly ===
     await Promise.all(
       parsed.map((item) => {
         const basePayload = {
@@ -125,7 +133,7 @@ export async function PUT(req: NextRequest) {
           can_delete: item.can_delete,
         };
 
-        // === Update existing permission if `id` is present ===
+        // === Update existing permission if `id` is present (means it is greater then 0) ===
         if (item.id) {
           return updateData("permissions", "id", item.id, basePayload);
         }
@@ -140,20 +148,20 @@ export async function PUT(req: NextRequest) {
           return insertData("permissions", basePayload);
         }
 
-        // === If all permissions are false, skip insert ===
+        // === Skip inserting if all are false ===
         return Promise.resolve();
       })
     );
 
     return NextResponse.json(
-      { message: "Permission updated successfully." },
+      { message: "Permissions updated successfully!" },
       { status: 202 }
     );
   } catch (error) {
-    console.error(`[PUT ${path}] Permission update failed:`, error);
+    console.error(`[PUT ${path}] Permissions update failed:`, error);
 
     return NextResponse.json(
-      { error: "An unexpected error occurred while updating permissions." },
+      { error: "Something went wrong while updating permissions. Please try again." },
       { status: 500 }
     );
   }

@@ -1,3 +1,4 @@
+// app/errors/service-unavailable.tsx
 import React from 'react'
 
 const ServiceUnavailable = ({title, statusCode, description}:{title: string, statusCode?: string | number, description: string}) => {

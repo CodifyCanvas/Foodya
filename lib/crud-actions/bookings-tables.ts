@@ -5,65 +5,112 @@ import { db } from "../db";
 import { schema } from "../drizzle-schema";// Use alias to avoid conflict if 'schema' is general
 import { BookingsTablesInterface } from "../definations";
 
+
+
+// === Drizzle table schemas ===
 const bookingsTable = schema.bookingsTables;
 const users = schema.users;
 const restaurantTables = schema.restaurantTables;
 
+
+// === Constants ===
+type BookingStatus = 'scheduled' | 'booked' | 'completed' | 'expired' | 'processing' | 'cancelled';
+
+
+
+/**
+ * === Fetch All Bookings with Related User and Table Info ===
+ *
+ * - Uses LEFT JOIN on `users` and `restaurantTables` via Drizzle ORM.
+ * - Returns bookings enriched with user name/email and table number.
+ * - Handles null/undefined fields gracefully.
+ * 
+ * @returns {Promise<BookingsTablesInterface[]>} List of booking records with joined user and table details.
+ */
 export const getAllBookingsTables = async (): Promise<BookingsTablesInterface[]> => {
+
+  // === Query: Join bookings with users and restaurant tables ===
   const bookings = await db
     .select()
     .from(bookingsTable)
     .leftJoin(users, eq(bookingsTable.bookedByUserId, users.id))
     .leftJoin(restaurantTables, eq(bookingsTable.tableId, restaurantTables.id));
 
-  const finalData = bookings.map((data) => {
+  // === Map and format result with normalize the values ===
+  const finalData = bookings.map((data) => ({
+    id: data.bookings_tables.id,
+    tableId: String(data.bookings_tables.tableId),
+    tableName: data.restaurant_tables?.table_number || null,
+    customerName: data.bookings_tables.customerName,
+    advancePaid: data.bookings_tables.advancePaid,
+    status: data.bookings_tables.status,
+    bookedByUserId: data.bookings_tables?.bookedByUserId,
+    bookedByUserName: data.users?.name || null,
+    bookedByUserEmail: data.users?.email || null,
+    reservationStart: data.bookings_tables.reservationStart,
+    reservationEnd: data.bookings_tables.reservationEnd,
+    bookingDate: data.bookings_tables.bookingDate,
+  }));
 
-    return {
-      id: data.bookings_tables.id,
-      tableId: String(data.bookings_tables.tableId),
-      tableName: data.restaurant_tables?.table_number || null,
-      customerName: data.bookings_tables.customerName,
-      advancePaid: data.bookings_tables.advancePaid,
-      status: data.bookings_tables.status,
-      bookedByUserId: data.bookings_tables?.bookedByUserId,
-      bookedByUserName: data.users?.name || null,
-      bookedByUserEmail: data.users?.email || null,
-      reservationStart: data.bookings_tables.reservationStart,
-      reservationEnd: data.bookings_tables.reservationEnd,
-      bookingDate: data.bookings_tables.bookingDate,
-    };
-  });
-
+  // === Return normalized bookings array ===
   return finalData;
 };
 
-type BookingStatus = 'scheduled' | 'booked' | 'completed' | 'expired' | 'processing' | 'cancelled';
 
-export async function syncBookingAndTableStatuses() {
+
+/**
+ * === Synchronize Booking and Table Statuses ===
+ *
+ * Iterates over all bookings joined with their associated tables,
+ * updating booking and table statuses based on time-based rules and business logic.
+ * 
+ * Key behaviors:
+ * - Respects manual states like 'cancelled' and 'completed'.
+ * - Handles grace periods for no-shows.
+ * - Automatically promotes bookings through statuses: scheduled → booked → processing.
+ * - Frees up tables when bookings expire or are cancelled.
+ *
+ * Status sync logic covers:
+ * - CASE 00: Far future → set to 'scheduled'
+ * - CASE 01: Starts within 30 mins → mark as 'booked'
+ * - CASE 02: Now active → mark as 'booked'
+ * - CASE 03: No-show grace period
+ * - CASE 04: Completed/cancelled
+ * - CASE 05: Processing override
+ * - CASE 06: Upgrade to 'processing' if occupied
+ * - CASE 07: Expired → mark as expired
+ * 
+ * @returns {Promise<void>} Resolves when all bookings and tables are synchronized.
+ */
+export async function syncBookingAndTableStatuses(): Promise<void> {
   const now = new Date();
 
+  // === Fetch all bookings with related table info ===
   const bookings = await db
     .select()
     .from(bookingsTable)
     .leftJoin(restaurantTables, eq(bookingsTable.tableId, restaurantTables.id));
 
+  // === Iterate over each booking record to apply sync logic ===
   for (const bookingData of bookings) {
     const booking = bookingData.bookings_tables;
     const table = bookingData.restaurant_tables;
 
+    // === Skip if either booking or table is missing ===
     if (!booking || !table) continue;
 
+    // === Parse dates and statuses ===
     const reservationStart = new Date(booking.reservationStart);
     const reservationEnd = new Date(booking.reservationEnd);
     const tableStatus = table.status;
     const bookingStatus = booking.status as BookingStatus;
 
+    // === Define time thresholds ===
     const thirtyMinutesFromNow = new Date(now.getTime() + 30 * 60 * 1000);
     const gracePeriodEnd = new Date(reservationEnd.getTime() + 2 * 60 * 60 * 1000);
 
-    // === CASE 04: Skip manual/finished bookings ===
+    // === CASE 04: Skip finished or cancelled bookings, free table if cancelled ===
     if (bookingStatus === 'cancelled' || bookingStatus === 'completed') {
-      // Optional: free table if cancelled
       if (bookingStatus === 'cancelled' && tableStatus !== 'available') {
         await db
           .update(restaurantTables)
@@ -73,12 +120,12 @@ export async function syncBookingAndTableStatuses() {
       continue;
     }
 
-    // === CASE 02: Table is OCCUPIED ===
+    // === CASE 05: Respect manual processing state if table is occupied ===
     if (table.status === 'occupied' && booking.status === 'processing') {
       continue; // Do nothing — respect manual state
     }
 
-    // CASE: If table is 'occupied' and booking is 'booked' or 'scheduled', upgrade booking to 'processing'
+    // === CASE 06: Upgrade booking to 'processing' if table is occupied and booking is booked or scheduled ===
     if (
       table.status === 'occupied' &&
       (booking.status === 'booked' || booking.status === 'scheduled') &&
@@ -93,14 +140,14 @@ export async function syncBookingAndTableStatuses() {
       continue; // Don't auto-change table status
     }
 
-    // --- CASE 02: Handle grace period for no-show ---
+    // === CASE 03: Handle grace period for no-show bookings ===
     if (bookingStatus === 'booked' && tableStatus === 'booked') {
       if (now > reservationEnd && now <= gracePeriodEnd) {
-        // Within grace period — do nothing, keep statuses
+        // Within grace period — keep statuses as-is
         continue;
       }
       if (now > gracePeriodEnd) {
-        // Grace period expired — mark booking expired & free table
+        // Grace period expired — expire booking & free table
         await db
           .update(bookingsTable)
           .set({ status: 'expired' })
@@ -115,19 +162,17 @@ export async function syncBookingAndTableStatuses() {
       }
     }
 
-    // === CASE 00: Booking is far in future (> 30 min) → keep it 'scheduled' ===
-    if (
-      reservationStart > thirtyMinutesFromNow &&
-      bookingStatus !== 'scheduled'
-    ) {
+    // === CASE 00: Booking far in future (>30 min) → keep or reset to 'scheduled' ===
+    if (reservationStart > thirtyMinutesFromNow && bookingStatus !== 'scheduled') {
       await db
         .update(bookingsTable)
         .set({ status: 'scheduled' })
         .where(eq(bookingsTable.id, booking.id));
+
       continue;
     }
 
-    // === CASE 01: Booking starts in 30 min and table is available → mark 'booked' ===
+    // === CASE 01: Booking starts within 30 minutes and table is available → mark as 'booked' ===
     if (
       reservationStart > now &&
       reservationStart <= thirtyMinutesFromNow &&
@@ -148,7 +193,7 @@ export async function syncBookingAndTableStatuses() {
       continue;
     }
 
-    // === CASE: Booking is currently active and table is still available → mark 'processing' and table 'booked' ===
+    // === CASE 02: Booking active now, table available → mark booking 'booked' and table 'booked' ===
     if (
       reservationStart <= now &&
       reservationEnd >= now &&
@@ -173,11 +218,8 @@ export async function syncBookingAndTableStatuses() {
       continue;
     }
 
-    // === CASE: Booking time has ended and still not completed → mark expired + free table ===
-    if (
-      now > reservationEnd &&
-      bookingStatus !== 'expired'
-    ) {
+    // === CASE 07: Booking ended but not expired yet → mark expired and free table ===
+    if (now > reservationEnd && bookingStatus !== 'expired') {
       await db
         .update(bookingsTable)
         .set({ status: 'expired' })
@@ -193,16 +235,38 @@ export async function syncBookingAndTableStatuses() {
   }
 }
 
+
+
+/**
+ * === Manually Check-In or Check-Out a Table & Associated Booking ===
+ *
+ * - On **check-in**:
+ *   - Finds the nearest eligible booking for the table (status: 'booked' or 'scheduled').
+ *   - Marks the booking as 'processing' if found.
+ *   - Always updates the table status to 'occupied'.
+ *
+ * - On **check-out**:
+ *   - Finds the current 'processing' booking for the table.
+ *   - Marks the booking as 'completed'.
+ *   - Always updates the table status to 'available'.
+ *
+ * @param tableId - The ID of the table being checked in/out.
+ * @param mode - Either `'check-in'` or `'check-out'`.
+ * @returns {Promise<void>} Resolves after status updates are applied.
+ */
 export async function updateTableAndBookingStatus(tableId: number, mode: 'check-in' | 'check-out') {
+
+  // === Validate input ===
   if (!tableId) {
-    console.error("Table ID is required.");
+    console.error("Table ID is required to perform check-in/check-out.");
     return;
   }
 
   const now = new Date();
 
+  // === CHECK-IN MODE ===
   if (mode === 'check-in') {
-    // === CASE: Check-in → find upcoming or just-started booking within buffer ===
+    // === Find valid upcoming or just-started booking ===
     const activeBookingResult = await db
       .select()
       .from(bookingsTable)
@@ -213,10 +277,8 @@ export async function updateTableAndBookingStatus(tableId: number, mode: 'check-
             eq(bookingsTable.status, 'booked'),
             eq(bookingsTable.status, 'scheduled')
           ),
-          // Allow check-in 30 minutes early
-          lte(bookingsTable.reservationStart, new Date(now.getTime() + 30 * 60 * 1000)),
-          // Allow 2-hour grace period after reservation end
-          gte(bookingsTable.reservationEnd, new Date(now.getTime() - 2 * 60 * 60 * 1000))
+          lte(bookingsTable.reservationStart, new Date(now.getTime() + 30 * 60 * 1000)), // <- Allow check-in up to 30 min early
+          gte(bookingsTable.reservationEnd, new Date(now.getTime() - 2 * 60 * 60 * 1000)) // <- Allow check-in up to 2 hours after reservation end
         )
       )
       .orderBy(desc(bookingsTable.reservationStart))
@@ -224,7 +286,7 @@ export async function updateTableAndBookingStatus(tableId: number, mode: 'check-
 
     const booking = activeBookingResult[0];
 
-    // === CASE: Valid booking found → mark it as 'processing' ===
+    // === Mark booking as 'processing' if found ===
     if (booking) {
       const result = await db
         .update(bookingsTable)
@@ -232,22 +294,24 @@ export async function updateTableAndBookingStatus(tableId: number, mode: 'check-
         .where(eq(bookingsTable.id, booking.id));
 
       if (result?.[0]?.affectedRows === 0) {
-        console.warn(`⚠️ Booking ID ${booking.id} was not updated to 'processing'.`);
+        console.warn(`Booking ID ${booking.id} was not updated to 'processing'.`);
       }
     }
 
-    // === CASE: Always mark table as 'occupied' ===
+    // === Always mark table as 'occupied' ===
     const tableUpdate = await db
       .update(restaurantTables)
       .set({ status: 'occupied' })
       .where(eq(restaurantTables.id, tableId));
 
     if (tableUpdate[0]?.affectedRows === 0) {
-      console.warn(`⚠️ No table found with ID ${tableId} to mark as 'occupied'.`);
+      console.warn(`No table found with ID ${tableId} to mark as 'occupied'.`);
     }
 
+    // === CHECK-OUT MODE ===
   } else if (mode === 'check-out') {
-    // === CASE: Check-out → find current 'processing' booking for the table ===
+
+    // === Find current processing booking ===
     const processingBookingResult = await db
       .select()
       .from(bookingsTable)
@@ -262,7 +326,7 @@ export async function updateTableAndBookingStatus(tableId: number, mode: 'check-
 
     const booking = processingBookingResult[0];
 
-    // === CASE: Valid processing booking found → mark as 'completed' ===
+    // === Mark booking as 'completed' ===
     if (booking) {
       const result = await db
         .update(bookingsTable)
@@ -270,23 +334,18 @@ export async function updateTableAndBookingStatus(tableId: number, mode: 'check-
         .where(eq(bookingsTable.id, booking.id));
 
       if (result?.[0]?.affectedRows === 0) {
-        console.warn(`⚠️ Booking ID ${booking.id} was not updated to 'completed'.`);
+        console.warn(`Booking ID ${booking.id} was not updated to 'completed'.`);
       }
     }
 
-    // === CASE: Always mark table as 'available' ===
+    // === Always mark table as 'available' ===
     const tableUpdate = await db
       .update(restaurantTables)
       .set({ status: 'available' })
       .where(eq(restaurantTables.id, tableId));
 
     if (tableUpdate[0]?.affectedRows === 0) {
-      console.warn(`⚠️ No table found with ID ${tableId} to mark as 'available'.`);
+      console.warn(`No table found with ID ${tableId} to mark as 'available'.`);
     }
   }
 }
-
-
-
-
-

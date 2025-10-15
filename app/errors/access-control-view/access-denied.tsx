@@ -1,3 +1,4 @@
+// app/errors/access-control-view/access-denied.tsx
 import React from 'react'
 
 const AccessDenied = () => {
@@ -12,4 +13,4 @@ const AccessDenied = () => {
   )
 }
 
-export default AccessDenied
+export default AccessDenied;

@@ -5,13 +5,25 @@ import { db } from "../db";
 import { eq } from "drizzle-orm";
 import { Permissions as PermissionType } from "../definations";
 
-// === Tables ===
+
+
+// === Drizzle table schemas ===
 const modules = schema.modules;
 const roles = schema.roles;
 const permissions = schema.permissions;
 
-// === Get permissions assigned to a specific role ID ===
+
+
+/**
+ * Retrieves the permissions assigned to a specific role by its ID,
+ * including associated module and role details.
+ * 
+ * @param {number} id - The role ID to fetch permissions for.
+ * @returns {Promise<PermissionType[]>} A list of permissions with normalized values.
+ */
 export const getPermissionsViaRoleId = async (id: number): Promise<PermissionType[]> => {
+
+  // === Query permissions joined with roles and modules ===
   const result = await db
     .select({
       id: permissions.id,
@@ -29,7 +41,7 @@ export const getPermissionsViaRoleId = async (id: number): Promise<PermissionTyp
     .innerJoin(roles, eq(permissions.role_id, roles.id))
     .innerJoin(modules, eq(permissions.module_id, modules.id));
 
-  // === Normalize result and ensure fallback values ===
+  // === Format & normalize fields ===
   return result.map((row) => ({
     id: row.id,
     role_id: row.role_id ?? 0,

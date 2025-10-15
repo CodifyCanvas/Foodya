@@ -1,48 +1,62 @@
-"use server";
-
 import { auth } from "@/auth";
 import { checkDuplicate } from "@/lib/crud-actions/general-actions";
 import { fetchInvoice, upsertInvoiceOrderItemsTx } from "@/lib/crud-actions/invoices";
 import { invoiceActionFormSchema } from "@/lib/zod-schema/restaurant.zod";
 import { NextRequest, NextResponse } from "next/server";
 
-/* ======================================
-  === [GET] Fetch All Menu and Its items from DB ===
-========================================= */
-const path = '/api/invoices/[invoiceId]'
-export async function GET(req: NextRequest, { params }: { params: { slug: number } }) {
+
+
+const path = '/api/invoices/[invoiceId]';
+
+
+
+/* =======================================================================
+=== [GET] Fetch Specific Invoice by Id with Linked Order + Order Items ===
+======================================================================= */
+export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: number }> }) {
   try {
     const session = await auth();
     const userId = session?.user.id;
 
+    // === Authenticate User ===
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    const { slug } = await params;
+    // === Validate slug parameter === 
+    const { slug: invoiceId } = await params;
+    if (!invoiceId || isNaN(Number(invoiceId))) {
+      return NextResponse.json(
+        { error: "Invalid invoice ID. Please verify the URL and try again." },
+        { status: 400 }
+      );
+    }
 
-    const invoice = await fetchInvoice(slug);
+    const invoice = await fetchInvoice(invoiceId);
 
     return NextResponse.json(invoice, { status: 200 });
   } catch (error) {
-    console.error(`[GET ${path}] Failed to fetch order and its items:`, error);
+    console.error(`[GET ${path}] Failed to fetch invoice:`, error);
 
     return NextResponse.json(
-      { error: "Failed to fetch order and items. Please try again later." },
+      { error: "Failed to load invoice. Please try again later." },
       { status: 500 }
     );
   }
 }
 
-/* ========================================
-=== [POST] Create a New Invoice + Order + Order Items Entry ===
-========================================= */
-export async function POST(req: NextRequest, { params }: { params: { slug: string } }) {
+
+
+/* =========================================================
+=== [POST] Create Invoice + Order + Order Items (Atomic) ===
+========================================================= */
+export async function POST(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     // === Authenticate the user session === 
     const session = await auth();
     const userId = Number(session?.user.id);
 
+    // === Authenticate User ===
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
@@ -51,7 +65,7 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
     const { slug } = await params;
     if (slug !== 'create') {
       return NextResponse.json(
-        { error: "Invalid API endpoint. Please verify the URL and try again." },
+        { error: "Invalid API endpoint. Please verify the [Slug] and try again." },
         { status: 400 }
       );
     }
@@ -60,7 +74,7 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
     const body = await req.json();
     const parsed = invoiceActionFormSchema.parse(body);
 
-    // === Check for duplicate orderId in Invoices table === 
+    // === Check for duplicate order ID ===
     const duplicate = await checkDuplicate("InvoicesTable", "orderId", parsed.orderId);
     if (duplicate) {
       return NextResponse.json(
@@ -68,8 +82,8 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
         { status: 409 }
       );
     }
-    
-   // === Create order + items + invoice inside a transaction === 
+
+    // === Create Invoice + Order + Items Transactionally ===
     const newInvoiceId = await upsertInvoiceOrderItemsTx(parsed, userId, 'insert');
 
     // === Return success response with invoice ID === 
@@ -79,25 +93,26 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
     );
 
   } catch (error) {
-    // === Catch and log any unexpected errors === 
     console.error(`[POST /api/invoices/[slug]] Invoice creation failed:`, error);
+
     return NextResponse.json(
-      {
-        error: "An unexpected error occurred while creating the order & invoice. Please try again later.",
-      },
+      { error: "An unexpected error occurred while creating the invoice. Please try again later." },
       { status: 500 }
     );
   }
 }
 
-/* =======================================================
-=== [PUT] Update an Existing Invoice + Order + Items ===
-======================================================= */
-export async function PUT(req: NextRequest, { params }: { params: { slug: string } }) {
+
+
+/* ============================================================
+=== [PUT] Update Invoice + Order + Items (Atomic Operation) ===
+============================================================ */
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const session = await auth();
     const userId = Number(session?.user.id);
 
+    // === Authenticate User ===
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
@@ -114,14 +129,15 @@ export async function PUT(req: NextRequest, { params }: { params: { slug: string
     // === Parse and validate request body === 
     const body = await req.json();
     const parsed = invoiceActionFormSchema.parse(body);
-    
+
     const updateInvoiceId = await upsertInvoiceOrderItemsTx(parsed, userId, 'update');
 
     return NextResponse.json({ message: "Menu item updated successfully.", UpdateInvoiceId: updateInvoiceId }, { status: 202 });
   } catch (error) {
-    console.error(`[PUT /api/menu-items] menu item update failed:`, error);
+    console.error(`[PUT ${path}] Invoice update failed:`, error);
+
     return NextResponse.json(
-      { error: "An unexpected error occurred while updating the menu item." },
+      { error: "An unexpected error occurred while updating the invoice. Please try again later." },
       { status: 500 }
     );
   }

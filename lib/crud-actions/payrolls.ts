@@ -3,16 +3,31 @@
 import { schema } from "@/lib/drizzle-schema";
 import { db } from "../db";
 import { and, desc, eq, gte, lte, sql } from "drizzle-orm";
-import { format } from "date-fns";
-import { PayrollDialogSalaryRow } from "../definations";
+import { EmployeePayrollInterface, PayrollDialogSalaryRow, PayrollSummary } from "../definations";
 import { insertData } from "./general-actions";
+import { formatMonth } from "../utils";
 
+
+
+// === Drizzle table schemas ===
 const payrollsTable = schema.payrollsTable;
 const employeesTable = schema.employeesTable;
 const employmentRecordsTable = schema.employmentRecordsTable;
 
+
+
+/**
+ * === Fetches payroll summaries for all employees with their latest designation. ===
+ * 
+ * - Reads from `employeesTable`, `employmentRecordsTable`, and `payrollsTable`.
+ * - Uses a subquery to get the latest employment record per employee.
+ * - Fetches all payrolls in one query and groups them by employee.
+ * - Calculates unpaid months, previous balance, current salary, and payroll status.
+ * 
+ * @returns An array of payroll summaries for each employee.
+ */
 export const getAllPayrollsWithEmployeeDetails = async () => {
-  // Subquery: Get latest designation record for each employee
+  // === Subquery: Get latest designation record for each employee ===
   const latestRecordSubquery = db
     .select({
       employeeId: employmentRecordsTable.employeeId,
@@ -22,7 +37,7 @@ export const getAllPayrollsWithEmployeeDetails = async () => {
     .groupBy(employmentRecordsTable.employeeId)
     .as("latestRecords");
 
-  // Get employees with their latest designation
+  // === Join employees with their latest designation ===
   const employeesWithDesignation = await db
     .select({
       id: employeesTable.id,
@@ -40,58 +55,71 @@ export const getAllPayrollsWithEmployeeDetails = async () => {
       eq(employmentRecordsTable.id, latestRecordSubquery.latestRecordId)
     );
 
-  // For each employee, calculate payroll details
-  const results = await Promise.all(
-    employeesWithDesignation.map(async (emp, index) => {
-      // Get all payrolls for this employee
-      const payrolls = await db
-        .select()
-        .from(payrollsTable)
-        .where(eq(payrollsTable.employeeId, emp.id));
+  // === Fetch all payrolls for all employees in one query ===
+  const allPayrolls = await db
+    .select()
+    .from(payrollsTable);
 
-      // Unpaid months
-      const unpaidMonths = payrolls
-        .filter((p) => p.status === "pending")
-        .map((p) => p.month);
+  // === Group payrolls by employeeId for faster access ===
+  const payrollsByEmployee = allPayrolls.reduce((acc, payroll) => {
+    const empId = payroll.employeeId;
+    if (!acc[empId]) acc[empId] = [];
+    acc[empId].push(payroll);
+    return acc;
+  }, {} as Record<number, typeof allPayrolls>);
 
-      // Prev balance (sum of pending before current month)
-      const prevBalance = payrolls
-        .filter((p) => p.status === "pending")
-        .reduce((sum, p) => sum + Number(p.totalPay), 0);
+  // === Build the final result for each employee ===
+  const results = employeesWithDesignation.map((emp, index) => {
+    const payrolls = payrollsByEmployee[emp.id] || [];
 
-      // Latest payroll (this month)
-      const latestPayroll = payrolls.sort(
-        (a, b) => new Date(b.month).getTime() - new Date(a.month).getTime()
-      )[0];
+    const unpaidPayrolls = payrolls.filter(p => p.status === "pending");
 
-      const thisMonth = latestPayroll
-        ? Number(emp.salary) +
-        Number(latestPayroll.bonus || 0) -
-        Number(latestPayroll.penalty || 0)
-        : Number(emp.salary);
+    const unpaidMonths = unpaidPayrolls.map(p => p.month);
 
-      return {
-        id: index + 1,
-        employeeId: emp.id,
-        employee: emp.name,
-        designation: emp.designation,
-        unpaidMonths: unpaidMonths,
-        currentSalary: emp.salary,
-        prevBalance,
-        thisMonth,
-        status: latestPayroll?.status || "pending",
-      };
-    })
-  );
+    const prevBalance = unpaidPayrolls.reduce(
+      (sum, p) => sum + Number(p.totalPay),
+      0
+    );
+
+    const latestPayroll = payrolls.reduce((latest, current) => {
+      return new Date(current.month) > new Date(latest?.month || 0)
+        ? current
+        : latest;
+    }, null as typeof payrolls[0] | null);
+
+    const thisMonth =
+      Number(emp.salary) +
+      Number(latestPayroll?.bonus || 0) -
+      Number(latestPayroll?.penalty || 0);
+
+    return {
+      id: index + 1,
+      employeeId: emp.id,
+      employee: emp.name,
+      designation: emp.designation,
+      unpaidMonths,
+      currentSalary: emp.salary,
+      prevBalance,
+      thisMonth,
+      status: latestPayroll?.status || "pending",
+    };
+  });
 
   return results;
 };
 
-// Helpers
-function formatMonth(date: Date): string {
-  return format(date, "yyyy-MM"); // e.g., 2025-09
-}
 
+
+/**
+ * === Helper Function ===
+ * 
+ * Generates a list of months between two dates (inclusive) in 'YYYY-MM' format.
+ * Example: '2025-01' to '2025-03' => ['2025-01', '2025-02', '2025-03']
+ * 
+ * @param start - The start date in 'YYYY-MM' format.
+ * @param end - The end date in 'YYYY-MM' format.
+ * @returns An array of strings, each in 'YYYY-MM' format.
+ */
 function generateMonthsBetween(start: string, end: string): string[] {
   const months: string[] = [];
   const current = new Date(start + "-01");
@@ -104,45 +132,65 @@ function generateMonthsBetween(start: string, end: string): string[] {
   return months;
 }
 
-export async function refreshPayrolls() {
-  // Step 1: fetch all employees
+
+
+/**
+ * === Refreshes payroll records for all employees by ensuring payroll entries exist ===
+ * 
+ * for every month from their joined date to resigned date or last month if still active.
+ * 
+ * This function:
+ * - Fetches all employees.
+ * - Retrieves each employee's latest employment record.
+ * - Calculates the months range for payroll generation.
+ * - Finds missing payroll months.
+ * - Inserts missing payroll rows with the employee's salary.
+ * 
+ * @returns {Promise<{ success: boolean }>} An object indicating success of the operation.
+ */
+export async function refreshPayrolls(): Promise<{ success: boolean }> {
+
+  // === Step 1: Fetch all employees ===
   const employees = await db.query.employeesTable.findMany();
 
   for (const emp of employees) {
-    // Step 2: fetch latest employment record for each employee (order by ID DESC)
+
+    // === Step 2: Process each employee sequentially ===
     const [latestRecord] = await db.query.employmentRecordsTable.findMany({
       where: eq(employmentRecordsTable.employeeId, emp.id),
       orderBy: (records, { desc }) => [desc(records.id)],
       limit: 1,
     });
+
     if (!latestRecord) continue;
 
-    // Step 3: define date range (joined → resigned OR joined → last month if still active)
+    // === Step 3: define date range (joined → resigned OR joined → last month if still active) ===
     const startMonth = formatMonth(new Date(latestRecord.joinedAt));
-
     let endDate: Date;
+
     if (latestRecord.resignedAt) {
       endDate = new Date(latestRecord.resignedAt);
     } else {
       // active employee → use last month instead of current month
       endDate = new Date();
-      endDate.setMonth(endDate.getMonth() - 1);
+      endDate.setMonth(endDate.getMonth() - 1); // <- use last month for active employees
     }
 
+    // === Generate all months between start and end month ===
     const endMonth = formatMonth(endDate);
     const allMonths = generateMonthsBetween(startMonth, endMonth);
 
-    // Step 4: fetch all existing payrolls of this employee
+    // === Step 4: Fetch existing payroll months for this employee ===
     const existingPayrolls = await db.query.payrollsTable.findMany({
       where: eq(payrollsTable.employeeId, emp.id),
       columns: { month: true },
     });
     const existingMonths = new Set(existingPayrolls.map((p) => p.month));
 
-    // Step 5: filter missing months
+    // === Step 5: Identify missing payroll months ===
     const unpaidMonths = allMonths.filter((m) => !existingMonths.has(m));
 
-    // Step 6: insert missing payroll rows
+    // === Step 6: Insert missing payroll entries ===
     const salary = Number(emp.salary ?? 0);
     if (salary > 0) {
       for (const month of unpaidMonths) {
@@ -160,19 +208,30 @@ export async function refreshPayrolls() {
   return { success: true };
 }
 
-export async function fetchEmployeeUnpaidPayrolls( employeeId: number, status: 'pending' | 'paid' | 'all' = 'all', from?: string, to?: string) {
-  
-  // Base condition: filter by employee ID
+
+
+/**
+ * === Fetches payroll records for a specific employee filtered by status and optional month range. ===
+ * 
+ * @param {number} employeeId - The ID of the employee whose payrolls to fetch.
+ * @param {'pending' | 'paid' | 'all'} [status='all'] - Filter by payroll status. Defaults to 'all'.
+ * @param {string} [from] - Optional start month (inclusive) in "YYYY-MM" format.
+ * @param {string} [to] - Optional end month (inclusive) in "YYYY-MM" format.
+ * 
+ * @returns {Promise<PayrollDialogSalaryRow[]>} A promise that resolves to an array of payroll records matching the criteria.
+ * Each record includes a `paidAt` field as an ISO string or `null` if not available.
+ */
+export async function fetchEmployeeUnpaidPayrolls(employeeId: number, status: 'pending' | 'paid' | 'all' = 'all', from?: string, to?: string): Promise<PayrollDialogSalaryRow[]> {
+
+  // === Base condition: filter by employee ID ===
   const baseConditions = [eq(payrollsTable.employeeId, employeeId)];
 
-  console.warn("⚠️ call fetchEmployeeUnpaidPayrolls funtion ")
-
-  // Add status filter unless 'all' is specified
+  // === Add status filter unless 'all' is specified ===
   if (status !== 'all') {
     baseConditions.push(eq(payrollsTable.status, status));
   }
 
-  // Add month range filters if provided
+  // === Add month range filters if provided ===
   if (from) {
     baseConditions.push(gte(payrollsTable.month, from));
   }
@@ -180,7 +239,7 @@ export async function fetchEmployeeUnpaidPayrolls( employeeId: number, status: '
     baseConditions.push(lte(payrollsTable.month, to));
   }
 
-  // [=== Execute Query ===]
+  // === Execute Query ===
   const payrolls = await db
     .select({
       id: payrollsTable.id,
@@ -198,15 +257,23 @@ export async function fetchEmployeeUnpaidPayrolls( employeeId: number, status: '
     .where(and(...baseConditions))
     .orderBy(desc(payrollsTable.id));
 
-  // Convert 'paidAt' dates to ISO string or null if missing
+  // === Convert 'paidAt' dates to ISO string or null if missing ===
   return payrolls.map((p) => ({
     ...p,
     paidAt: p.paidAt ? p.paidAt.toISOString() : null,
   }));
 }
 
-export async function getEmployeePayrollSummary(employeeId: number) {
-  console.warn("⚠️ getEmployeePayrollSummary function called");
+
+
+/**
+ * Retrieves a payroll summary for a given employee, including total paid and pending amounts,
+ * as well as counts of paid and unpaid months.
+ * 
+ * @param {number} employeeId - The ID of the employee to fetch the payroll summary for.
+ * @returns {Promise<PayrollSummary>} An object containing formatted totals and counts of payroll statuses.
+ */
+export async function getEmployeePayrollSummary(employeeId: number): Promise<PayrollSummary> {
 
   // === Fetch Payroll Records for the Employee ===
   const payrollRecords = await db
@@ -239,19 +306,28 @@ export async function getEmployeePayrollSummary(employeeId: number) {
 
   // === Return Formatted Payroll Summary ===
   return {
-    totalAmountPaid: paidAmountTotal.toFixed(2),         // e.g. "12000.00"
+    totalAmountPaid: paidAmountTotal.toFixed(2),         // <- e.g. "12000.00"
     totalAmountPending: pendingAmountTotal.toFixed(2),
-    totalPaidMonths: paidMonthCount.toString(),          // e.g. "6"
-    totalUnpaidMonths: unpaidMonthCount.toString(), 
+    totalPaidMonths: paidMonthCount.toString(),          // <- e.g. "6"
+    totalUnpaidMonths: unpaidMonthCount.toString(),
   };
 }
 
-export async function markUnpaidPayrollsAsPaid(salaries: PayrollDialogSalaryRow[]) {
+
+
+/**
+ * === Marks specified unpaid payroll records as paid and logs corresponding transaction entries. ===
+ * 
+ * @param {PayrollDialogSalaryRow[]} salaries - Array of salary payroll rows to mark as paid.
+ * @returns {Promise<boolean>} Returns true if operation completes successfully, false if no salaries provided.
+ */
+export async function markUnpaidPayrollsAsPaid(salaries: PayrollDialogSalaryRow[]): Promise<boolean> {
   if (!salaries || salaries.length === 0) return false;
 
+  // === Perform all updates within a transaction for atomicity ===
   await db.transaction(async (tx) => {
     for (const salary of salaries) {
-      // === Update payroll record ===
+      // === Update payroll record to mark as paid with details ===
       await tx.update(payrollsTable)
         .set({
           basicPay: salary.basicPay,
@@ -271,7 +347,7 @@ export async function markUnpaidPayrollsAsPaid(salaries: PayrollDialogSalaryRow[
           )
         );
 
-      // === Insert transaction record for payroll payment ===
+      // === Insert transaction record logging the salary payment ===
       await insertData("transactionsTable", {
         categoryId: 1,
         title: 'Salary Payment to Employee',
@@ -286,8 +362,18 @@ export async function markUnpaidPayrollsAsPaid(salaries: PayrollDialogSalaryRow[
   return true;
 }
 
-export async function fetchPayrollWithDetail(payrollId: number) {
 
+
+/**
+ * === Fetches detailed payroll information by payroll ID, including employee details. ===
+ * 
+ * @param {number} payrollId - The ID of the payroll record to fetch.
+ * @returns {Promise<Object>} A promise that resolves to the payroll record with employee details,
+ * or an empty object if no record is found.
+ */
+export async function fetchPayrollWithDetail(payrollId: number): Promise<EmployeePayrollInterface> {
+
+  // === Query payroll with joined employee details ===
   const [payroll] = await db
     .select({
       id: payrollsTable.id,
@@ -315,7 +401,20 @@ export async function fetchPayrollWithDetail(payrollId: number) {
       )
     ).orderBy(desc(payrollsTable.id));
 
-  return payroll ?? {};
+  // === Format payroll & normalize fields ===
+  const formattedPayroll = {
+    ...payroll,
+    employeeName: payroll.employeeName ?? "",
+    employeeCNIC: payroll.employeeCNIC ?? "",
+    employeeEmail: payroll.employeeEmail ?? "",
+
+    bonus: payroll.bonus ?? "0.00",
+    penalty: payroll.penalty ?? "0.00",
+
+    description: payroll.description ?? "",
+    paidAt: payroll.paidAt ? payroll.paidAt.toISOString() : '',
+  }
+
+  // === Return payroll or empty object if not found ===
+  return formattedPayroll ?? {};
 }
-
-

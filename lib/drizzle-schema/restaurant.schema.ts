@@ -1,14 +1,28 @@
 import { mysqlTable, varchar, int, decimal, boolean, timestamp, datetime, mysqlEnum, text } from 'drizzle-orm/mysql-core';
 import { adminSchema } from './admin-panel.schema'
 
-// Menu Categories Table
+
+
+/* ===========================
+=== Menu Management Tables ===
+=========================== */
+
+/**
+ * Menu Categories
+ * Groups menu items under a named category.
+ */
 export const menuCategories = mysqlTable('menu_categories', {
   id: int().autoincrement().primaryKey(),
   name: varchar({ length: 255 }).notNull(),
   description: varchar({ length: 255 }),
 });
 
-// Menu Items Table
+
+
+/**
+ * Menu Items
+ * Represents individual food/drink items available to order.
+ */
 export const menuItems = mysqlTable('menu_items', {
   id: int().autoincrement().primaryKey(),
   image: text(),
@@ -19,7 +33,12 @@ export const menuItems = mysqlTable('menu_items', {
   is_available: boolean().default(true),
 });
 
-// Menu Item Options Table
+
+
+/**
+ * Menu Item Options
+ * Customizations or size variations for a menu item.
+ */
 export const menuItemOptions = mysqlTable('menu_item_options', {
   id: int().autoincrement().primaryKey(),
   menu_item_id: int().notNull().references(() => menuItems.id),
@@ -27,14 +46,28 @@ export const menuItemOptions = mysqlTable('menu_item_options', {
   price: decimal({ precision: 10, scale: 2 }).notNull(),
 });
 
-// Table Management Table
+
+
+/* ===============================
+=== Table & Booking Management ===
+=============================== */
+
+/**
+ * Restaurant Tables
+ * Physical tables available for dining in the restaurant.
+ */
 export const restaurantTables = mysqlTable('restaurant_tables', {
   id: int().autoincrement().primaryKey(),
   table_number: varchar({ length: 50 }).notNull(),
   status: mysqlEnum(['booked', 'occupied', 'available']).notNull().default('available'),
 });
 
-// Bookings Table
+
+
+/**
+ * Bookings Table
+ * Stores reservation records for restaurant tables.
+ */
 export const bookingsTables = mysqlTable('bookings_tables', {
   id: int('id').autoincrement().primaryKey(),
   tableId: int('table_id').notNull().references(() => restaurantTables.id),
@@ -47,7 +80,16 @@ export const bookingsTables = mysqlTable('bookings_tables', {
   bookingDate: timestamp('booking_date').defaultNow().notNull(),
 });
 
-// Orders Table
+
+
+/* ====================
+=== Order & Billing ===
+==================== */
+
+/**
+ * Orders Table
+ * Represents a single order tied to a table.
+ */
 export const ordersTable = mysqlTable('orders_table', {
   id: int('id').autoincrement().primaryKey(),
   tableId: int('table_id').references(() => restaurantTables.id),
@@ -58,7 +100,12 @@ export const ordersTable = mysqlTable('orders_table', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-// Order Items Table
+
+
+/**
+ * Order Items Table
+ * Line items associated with an order.
+ */
 export const orderItemsTable = mysqlTable('order_items_table', {
   id: int('id').autoincrement().primaryKey(),
   menuItemImage: text('menu_item_image'),
@@ -71,7 +118,12 @@ export const orderItemsTable = mysqlTable('order_items_table', {
   price: decimal('price', { precision: 10, scale: 2 }).notNull(),
 });
 
-// Invoices Table
+
+
+/**
+ * Invoices Table
+ * Final billing summary for an order, including discounts and payment method.
+ */
 export const InvoicesTable = mysqlTable('invoices_table', {
   id: int('id').autoincrement().primaryKey(),
   orderId: int('order_id').references(() => ordersTable.id).notNull(),
@@ -81,13 +133,22 @@ export const InvoicesTable = mysqlTable('invoices_table', {
   discount: decimal('discount_percentage', { precision: 10, scale: 2 }).default('0.00').notNull(),
   totalAmount: decimal('total_amount', { precision: 10, scale: 2 }).notNull(),
   advancePaid: decimal('advance_paid', { precision: 10, scale: 2 }).default('0.00'),
-  grandTotal: decimal('grand_total',{ precision: 10, scale: 2 }).default('0.00').notNull(),
-  paymentMethod: mysqlEnum('payment_method' ,['cash', 'card', 'online']),
-  isPaid: boolean('is_paid').default(false),
+  grandTotal: decimal('grand_total', { precision: 10, scale: 2 }).default('0.00').notNull(),
+  paymentMethod: mysqlEnum('payment_method', ['cash', 'card', 'online']).notNull(),
+  isPaid: boolean('is_paid').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-// Employees Table
+
+
+/* ========================
+=== Employee Management ===
+======================== */
+
+/**
+ * Employees Table
+ * Stores all employee records for the restaurant.
+ */
 export const employeesTable = mysqlTable('employees', {
   id: int('id').autoincrement().primaryKey(),
   image: text(),
@@ -98,9 +159,14 @@ export const employeesTable = mysqlTable('employees', {
   email: varchar('email', { length: 100 }).notNull(),
   phone: varchar('phone', { length: 15 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-}); 
+});
 
-// Employment Records Table
+
+
+/**
+ * Employment Records
+ * Tracks employment history (status changes, rejoining, etc.).
+ */
 export const employmentRecordsTable = mysqlTable('employment_records', {
   id: int('id').autoincrement().primaryKey(),
   employeeId: int('employee_id').references(() => employeesTable.id).notNull(),
@@ -113,7 +179,12 @@ export const employmentRecordsTable = mysqlTable('employment_records', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-// Salary History Table
+
+
+/**
+ * Salary Changes Table
+ * Logs changes to an employee’s salary over time.
+ */
 export const salaryChangesTable = mysqlTable('salary_changes', {
   id: int('id').autoincrement().primaryKey(),
   employeeId: int('employee_id').references(() => employeesTable.id).notNull(),
@@ -124,7 +195,16 @@ export const salaryChangesTable = mysqlTable('salary_changes', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-// Payroll Table
+
+
+/* ===========================
+=== Payroll & Transactions ===
+=========================== */
+
+/**
+ * Payrolls Table
+ * Stores salary payment records per employee per month.
+ */
 export const payrollsTable = mysqlTable('payrolls', {
   id: int('id').autoincrement().primaryKey(),
   employeeId: int('employee_id').references(() => employeesTable.id).notNull(),
@@ -141,18 +221,32 @@ export const payrollsTable = mysqlTable('payrolls', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-// Transaction Categories Management Table
+
+
+/* ==========================================
+=== Transaction Categories & Transactions ===
+========================================== */
+
+/**
+ * Transaction Categories Table
+ * Categorizes financial transactions, e.g., rent, salary, utilities.
+ */
 export const transactionCategoriesTable = mysqlTable('transaction_categories', {
   id: int('id').autoincrement().primaryKey(),
-  category: varchar('category',{ length: 255 }).notNull(),
+  category: varchar('category', { length: 255 }).notNull(),
   description: text('description'),
   locked: boolean('locked').default(false),
 });
 
-// Transactions Management Table
+
+
+/**
+ * Transactions Table
+ * Records individual financial transactions with references to categories and source.
+ */
 export const transactionsTable = mysqlTable('transactions', {
   id: int('id').autoincrement().primaryKey(),
-  title: varchar('title',{ length: 255 }).notNull(),
+  title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
   amount: decimal('amount', { precision: 10, scale: 2 }).notNull(),
   categoryId: int('category_id').references(() => transactionCategoriesTable.id).notNull(),
@@ -163,7 +257,9 @@ export const transactionsTable = mysqlTable('transactions', {
   createdAt: timestamp('created_at').defaultNow().notNull()
 });
 
-// Export Db Table Schema -> index.ts -> export to app
+
+
+// === Schema Export ===
 export const restaurantSchema = {
   menuCategories,
   menuItems,
