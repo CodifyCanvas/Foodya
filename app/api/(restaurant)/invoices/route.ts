@@ -3,6 +3,7 @@ import { updateTableAndBookingStatus } from "@/lib/crud-actions/bookings-tables"
 import { checkDuplicate, getAllData } from "@/lib/crud-actions/general-actions";
 import { getAllWaiters, upsertInvoiceOrderItemsTx } from "@/lib/crud-actions/invoices";
 import { getAllMenuItems } from "@/lib/crud-actions/menu-items";
+import { getAllActiveTable } from "@/lib/crud-actions/restaurant-tables";
 import { mapToLabelValue } from "@/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -28,7 +29,7 @@ export async function GET() {
     // === Fetch invoices and related data ===
     const invoices = await getAllData("InvoicesTable");
     const menuItems = await getAllMenuItems();
-    const rawTables = await getAllData("restaurantTables");
+    const rawTables = await getAllActiveTable();
     const rawWaiter = await getAllWaiters('waiter');
 
     const tables = mapToLabelValue(rawTables, {
@@ -72,6 +73,8 @@ export async function POST(req: NextRequest) {
     const dineInInvoice = body?.invoice;
     const orderItems = body?.items;
 
+    console.log(body);
+
     // === DINE-IN Order Invoice ===
     if (dineInInvoice?.orderType === "dine_in") {
 
@@ -94,7 +97,7 @@ export async function POST(req: NextRequest) {
         orderItems,
       };
 
-      await upsertInvoiceOrderItemsTx(parsed, Number(userId), "update");
+      await upsertInvoiceOrderItemsTx(parsed, Number(userId), "insert");
 
       // Set table and booking status to "check-out"
       await updateTableAndBookingStatus(Number(dineInInvoice.tableId), "check-out");

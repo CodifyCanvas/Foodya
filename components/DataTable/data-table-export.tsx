@@ -11,22 +11,44 @@ import autoTable from "jspdf-autotable"
 import Image from "next/image"
 import { Icons } from "@/constants"
 
-interface ExportButtonProps<TData extends Record<string, any>> {
+
+
+// === Props ===
+interface ExportButtonProps<TData> {
   table: Table<TData>
 }
 
+
+
+/**
+ * Component that provides export options (copy, CSV, Excel, PDF, print) for a data table.
+ *
+ * It uses the current filtered, visible, or paginated data in the table to export.
+ * Excludes columns with id "actions" from exports.
+ *
+ * @template TData - Type of data in the table rows
+ * @param {ExportButtonProps<TData>} props - Props containing the table instance
+ * @returns - A dropdown menu with export options
+ */
 export function DataTableExport<TData extends Record<string, any>>({ table }: ExportButtonProps<TData>) {
 
   const data = table.getFilteredRowModel().rows.map((row) => row.original)
 
+
+  /**
+   * Copy the current paginated visible table data as CSV text to clipboard.
+   * Includes only visible columns except columns with id "actions".
+   */
   const exportCopy = () => {
-    // // Get all rows that match current filters/search (ignores pagination)
+
+    // Get all filtered rows (ignores pagination)
     // const rows = table.getFilteredRowModel().rows;
 
-    // Get only the rows visible on the current page (respects pagination and filters)
+    // Get rows shown on this page (with filters and pagination)
     const rows = table.getPaginationRowModel().rows;
 
-    // Exclude columns with id "no-print"
+
+    // Filter columns excluding those with id "actions"
     const columns = table
       .getVisibleFlatColumns()
       .filter((col) => col.id !== "actions");
@@ -40,7 +62,6 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
       if (typeof header === "string") return header.replace(/"/g, '""');
       if (typeof header === "function") {
         try {
-          // Cast to any to avoid TS errors, since we only want string output
           const result = (header as any)({ column: col });
           if (typeof result === "string") return result.replace(/"/g, '""');
         } catch { }
@@ -49,8 +70,9 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
       return col.id.replace(/"/g, '""');
     });
 
+    // Create CSV rows escaping quotes in cell values
     const csvRows = [
-      headers.join(","), // header row
+      headers.join(","), // <- header row
       ...rows.map(row =>
         columns.map(col => {
           const cellValue = row.getValue(col.id);
@@ -74,18 +96,21 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
       });
   };
 
+
+  /**
+   * Export the filtered data as a downloadable CSV file.
+   * Excludes columns with id "actions".
+   */
   const exportCSV = () => {
-    // Get visible columns (excluding actions or hidden columns)
-    const columns = table
-      .getVisibleFlatColumns()
-      .filter((col) => col.id !== "actions")
-      .map((col) => col.id);
+
+    // Filter columns excluding those with id "actions"
+    const columns = table.getVisibleFlatColumns().filter((col) => col.id !== "actions").map((col) => col.id);
 
     if (data.length === 0 || columns.length === 0) return;
 
-    // Prepare CSV rows: header + filtered rows
+    // Build CSV string from header and data rows
     const csvRows = [
-      columns.join(","), // header row with visible columns
+      columns.join(","), // <- header row with visible columns
       ...data.map((row) =>
         columns
           .map((col) => {
@@ -98,7 +123,7 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
 
     const csv = csvRows.join("\n");
 
-    // Download CSV file
+    // Trigger CSV download
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
@@ -109,6 +134,10 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
   };
 
 
+  /**
+   * Export the filtered data as an Excel (.xlsx) file.
+   * Excludes columns with id "actions".
+   */
   const exportExcel = async () => {
     const columns = table
       .getVisibleFlatColumns()
@@ -141,10 +170,15 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
     saveAs(blob, "data.xlsx");
   };
 
+
+  /**
+   * Export the filtered data as a PDF file with a table.
+   * Excludes columns with id "actions".
+   */
   const exportPDF = () => {
     const doc = new jsPDF();
 
-    // Header
+    // Add header content
     doc.setFontSize(18);
     doc.text("Foodya Restaurant", 14, 20);
     doc.setFontSize(10);
@@ -152,7 +186,7 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
     doc.setTextColor(100);
     doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 35);
 
-    // Get visible columns (excluding "actions")
+    // Filter columns excluding those with id "actions"
     const visibleColumns = table
       .getVisibleFlatColumns()
       .filter((col) => col.id !== "actions");
@@ -173,22 +207,23 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
       })
     );
 
-    // Generate PDF table
+    // Generate table in PDF
     autoTable(doc, {
       head: [headers],
       body: rows,
       startY: 42,
       styles: { fontSize: 10 },
-      headStyles: {
-        fillColor: [22, 160, 133],
-        textColor: 255,
-      },
+      headStyles: { fillColor: [22, 160, 133], textColor: 255, },
       margin: { top: 10 },
     });
 
     doc.save("data.pdf");
   };
 
+
+  /**
+   * Print the current visible table (excluding the "actions" column).
+   */
   const printTable = () => {
     const original = document.querySelector("#table-to-print table");
     if (!original) return;
@@ -250,6 +285,7 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
     };
   };
 
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -273,15 +309,24 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
   )
 }
 
-const ExportItem = ({
-  icon,
-  label,
-  onClick,
-}: {
-  icon: string
-  label: string
-  onClick: () => void
-}) => (
+
+
+// === Props for ExportItem component ===
+interface ExportItemProps {
+  icon: string;
+  label: string;
+  onClick: () => void;
+}
+
+
+
+/**
+ * Component for a single export dropdown item.
+ *
+ * @param props - Props for the export item
+ * @returns - JSX element representing a dropdown item
+ */
+const ExportItem: React.FC<ExportItemProps> = ({ icon, label, onClick }) => (
   <DropdownMenuItem onClick={onClick} className="cursor-pointer">
     <div className="min-w-10 min-h-10 flex items-center justify-center relative overflow-hidden rounded-sm bg-black/5 transition-colors duration-200">
       <Image src={icon} alt={label} width={48} height={48} className="object-contain absolute w-7 h-7" />

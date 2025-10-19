@@ -24,8 +24,8 @@ const menuCategories = schema.menuCategories;
 export const getAllMenuItems = async (categoryName?: string, onlyAvailable: boolean = false): Promise<ItemWithOptions[]> => {
 
   // === Build dynamic conditions ===
-  const conditions = [];
-  
+  const conditions = [eq(menuItems.isDeleted, false)];
+
   if (categoryName) {
     conditions.push(eq(menuCategories.name, categoryName));
   }
@@ -34,19 +34,16 @@ export const getAllMenuItems = async (categoryName?: string, onlyAvailable: bool
     conditions.push(eq(menuItems.is_available, true));
   }
 
-  // === Start base query with joins ===
-  const baseQuery = db
-    .select()
+  const items = await db
+    .select({
+      menu_items: menuItems,
+      menu_item_options: menuItemOptions,
+      menu_categories: menuCategories,
+    })
     .from(menuItems)
     .leftJoin(menuItemOptions, eq(menuItems.id, menuItemOptions.menu_item_id))
-    .leftJoin(menuCategories, eq(menuItems.category_id, menuCategories.id));
-
-  // === Apply conditions if present ===
-  const query = conditions.length > 0
-    ? baseQuery.where(and(...conditions))
-    : baseQuery;
-
-  const items = await query;
+    .leftJoin(menuCategories, eq(menuItems.category_id, menuCategories.id))
+    .where(and(...conditions));
 
   // === Map to hold and group items with their options ===
   const itemMap = new Map<number, ItemWithOptions>();
@@ -65,8 +62,8 @@ export const getAllMenuItems = async (categoryName?: string, onlyAvailable: bool
         description: item.description ?? "",
         price: Number(item.price),
         is_available: item.is_available ?? false,
-        category: category?.name ?? "",
-        category_id: item.category_id.toString(),
+        category: category?.name ?? "Others",
+        category_id: item.category_id ? item.category_id.toString() : 'others',
         options: [],
       });
     }

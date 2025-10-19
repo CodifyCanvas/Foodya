@@ -83,18 +83,26 @@ export interface ModuleInterface {
 
 
 /**
- * Permissions assigned to a role for a specific module (RBAC - Role Based Access Control).
+ * Permissions flags assigned to a role for a specific module (RBAC).
  */
-export interface Permissions {
+export interface ModulePermission {
+  can_view: boolean;
+  can_create: boolean;
+  can_edit: boolean;
+  can_delete: boolean;
+}
+
+
+
+/**
+ * Permissions assigned to a role for a specific module, including role and module info.
+ */
+export interface Permissions extends ModulePermission {
   id: number;
   role_id: number;
   role_name: string;
   module_id: number;
   module_name: string;
-  can_view: boolean;
-  can_create: boolean;
-  can_edit: boolean;
-  can_delete: boolean;
 }
 
 
@@ -344,10 +352,10 @@ export interface EmploymentRecordInterface {
   id: number | null;
   designation: string;
   shift: string;
-  status: 'active' | 'resigned' | 'terminated' | 'rejoined'; 
+  status: 'active' | 'resigned' | 'terminated' | 'rejoined';
   joinedAt: string;
   resignedAt: string | null;
-  changeType: 'valid' | 'correction'; 
+  changeType: 'valid' | 'correction';
   createdAt?: string | Date;
 }
 
@@ -528,12 +536,12 @@ export interface EmployeePayrollInterface {
   employeeName: string;
   employeeCNIC: string;
   employeeEmail: string;
-  basicPay: string; 
+  basicPay: string;
   bonus: string;
   penalty: string;
   totalPay: string;
   description: string;
-  month: string; 
+  month: string;
   status: 'paid' | 'pending';
   paidAt: string;
 }

@@ -1,66 +1,111 @@
+"use client";
+
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { buttonVariants } from "@/components/ui/button";
-import { OctagonAlert } from "lucide-react";
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Loader, OctagonAlert } from "lucide-react";
+import { useState, useCallback } from "react";
+import toast from "react-hot-toast";
+import { refreshData } from "@/lib/swr";
 
 interface DeleteConfirmationDialogProps<T> {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    data: T;
-    dbTable: string;
-    tableName: string;
+    isOpen: boolean;
+    setIsOpen: (open: boolean) => void;
+    deletePayload: T;
+    deleteEndpoint: string;
+    title?: string;
+    confirmMessage?: string;
+    revalidateEndpoint?: string;
 }
 
-export default function DeleteConfirmationDialog<T extends { id?: number }>({
-    open,
-    onOpenChange,
-    data,
-    dbTable,
-    tableName,
+export default function DeleteConfirmationDialog<T>({
+    isOpen,
+    setIsOpen,
+    deletePayload,
+    deleteEndpoint,
+    title,
+    confirmMessage,
+    revalidateEndpoint,
 }: DeleteConfirmationDialogProps<T>) {
+    const [isDeleting, setIsDeleting] = useState(false);
 
-    // Handler for confirm button click
-    const handleConfirm = async () => {
+    const handleDelete = useCallback(async () => {
         try {
-            console.log("deleted row id: ", data.id, " from ", dbTable, " table ")  
-            onOpenChange(false);      
+            setIsDeleting(true);
+
+            const response = await fetch(deleteEndpoint, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(deletePayload),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                toast.error(result?.error ?? "Failed to delete. Please try again.");
+                return;
+            }
+
+            toast.success(result?.message ?? "Successfully deleted.");
+            refreshData(revalidateEndpoint ?? deleteEndpoint);
+            setIsOpen(false);
         } catch (error) {
-            console.error("Delete failed:", error);
+            console.error("Delete error:", error);
+            toast.error("Unexpected error occurred. Please try again later.");
+        } finally {
+            setIsDeleting(false);
         }
-    };
+    }, [deletePayload, deleteEndpoint, revalidateEndpoint, setIsOpen]);
+
+    console.warn("Delete component render:");
 
     return (
-        <AlertDialog open={open} onOpenChange={onOpenChange}>
-            <AlertDialogContent className="font-rubik-400">
-                <AlertDialogHeader className="items-center">
-                    <AlertDialogTitle className="font-medium">
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogContent className="font-rubik-400">
+                <DialogHeader className="items-center">
+                    <DialogTitle className="font-medium text-center">
                         <div className="mb-2 mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
                             <OctagonAlert className="h-7 w-7 text-destructive" />
                         </div>
-                        Are you absolutely sure?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription className="text-[15px] text-center">
-                        This will permanently remove a <strong>{tableName}</strong> entry.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter className="mt-2 sm:justify-center">
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                        className={buttonVariants({ variant: "destructive" })}
-                        onClick={handleConfirm}
+                        {title ?? "Are you absolutely sure?"}
+                    </DialogTitle>
+                    <DialogDescription className="text-[15px] text-center">
+                        {confirmMessage ??
+                            "This action cannot be undone. This will permanently delete the selected item."}
+                    </DialogDescription>
+                </DialogHeader>
+
+                <DialogFooter className="mt-2 sm:justify-center">
+                    <Button
+                        variant="outline"
+                        className="min-w-28"
+                        onClick={() => setIsOpen(false)}
+                        disabled={isDeleting}
                     >
-                        Confirm
-                    </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="destructive"
+                        className="min-w-28 flex items-center gap-2"
+                        onClick={handleDelete}
+                        disabled={isDeleting}
+                    >
+                        {isDeleting && (
+                            <Loader
+                                className="animate-spin size-4 text-white"
+                                aria-hidden="true"
+                            />
+                        )}
+                        {isDeleting ? "Deleting..." : "Confirm"}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 }

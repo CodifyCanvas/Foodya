@@ -53,6 +53,7 @@ const RolesPage = () => {
         data={roles ?? []}
         filterColumns={['role']}
         createComponent={<CreateForm />}
+        loading={isLoading}
       />
 
     </div>

@@ -87,12 +87,12 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
 
       {/* === Show warning toast for duplicate/409 error === */ }
       if (result.status === 409) {
-        toast.error(result?.message ?? "Duplicate value found.");
+        toast.error(result?.error ?? "Duplicate value found.");
         return;
       }
 
       if (!response.ok) {
-        toast.error(result?.message ?? (isEditing
+        toast.error(result?.error ?? (isEditing
           ? "Role can't be updated. Please try again."
           : "Role can't be created. Please try again."))
         return

@@ -57,7 +57,7 @@ export const menuItemFormSchema = z.object({
  */
 export const restaurantTablesFormSchema = z.object({
   id: z.union([z.number(), z.string().transform(String)]).optional(),
-  table_number: z.string().min(1, { error: "Table name is required."}).max(50, {error: 'Table number cannot exceed 50 characters.'}),
+  table_number: z.string().min(1, { error: "Table name is required." }).max(50, { error: 'Table number cannot exceed 50 characters.' }),
   status: z.enum(["occupied", "booked", "available"], { error: "Please select a valid status." }),
 })
 
@@ -74,6 +74,14 @@ export const bookingsTablesFormSchema = z.object({
   advancePaid: z.string().max(11, { error: "Hmm, that payment amount looks off. Please check again." }).optional(),
   reservationStart: z.date({ error: issue => issue.input === undefined ? "Required" : "Invalid date" }),
   reservationEnd: z.date({ error: issue => issue.input === undefined ? "Required" : "Invalid date" }),
+}).superRefine((data, ctx) => {
+  if (data.reservationStart >= data.reservationEnd) {
+    ctx.addIssue({
+      code: 'custom',
+      message: "Reservation start time must be before end time.",
+      path: ["reservationStart"],
+    });
+  }
 })
 
 
@@ -85,7 +93,7 @@ export const bookingsTablesFormSchema = z.object({
 export const invoiceFormSchema = z.object({
   customerName: z.string().max(50, { error: "Whoa, that's a long name! Keep it under 50 characters." }).optional(),
   paymentMethod: z.enum(["cash", "card", "online"], { error: "Please select a payment method." }),
-  orderType: z.enum(["dine_in", "drive_thru", "takeaway"], { error: "Please select an order type."}),
+  orderType: z.enum(["dine_in", "drive_thru", "takeaway"], { error: "Please select an order type." }),
   subTotalAmount: z.string().max(11, { error: "Please check the subtotal amount." }),
   discount: z.string().max(11, { error: "Please check the discount amount." }),
   totalAmount: z.string().max(11, { error: "Please check the total amount." }),

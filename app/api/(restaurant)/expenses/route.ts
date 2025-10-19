@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions";
+import { deleteData, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions";
 import { getAllTransactionsWithDetails } from "@/lib/crud-actions/transactions";
 import { mapToLabelValue } from "@/lib/utils";
 import { TransactionFormSchema } from "@/lib/zod-schema/restaurant.zod";
@@ -124,6 +124,45 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(
       { error: "Unable to update the expense at this time. Please try again later." },
+      { status: 500 }
+    );
+  }
+}
+
+
+
+/* ========================================
+=== [Delete] Delete Expense Transaction ===
+======================================== */
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await auth();
+    const userId = session?.user.id;
+
+    // === Authenticate User ===
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
+    // === Parse Request Body ===
+    const body = await req.json();
+
+    // === Validate ===
+    const { id } = body;
+    if (!id) {
+      return NextResponse.json({ error: "Missing Transaction ID." }, { status: 400 });
+    }
+
+    // === Perform Delete Action ===
+    await deleteData("transactionsTable", 'id', id);
+
+    // === Return Success Response ===
+    return NextResponse.json({ message: "Expense Transaction deleted successfully." }, { status: 200 });
+  } catch (error) {
+    console.error("Failed to delete expense transaction: ", error);
+
+    return NextResponse.json(
+      { error: "Failed to delete transaction. Please try again." },
       { status: 500 }
     );
   }

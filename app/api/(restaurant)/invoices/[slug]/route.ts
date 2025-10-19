@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
-import { checkDuplicate } from "@/lib/crud-actions/general-actions";
-import { fetchInvoice, upsertInvoiceOrderItemsTx } from "@/lib/crud-actions/invoices";
+import { checkDuplicate, deleteData, updateData } from "@/lib/crud-actions/general-actions";
+import { deleteInvoiceWithTransaction, fetchInvoice, upsertInvoiceOrderItemsTx } from "@/lib/crud-actions/invoices";
+import { db } from "@/lib/db";
 import { invoiceActionFormSchema } from "@/lib/zod-schema/restaurant.zod";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -138,6 +139,44 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug
 
     return NextResponse.json(
       { error: "An unexpected error occurred while updating the invoice. Please try again later." },
+      { status: 500 }
+    );
+  }
+}
+
+
+
+/* ============================
+=== [Delete] Delete Invoice ===
+============================ */
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+  try {
+    const session = await auth();
+    const userId = session?.user.id;
+
+    // === Authenticate User ===
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
+    // === Validate slug parameter === 
+    const { slug } = await params;
+    const invoiceId = Number(slug);
+
+    if (!invoiceId || typeof invoiceId !== "number" || isNaN(invoiceId)) {
+      return NextResponse.json({ error: "Invalid or missing invoice ID." }, { status: 400 });
+    }
+
+    // === Perform Delete Action ===
+    await deleteInvoiceWithTransaction(invoiceId);
+
+    // === Return Success Response ===
+    return NextResponse.json({ message: "Invoice deleted successfully." }, { status: 200 });
+  } catch (error) {
+    console.error("Failed to delete invoice: ", error);
+
+    return NextResponse.json(
+      { error: "Unable to delete the invoice at this time. Please try again later." },
       { status: 500 }
     );
   }

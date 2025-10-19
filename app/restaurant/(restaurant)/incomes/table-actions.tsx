@@ -89,15 +89,13 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
       </DropdownMenu>
 
       {openEdit && <RoleForm open={openEdit} onOpenChange={setOpenEdit} data={data} {...props} />}
-      {openDelete && (
-        <DeleteConfirmationDialog<TransactionsTablesInterface>
-          open={openDelete}
-          onOpenChange={setOpenDelete}
-          data={data}
-          dbTable="roles"
-          tableName="Role"
-        />
-      )}
+      {openDelete &&
+        <DeleteConfirmationDialog
+          isOpen={openDelete}
+          confirmMessage="This will permanently delete the income transaction. This action cannot be undone."
+          setIsOpen={setOpenDelete} deletePayload={{ id: data.id }}
+          deleteEndpoint="/api/incomes"
+        />}
     </div>
   );
 }

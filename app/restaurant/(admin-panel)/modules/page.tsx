@@ -52,6 +52,7 @@ const ModulesPage = () => {
         data={modules ?? []}
         filterColumns={['name']}
         createComponent={<CreateForm />}
+        loading={isLoading}
       />
 
     </div>

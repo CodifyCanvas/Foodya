@@ -47,6 +47,8 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
 
+  const locked = data.role === 'admin';
+
   const { canEdit, canDelete } = useModulePermission();
 
   const handleEditClick = () => {
@@ -75,12 +77,12 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
           </Button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent align="end" className="font-rubik-400 text-xs">
-          <DropdownMenuItem onClick={handleEditClick}>
+        <DropdownMenuContent title={locked ? "Role is locked" : ""} align="end" className="font-rubik-400 text-xs">
+          <DropdownMenuItem disabled={locked} onClick={handleEditClick}>
             <PencilLine className="mr-2 size-4" />
             Edit
           </DropdownMenuItem>
-          <DropdownMenuItem variant="destructive" onClick={handleDeleteClick}>
+          <DropdownMenuItem disabled={locked} variant="destructive" onClick={handleDeleteClick}>
             <Trash2 className="mr-2 size-4" />
             Delete
           </DropdownMenuItem>
@@ -91,15 +93,14 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
         <RoleForm open={openEdit} onOpenChange={setOpenEdit} data={data} {...props} />
       )}
 
-      {openDelete && (
-        <DeleteConfirmationDialog<Role>
-          open={openDelete}
-          onOpenChange={setOpenDelete}
-          data={data}
-          dbTable="roles"
-          tableName="Role"
-        />
-      )}
+      {openDelete &&
+        <DeleteConfirmationDialog
+          isOpen={openDelete}
+          title="Are you sure you want to delete this role?"
+          confirmMessage="This action will also remove all users assigned to this role, along with any related settings. This cannot be undone."
+          setIsOpen={setOpenDelete} deletePayload={{ id: data.id, role: data.role }}
+          deleteEndpoint="/api/role"
+        />}
     </div>
   );
 }

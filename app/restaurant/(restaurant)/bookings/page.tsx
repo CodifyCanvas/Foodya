@@ -14,7 +14,7 @@ import ServiceUnavailable from '@/app/errors/service-unavailable';
 /* === Data Fetcher === */
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-const ModulesPage = () => {
+const BookingsPage = () => {
   // Use the custom permission hook
   const { canView, loading: permLoading } = useModulePermission();
 
@@ -52,10 +52,11 @@ const ModulesPage = () => {
         data={data?.bookings ?? []}
         filterColumns={[]}
         createComponent={<CreateForm props={{ tables: data?.tables }} />}
+        loading={isLoading}
       />
 
     </div>
   );
 };
 
-export default ModulesPage;
+export default BookingsPage;

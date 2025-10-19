@@ -87,15 +87,7 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
       </DropdownMenu>
 
       {openEdit && <RoleForm open={openEdit} onOpenChange={setOpenEdit} data={data} {...props} />}
-      {openDelete && (
-        <DeleteConfirmationDialog<RestaurantTablesInterface>
-          open={openDelete}
-          onOpenChange={setOpenDelete}
-          data={data}
-          dbTable="roles"
-          tableName="Role"
-        />
-      )}
+      {openDelete && <DeleteConfirmationDialog isOpen={openDelete} setIsOpen={setOpenDelete} deletePayload={{ id: data.id }} deleteEndpoint="/api/restaurant-tables" />}
     </div>
   );
 }

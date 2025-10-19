@@ -15,7 +15,7 @@ import { OrderCartProvider } from '@/hooks/context/OrderCartContext';
 /* === Data Fetcher === */
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-const ModulesPage = () => {
+const OrdersPage = () => {
   // Use the custom permission hook
   const { canView, loading: permLoading } = useModulePermission();
 
@@ -63,6 +63,4 @@ const ModulesPage = () => {
   );
 };
 
-export default ModulesPage;
-
-
+export default OrdersPage;

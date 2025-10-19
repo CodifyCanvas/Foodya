@@ -88,12 +88,13 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
 
       {openEdit && <RoleForm open={openEdit} onOpenChange={setOpenEdit} data={data} {...props} />}
       {openDelete && (
-        <DeleteConfirmationDialog<TransactionCategoriesTablesInterface>
-          open={openDelete}
-          onOpenChange={setOpenDelete}
-          data={data}
-          dbTable="roles"
-          tableName="Role"
+        <DeleteConfirmationDialog
+          isOpen={openDelete}
+          title="Confirm Transaction Category Deletion"
+          confirmMessage="Deleting this transaction category will move all its transactions to the 'Others' category. This action cannot be undone."
+          setIsOpen={setOpenDelete}
+          deletePayload={{ id: data.id, category: data.category }}
+          deleteEndpoint="/api/transaction-categories"
         />
       )}
     </div>

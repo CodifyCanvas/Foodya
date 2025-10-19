@@ -51,8 +51,8 @@ const InvoicePage = () => {
       <DataTable
         columns={columns({ menuItems: invoices?.menuItems ?? [], tables: invoices?.tables ?? [], waiters: invoices?.waiters ?? [] })}
         data={invoices?.invoices ?? []}
-        // filterColumns={['name']}
         createComponent={<CreateForm props={{ menuItems: invoices?.menuItems ?? [], tables: invoices?.tables ?? [], waiters: invoices?.waiters ?? [] }} />}
+        loading={isLoading}
       />
 
     </div>

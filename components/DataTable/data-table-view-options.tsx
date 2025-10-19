@@ -4,21 +4,9 @@ import { Table } from "@tanstack/react-table"
 import { Columns3Cog, RefreshCcwIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
-export function DataTableViewOptions<TData>({
-  table,
-}: {
-  table: Table<TData>
-}) {
+export function DataTableViewOptions<TData>({ table }: { table: Table<TData> }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -34,22 +22,22 @@ export function DataTableViewOptions<TData>({
         <DropdownMenuLabel className="text-xs">Toggle columns</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {table
-  .getAllColumns()
-  .filter((column) => column.getCanHide())
-  .map((column) => {
-    const label = column.columnDef.meta?.title ?? column.id
+          .getAllColumns()
+          .filter((column) => column.getCanHide())
+          .map((column) => {
+            const label = column.columnDef.meta?.title ?? column.id
 
-    return (
-      <DropdownMenuCheckboxItem
-        key={column.id}
-        className="capitalize"
-        checked={column.getIsVisible()}
-        onCheckedChange={(value) => column.toggleVisibility(!!value)}
-      >
-        {label}
-      </DropdownMenuCheckboxItem>
-    )
-  })}
+            return (
+              <DropdownMenuCheckboxItem
+                key={column.id}
+                className="capitalize"
+                checked={column.getIsVisible()}
+                onCheckedChange={(value) => column.toggleVisibility(!!value)}
+              >
+                {label}
+              </DropdownMenuCheckboxItem>
+            )
+          })}
 
 
         <DropdownMenuSeparator />

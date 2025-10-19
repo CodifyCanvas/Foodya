@@ -92,12 +92,13 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
       )}
 
       {openDelete && (
-        <DeleteConfirmationDialog<MenuCategories>
-          open={openDelete}
-          onOpenChange={setOpenDelete}
-          data={data}
-          dbTable="roles"
-          tableName="Role"
+        <DeleteConfirmationDialog
+          isOpen={openDelete}
+          title={`Delete Category "${data.name}"?`}
+          confirmMessage="Deleting this category will unlink it from all associated menu items. This action cannot be undone. Are you sure you want to proceed?"
+          setIsOpen={setOpenDelete}
+          deletePayload={{ id: data.id }}
+          deleteEndpoint="/api/menu-categories"
         />
       )}
     </div>

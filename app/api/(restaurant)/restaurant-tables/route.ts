@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { syncBookingAndTableStatuses } from "@/lib/crud-actions/bookings-tables";
-import { checkDuplicate, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions";
+import { checkDuplicate, deleteData, getAllData, getSpecificColumns, insertData, updateData } from "@/lib/crud-actions/general-actions";
+import { deleteRestaurantTable, getAllActiveTable } from "@/lib/crud-actions/restaurant-tables";
 import { restaurantTablesFormSchema } from "@/lib/zod-schema/restaurant.zod";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -27,7 +28,7 @@ export async function GET() {
     await syncBookingAndTableStatuses();
 
     // === Fetch all restaurant tables ===
-    const data = await getAllData("restaurantTables");
+    const data = await getAllActiveTable();
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
@@ -129,6 +130,50 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(
       { error: "Something went wrong while updating the table. Please try again later." },
+      { status: 500 }
+    );
+  }
+}
+
+
+
+/* ==========================================
+=== [Delete] Soft Delete Restaurant Table ===
+========================================== */
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await auth();
+    const userId = session?.user.id;
+
+    // === Authenticate User ===
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
+    // === Parse Request Body ===
+    const body = await req.json();
+
+    // === Validate ===
+    const { id } = body;
+    if (!id) {
+      return NextResponse.json({ error: "Missing table ID" }, { status: 400 });
+    }
+
+    // === Perform Soft Delete ===
+    const result = await deleteRestaurantTable(id);
+
+    if (!result.success) {
+      return NextResponse.json({ error: result.message }, { status: 400 });
+    }
+
+    // === Return Success Response ===
+    return NextResponse.json({ message: result.message }, { status: 200 });
+
+  } catch (error) {
+    console.error("Failed to delete restaurant table: ", error);
+
+    return NextResponse.json(
+      { error: "Something went wrong while deleting the table." },
       { status: 500 }
     );
   }

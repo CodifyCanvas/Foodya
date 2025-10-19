@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
-import { checkDuplicate, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions";
+import { checkDuplicate, deleteData, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions";
+import { deleteTheTransactionCategory } from "@/lib/crud-actions/transaction-categories";
 import { TransactionCategoriesFormSchema } from "@/lib/zod-schema/restaurant.zod";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -126,6 +127,58 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(
       { error: "Oops! We had trouble updating the category. Please try again." },
+      { status: 500 }
+    );
+  }
+}
+
+
+
+/* =========================================
+=== [Delete] Delete Transaction Category ===
+========================================= */
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await auth();
+    const userId = session?.user.id;
+
+    // === Authenticate User ===
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
+    // === Parse Request Body ===
+    const body = await req.json();
+
+    // === Validate ===
+    const { id, category } = body;
+    if (!id || !category) {
+      return NextResponse.json({ error: "Category ID and name are required." }, { status: 400 });
+    }
+
+    const protectedCategories = ["salary", "invoice", "others"];
+    if (protectedCategories.includes(category.trim().toLowerCase())) {
+      return NextResponse.json(
+        { error: `"${category}" is a protected category and cannot be deleted.` },
+        { status: 403 }
+      );
+    }
+
+    // === Perform Delete Action ===
+    const success = await deleteTheTransactionCategory(id);
+
+    if (!success) {
+      return NextResponse.json({ error: "Could not delete the category. Try again." }, { status: 400 });
+    }
+
+    // === Return Success Response ===
+    return NextResponse.json({ message: "Category deleted. Transactions moved to 'Others'." }, { status: 200 });
+  } catch (error) {
+    console.error("Failed to delete transaction category: ", error);
+
+    const errorMessage = error instanceof Error ? error.message : "Something went wrong. Please try again.";
+    return NextResponse.json(
+      { error: errorMessage },
       { status: 500 }
     );
   }

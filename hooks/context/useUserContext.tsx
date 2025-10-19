@@ -1,29 +1,17 @@
 'use client';
 
-import React, {
-  createContext,
-  useContext,
-  useCallback,
-  useEffect,
-  useState,
-  useMemo,
-  ReactNode,
-} from 'react';
+import React, { createContext, useContext, useCallback, useEffect, useState, useMemo, ReactNode } from 'react';
 import useSWR from 'swr';
-import { User, Permissions } from '@/lib/definations';
+import { User, Permissions, ModulePermission } from '@/lib/definations';
 import toast from 'react-hot-toast';
 
-// ---- Types ----
-interface ModulePermission {
-  can_view: boolean;
-  can_create: boolean;
-  can_edit: boolean;
-  can_delete: boolean;
-}
+
 
 interface PermissionMap {
   [moduleName: string]: ModulePermission;
 }
+
+
 
 interface UserContextType {
   user: User | null;
@@ -36,75 +24,102 @@ interface UserContextType {
   reset: () => void;
 }
 
+
+
 interface UserProviderProps {
   children: ReactNode;
 }
 
-// ---- Fetch User ----
+
+
+// === Fetch function for SWR ===
 const fetchUser = (url: string) => fetch(url).then((res) => res.json());
 
-// ---- Context ----
+
+
+// === Context ===
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-// ---- Provider ----
+
+
+// === UserProvider Component===
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
+
+  // Fetch user data using SWR
   const { data: user, error, isLoading, mutate } = useSWR<User>('/api/user', fetchUser);
+
+  // Local state to manage permissions and related errors/loading
   const [permissions, setPermissions] = useState<Permissions[] | null>(null);
   const [permError, setPermError] = useState<Error | null>(null);
   const [permissionsLoading, setPermissionsLoading] = useState<boolean>(false);
 
-  // Fetch permissions from API
+
+  // === Fetch permissions for a given role_id ===
   const fetchPermissions = useCallback(async (role_id: string) => {
-  setPermissionsLoading(true); // ⬅️ Start loading
-  try {
-    toast.loading("Fetching permissions, please wait...", {
-      id: 'permission-toast'
-    })
-    const res = await fetch('/api/permission', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: Number(role_id) }),
-    });
+    setPermissionsLoading(true);
 
-    if (!res.ok) throw new Error('Failed to fetch permissions');
-    const data = await res.json();
-    setPermissions(data);
-    setPermError(null);
-  } catch (err) {
-    setPermissions(null);
-    setPermError(err as Error);
-  } finally {
-    setPermissionsLoading(false); // ⬅️ Done loading
-    toast.dismiss('permission-toast')
-  }
-}, []);
+    try {
+      toast.loading("Fetching permissions, please wait...", {
+        id: 'permission-toast'
+      })
+
+      const res = await fetch('/api/permission', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: Number(role_id) }),
+      });
+
+      if (!res.ok) throw new Error('Failed to fetch permissions');
+
+      const data = await res.json();
+      setPermissions(data);
+      setPermError(null);
+    } catch (err) {
+
+      setPermissions(null);
+      setPermError(err as Error);
+    } finally {
+
+      setPermissionsLoading(false);
+      toast.dismiss('permission-toast')
+    }
+  }, []);
 
 
-  // Refetch permissions when needed
-  const refetchPermissions = useCallback(async () => {
-    if (user?.role_id) await fetchPermissions(user.role_id);
-  }, [user?.role_id, fetchPermissions]);
-
-  // Fetch permissions when user.role_id is available
+  // Refetch permissions when user.role_id changes
   useEffect(() => {
     if (user?.role_id) {
       fetchPermissions(user.role_id);
     }
   }, [user?.role_id, fetchPermissions]);
 
-  // Refetch user
+
+  // Function to refetch permissions manually
+  const refetchPermissions = useCallback(async () => {
+    if (user?.role_id) {
+      await fetchPermissions(user.role_id);
+    }
+  }, [user?.role_id, fetchPermissions]);
+
+
+  // Function to refetch user data manually
   const refetchUser = useCallback(() => {
     mutate();
   }, [mutate]);
 
-  // Reset all user-related state
+
+  // Reset user and permissions state
   const reset = useCallback(() => {
     mutate(null as unknown as User, false);
     setPermissions(null);
     setPermError(null);
   }, [mutate]);
 
-  // Create permission object like: permission.roles.can_view
+
+  /**
+   * Memoized permission map for quick access:
+   * e.g. permission['module_name'].can_view
+   */
   const permission = useMemo(() => {
     if (!permissions) return {};
 
@@ -118,6 +133,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       return acc;
     }, {} as PermissionMap);
   }, [permissions]);
+
 
   return (
     <UserContext.Provider
@@ -137,9 +153,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   );
 };
 
-// ---- Hook ----
+
+
+// === Hook to use UserContext ===
 export const useUserContext = (): UserContextType => {
   const context = useContext(UserContext);
-  if (!context) throw new Error('useUserContext must be used within a UserProvider');
+  if (!context) throw new Error('Oops! useUserContext needs to be inside a UserProvider.');
   return context;
 };

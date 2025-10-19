@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { checkDuplicate, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions";
+import { checkDuplicate, deleteData, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions";
 import { moduleFormSchema } from "@/lib/zod-schema";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -125,6 +125,45 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(
       { error: "Something went wrong while creating the module. Please try again." },
+      { status: 500 }
+    );
+  }
+}
+
+
+
+/* ===========================
+=== [Delete] Delete Module ===
+=========================== */
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await auth();
+    const userId = session?.user.id;
+
+    // === Authenticate User ===
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
+    // === Parse Request Body ===
+    const body = await req.json();
+
+    // === Validate ===
+    const { id } = body;
+    if (!id) {
+      return NextResponse.json({ error: "Module ID is required." }, { status: 400 });
+    }
+
+    // === Perform Delete Action ===
+    await deleteData('modules', "id", id);
+
+    // === Return Success Response ===
+    return NextResponse.json({ message: "Module deleted along with related permissions and settings." }, { status: 200 });
+  } catch (error) {
+    console.error("Failed to delete module: ", error);
+
+    return NextResponse.json(
+      { error: "Failed to delete module. Please try again." },
       { status: 500 }
     );
   }

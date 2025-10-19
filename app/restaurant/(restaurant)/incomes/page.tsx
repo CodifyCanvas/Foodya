@@ -10,6 +10,7 @@ import { useModulePermission } from '@/hooks/useModulePermission';
 import AccessDenied from '@/app/errors/access-control-view/access-denied';
 import { TransactionsTablesInterface, TablesSelectInput } from '@/lib/definations';
 import ServiceUnavailable from '@/app/errors/service-unavailable';
+import { DataTableSkeleton } from '@/components/skeletons';
 
 /* === Data Fetcher === */
 const fetcher = (url: string) => fetch(url).then(res => res.json());
@@ -19,7 +20,7 @@ interface TransactionsResponseInterface {
   categories: TablesSelectInput[]
 }
 
-const ModulesPage = () => {
+const IncomesPage = () => {
   // Use the custom permission hook
   const { canView, loading: permLoading } = useModulePermission();
 
@@ -51,15 +52,18 @@ const ModulesPage = () => {
       <h3 className="text-3xl font-medium text-start px-4 pt-3 text-emerald-600">
         Incomes
       </h3>
-
-        <DataTable
+      
+      {/* Data Table */}
+      <DataTable
           columns={columns({categories: data?.categories ?? [] })}
           data={data?.transactions ?? []}
           filterColumns={[]}
           createComponent={<CreateForm props={{ categories: data?.categories ?? [] }} />}
+          loading={isLoading}
         />
+        
     </div>
   );
 };
 
-export default ModulesPage;
+export default IncomesPage;

@@ -14,8 +14,8 @@ import ServiceUnavailable from '@/app/errors/service-unavailable'
 /* === Data Fetcher Function === */
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
-/* === Employees Module Page === */
-const Page = () => {
+/* === Employees Page === */
+const EmployeesPage = () => {
 
   // === Module Permission Hook ===
   const { canView, loading: permLoading } = useModulePermission()
@@ -57,10 +57,11 @@ const Page = () => {
         data={data ?? []}
         filterColumns={[]}
         createComponent={<CreateForm />}
+        loading={isLoading}
       />
 
     </div>
   )
 }
 
-export default Page
+export default EmployeesPage

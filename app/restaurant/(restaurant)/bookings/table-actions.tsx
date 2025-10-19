@@ -40,38 +40,53 @@ const showPermissionToast = () => {
       position: 'top-right',
       duration: 4000,
     }
-  )};
+  )
+};
+
 
 
 /* === Row Actions (Edit / Cancel / Delete) === */
 export function RowActions({ data, props = {}, className }: EditFormMultiProps) {
+
+  const status = data.status?.toLowerCase().trim();
+
+  const isCancellable = !["expired", "cancelled", "completed", "processing"].includes(status);
+  const isEditable = !["expired", "completed", "processing"].includes(status);
+
   const [openCancel, setOpenCancel] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
 
+
+
   const { canEdit, canDelete } = useModulePermission();
 
   /* === Action Handlers === */
-  const handleCancelClick = useCallback(() => {
-  if (canEdit) 
-    setOpenCancel(true);
-  else 
-    showPermissionToast();
-}, [canEdit]);
-
-  const handleEditClick = useCallback(() => {
-    if (canEdit) 
-      setOpenEdit(true) 
-    else 
+  const handleCancelClick = () => {
+    if (canEdit) {
+      setOpenCancel(true);
+    }
+    else {
       showPermissionToast();
-  }, [canEdit]);
+    }
+  }
 
-  const handleDeleteClick = useCallback(() => {
-    if (canDelete)
-      setOpenDelete(true) 
-    else 
+  const handleEditClick = () => {
+    if (canEdit) {
+      setOpenEdit(true)
+    }
+    else {
       showPermissionToast();
-  }, [canDelete]);
+    }
+  }
+
+  const handleDeleteClick = () => {
+    if (canDelete) {
+      setOpenDelete(true);
+    } else {
+      showPermissionToast();
+    }
+  };
 
   return (
     <div className={cn('w-full flex flex-row justify-end items-center', className)}>
@@ -85,17 +100,20 @@ export function RowActions({ data, props = {}, className }: EditFormMultiProps) 
 
         <DropdownMenuContent align="end" className="font-rubik-400 text-xs">
           {/* === Show Cancel if status is not cancelled or expired === */}
-          {(data.status !== 'cancelled' && data.status !== 'expired') && (
+          {isCancellable && (
             <DropdownMenuItem onClick={handleCancelClick}>
               <X className="mr-2 size-4" />
               Cancel
             </DropdownMenuItem>
           )}
 
-          <DropdownMenuItem onClick={handleEditClick}>
-            <PencilLine className="mr-2 size-4" />
-            Edit
-          </DropdownMenuItem>
+          {/* === Show Edit if status is not cancelled or expired === */}
+          {isEditable && (
+            <DropdownMenuItem onClick={handleEditClick}>
+              <PencilLine className="mr-2 size-4" />
+              Edit
+            </DropdownMenuItem>
+          )}
 
           <DropdownMenuItem variant="destructive" onClick={handleDeleteClick}>
             <Trash2 className="mr-2 size-4" />
@@ -113,6 +131,7 @@ export function RowActions({ data, props = {}, className }: EditFormMultiProps) 
           {...props}
         />
       )}
+
       {openEdit && (
         <RoleForm
           open={openEdit}
@@ -121,18 +140,21 @@ export function RowActions({ data, props = {}, className }: EditFormMultiProps) 
           {...props}
         />
       )}
-      {openDelete && (
-        <DeleteConfirmationDialog<BookingsTablesInterface>
-          open={openDelete}
-          onOpenChange={setOpenDelete}
-          data={data}
-          dbTable="roles"
-          tableName="Role"
-        />
-      )}
+
+      {openDelete &&
+        <DeleteConfirmationDialog
+          isOpen={openDelete}
+          title="Delete Booking?"
+          confirmMessage="This will permanently remove the booking and cannot be undone."
+          setIsOpen={setOpenDelete}
+          deletePayload={{ id: data.id, status: data.status }}
+          deleteEndpoint="/api/bookings-tables"
+        />}
     </div>
   );
 }
+
+
 
 /* === Create New Record Button + Form === */
 export function CreateForm({ props = {} }: CreateFormMultiProps) {
@@ -140,12 +162,14 @@ export function CreateForm({ props = {} }: CreateFormMultiProps) {
   const { canCreate } = useModulePermission();
 
   /* === Create Button Click Handler === */
-  const handleCreateClick = useCallback(() => {
-    if (canCreate) 
-      setOpen(true) 
-    else 
+  const handleCreateClick = () => {
+    if (canCreate) {
+      setOpen(true)
+    }
+    else {
       showPermissionToast();
-  }, [canCreate]);
+    }
+  }
 
   return (
     <>

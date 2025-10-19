@@ -26,7 +26,7 @@ interface CreateFormMultiProps {
 
 interface EditFormMultiProps {
   props?: Record<string, any>;
-  data: { invoiceId: string | number};
+  data: { invoiceId: string | number };
   className?: string;
 }
 
@@ -103,26 +103,28 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
 
       {openInvoiceView && (
         <GenerateInvoiceDialog
-            isOpen={openInvoiceView}
-            setIsOpen={setOpenInvoiceView}
-            mode="view"
-            data={{
-              invoiceId: data.invoiceId
-            }}
-          />
+          isOpen={openInvoiceView}
+          setIsOpen={setOpenInvoiceView}
+          mode="view"
+          data={{
+            invoiceId: data.invoiceId
+          }}
+        />
       )}
-      
+
       {openEdit && (
         <RoleForm open={openEdit} onOpenChange={setOpenEdit} data={data} {...props} />
       )}
 
       {openDelete && (
-        <DeleteConfirmationDialog<InvoiceDetail>
-          open={openDelete}
-          onOpenChange={setOpenDelete}
-          data={data}
-          dbTable="roles"
-          tableName="Role"
+        <DeleteConfirmationDialog
+          isOpen={openDelete}
+          title={`Delete Invoice #${data.invoiceId}`}
+          confirmMessage="Consider marking it unavailable instead of deleting. If you're sure, proceed. This action is irreversible."
+          setIsOpen={setOpenDelete}
+          deletePayload={{ id: data.invoiceId }}
+          deleteEndpoint={`/api/invoices/${data.invoiceId}`}
+          revalidateEndpoint='/api/invoices'
         />
       )}
     </div>

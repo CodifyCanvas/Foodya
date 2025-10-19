@@ -19,7 +19,7 @@ interface TransactionsResponseInterface {
   categories: TablesSelectInput[]
 }
 
-const ModulesPage = () => {
+const ExpensePage = () => {
   // Use the custom permission hook
   const { canView, loading: permLoading } = useModulePermission();
 
@@ -57,9 +57,10 @@ const ModulesPage = () => {
           data={data?.transactions ?? []}
           filterColumns={[]}
           createComponent={<CreateForm props={{ categories: data?.categories ?? [] }} />}
+          loading={isLoading}
         />
     </div>
   );
 };
 
-export default ModulesPage;
+export default ExpensePage;

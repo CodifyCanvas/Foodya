@@ -2,6 +2,7 @@
 
 import { Card, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../ui/table"
 
 export function ReportsHeaderCardSkeleton() {
   const skeletons = new Array(4).fill(null)
@@ -28,6 +29,29 @@ export function ReportsHeaderCardSkeleton() {
           </CardFooter>
         </Card>
       ))}
+    </div>
+  )
+}
+
+export function DataTableSkeleton({
+  columnCount = 5,
+  rowCount = 8,
+  className
+}: { columnCount?: number; rowCount?: number; className?: string }) {
+  const columns = new Array(columnCount).fill(null)
+  const rows = new Array(rowCount).fill(null)
+
+  return (
+    <div className={cn("w-full overflow-hidden  border-t border-b my-5", className)}>
+          {rows.map((_, rowIndex) => (
+            <TableRow key={`row-${rowIndex}`}>
+              {columns.map((_, colIndex) => (
+                <TableCell key={`cell-${rowIndex}-${colIndex}`}>
+                  <div className="h-4 w-full max-w-[150px] rounded bg-gray-100 animate-pulse" />
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
     </div>
   )
 }

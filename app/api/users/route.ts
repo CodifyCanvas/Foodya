@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { checkDuplicate, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions";
+import { checkDuplicate, deleteData, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions";
 import { getAllUserWithRole } from "@/lib/crud-actions/users";
 import { mapToLabelValue } from "@/lib/utils";
 import { userFormSchema } from "@/lib/zod-schema";

@@ -3,22 +3,6 @@ import { boolean, int, mysqlTable, timestamp, varchar } from 'drizzle-orm/mysql-
 
 
 /**
- * === USERS TABLE ===
- * Stores user accounts and links each user to a role.
- */
-export const users = mysqlTable('users', {
-  id: int().autoincrement().primaryKey(),
-  name: varchar({ length: 255 }),
-  email: varchar({ length: 255 }).notNull().unique(),
-  password: varchar({ length: 50 }).notNull(),
-  is_active: boolean().default(false),
-  role_id: int().references(() => roles.id),
-  created_at: timestamp().defaultNow(),
-});
-
-
-
-/**
  * === ROLES TABLE ===
  * Defines user roles like admin, operator, etc.
  */
@@ -40,6 +24,22 @@ export const modules = mysqlTable('modules', {
 });
 
 
+7
+/**
+ * === USERS TABLE ===
+ * Stores user accounts and links each user to a role.
+ */
+export const users = mysqlTable('users', {
+  id: int().autoincrement().primaryKey(),
+  name: varchar({ length: 255 }),
+  email: varchar({ length: 255 }).notNull().unique(),
+  password: varchar({ length: 50 }).notNull(),
+  is_active: boolean().default(false),
+  role_id: int().references(() => roles.id, { onDelete: 'cascade' }),
+  created_at: timestamp().defaultNow(),
+});
+
+
 
 /**
  * === PERMISSIONS TABLE ===
@@ -47,8 +47,8 @@ export const modules = mysqlTable('modules', {
  */
 export const permissions = mysqlTable('permissions', {
   id: int().autoincrement().primaryKey(),
-  role_id: int().references(() => roles.id),
-  module_id: int().references(() => modules.id),
+  role_id: int().references(() => roles.id, { onDelete: 'cascade' }),
+  module_id: int().references(() => modules.id, { onDelete: 'cascade' }),
   label: varchar({ length: 255 }),
   can_view: boolean().default(false),
   can_edit: boolean().default(false),

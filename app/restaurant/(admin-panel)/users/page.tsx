@@ -55,6 +55,7 @@ const UsersPage = () => {
         createComponent={
           <CreateForm props={{ roles: data?.roles ?? [] }} />
         }
+        loading={isLoading}
       />
 
     </div>

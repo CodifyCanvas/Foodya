@@ -172,18 +172,20 @@ export async function upsertInvoiceOrderItemsTx(parsed: any, userId: number, mod
 
       // === Insert associated order items ===
       if (parsed.orderItems?.length) {
-        const insertPromises = parsed.orderItems.map((item: OrderItem) =>
+        const insertPromises = parsed.orderItems.map((item: OrderItem) => {
+          const parsedOptionId = Number(item.menuItemOptionId);
+
           insertData("orderItemsTable", {
             orderId: newOrderId,
             menuItemImage: item.menuItemImage || null,
             menuItemId: Number(item.menuItemId),
             menuItemName: item.menuItemName,
-            menuItemOptionId: item.menuItemOptionId !== null ? Number(item.menuItemOptionId) : null,
+            menuItemOptionId: parsedOptionId > 0 ? parsedOptionId : null,
             menuItemOptionName: item.menuItemOptionName || null,
             quantity: item.quantity,
             price: item.price,
           }, tx)
-        );
+        });
         await Promise.all(insertPromises);
       }
 
@@ -304,3 +306,29 @@ export async function upsertInvoiceOrderItemsTx(parsed: any, userId: number, mod
     throw new Error("Mode is Not Provided or valid");
   }
 }
+
+
+
+/**
+ * Deletes an invoice and related transaction references within a database transaction.
+ *
+ * @param {number} id - The ID of the invoice to be deleted.
+ * 
+ * @returns {Promise<void>} Resolves when the transaction completes successfully.
+ *
+ * @throws {Error} Propagates errors if the transaction fails; error handling should be done by the caller.
+ */
+export const deleteInvoiceWithTransaction = async (id: number): Promise<void> => {
+  if (!id) throw new Error('Oops! No invoice ID was provided for deletion.');
+
+  await db.transaction(async (tx) => {
+    // === Delete the invoice by ID ===
+    await tx.delete(invoices).where(eq(invoices.id, id));
+
+    // === Nullify sourceId in related transactions ===
+    await tx.delete(transactionsTable).where(and(
+      eq(transactionsTable.sourceType, 'invoice'),
+      eq(transactionsTable.sourceId, id)
+    ));
+  });
+};

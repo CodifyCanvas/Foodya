@@ -57,6 +57,7 @@ const PermissionsPage = () => {
         columns={columns({ refetchPermissions })}
         data={permissions ?? []}
         filterColumns={['role']}
+        loading={isLoading}
       />
 
     </div>

@@ -44,6 +44,7 @@ export async function getAllData<T extends TableName>(
 
 
 
+
 /**
  * === Inserts data into the specified table, optionally within a transaction. ===
  *
@@ -162,14 +163,14 @@ export async function checkDuplicate<T extends TableName, K extends ColumnName<T
   tx?: DBExecutor,
 ): Promise<boolean> {
 
-    const table = schema[tableName];
-    const column = table[columnName] as MySqlColumn;
-    const executor = tx ?? db;  // <- Use tx (executer) if provided, else default db
+  const table = schema[tableName];
+  const column = table[columnName] as MySqlColumn;
+  const executor = tx ?? db;  // <- Use tx (executer) if provided, else default db
 
-    const result = await executor.select()
-      .from(table)
-      .where(eq(column, value))
-      .limit(1);
+  const result = await executor.select()
+    .from(table)
+    .where(eq(column, value))
+    .limit(1);
 
-    return result.length > 0;
+  return result.length > 0;
 }

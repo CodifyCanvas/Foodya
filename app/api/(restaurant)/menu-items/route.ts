@@ -233,3 +233,45 @@ export async function PUT(req: NextRequest) {
     );
   }
 }
+
+
+
+/* ====================================
+=== [Delete] Soft Delete Menu Items ===
+==================================== */
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await auth();
+    const userId = session?.user.id;
+
+    // === Authenticate User ===
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
+    // === Parse Request Body ===
+    const body = await req.json();
+
+    // === Validate ===
+    const { id } = body;
+    if (!id) {
+      return NextResponse.json({ error: "Missing menu item ID. Please try again." }, { status: 400 });
+    }
+
+    // === Perform Soft Delete Action ===
+    await updateData('menuItems', "id", id, {
+      isDeleted: true,
+      is_available: false,
+    });
+
+    // === Return Success Response ===
+    return NextResponse.json({ message: "Menu item deleted successfully." }, { status: 200 });
+  } catch (error) {
+    console.error("Error while soft deleting menu item: ", error);
+
+    return NextResponse.json(
+      { error: "Something went wrong while deleting the menu item." },
+      { status: 500 }
+    );
+  }
+}

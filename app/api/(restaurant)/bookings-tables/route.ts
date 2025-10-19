@@ -2,7 +2,8 @@
 
 import { auth } from "@/auth"
 import { getAllBookingsTables, syncBookingAndTableStatuses } from "@/lib/crud-actions/bookings-tables"
-import { getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions"
+import { deleteData, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions"
+import { getAllActiveTable } from "@/lib/crud-actions/restaurant-tables";
 import { mapToLabelValue } from "@/lib/utils"
 import { bookingsTablesFormSchema } from "@/lib/zod-schema/restaurant.zod"
 import { NextRequest, NextResponse } from "next/server"
@@ -30,7 +31,7 @@ export async function GET() {
     await syncBookingAndTableStatuses();
 
     const bookings = await getAllBookingsTables();
-    const rawTables = await getAllData("restaurantTables");
+    const rawTables = await getAllActiveTable();
 
     const tables = mapToLabelValue(rawTables, { label: 'table_number', value: 'id' });
 
@@ -81,7 +82,7 @@ export async function POST(req: NextRequest) {
       customerName: customerName.trim(),
       reservationStart: new Date(reservationStart),
       reservationEnd: new Date(reservationEnd),
-      advancePaid: advancePaid,
+      advancePaid: isNaN(Number(advancePaid)) || advancePaid === '' ? '0.00' : advancePaid,
     });
 
     return NextResponse.json(
@@ -132,7 +133,7 @@ export async function PUT(req: NextRequest) {
       customerName: customerName.trim(),
       reservationStart,
       reservationEnd,
-      advancePaid,
+      advancePaid: isNaN(Number(advancePaid)) || advancePaid === '' ? '0.00' : advancePaid,
     });
 
     return NextResponse.json(
@@ -188,6 +189,54 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json(
       { error: "We couldn't update the reservation status. Please try again in a few moments." },
+      { status: 500 }
+    );
+  }
+}
+
+
+
+/* =============================================
+=== [Delete] Delete Restaurant Table Booking ===
+============================================= */
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await auth();
+    const userId = session?.user.id;
+
+    // === Authenticate User ===
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
+    /* === Parse & Validate Body === */
+    const body = await req.json();
+    const { id, status } = body;
+
+    if (!id || !status) {
+      return NextResponse.json(
+        { error: "Missing Reservation ID or status." },
+        { status: 400 }
+      );
+    }
+
+    /* === Prevent deletion while processing === */
+    if (status === 'processing') {
+      return NextResponse.json(
+        { error: "This booking is currently being processed. Please try again shortly." },
+        { status: 409 }
+      );
+    }
+
+    /* === Perform Delete Action === */
+    await deleteData("bookingsTables", 'id', id);
+
+    return NextResponse.json({ message: "The booking has been successfully deleted." }, { status: 200 });
+  } catch (error) {
+    console.error(`[GET ${path}] Failed to fetch tables:`, error);
+
+    return NextResponse.json(
+      { error: "We couldn't load the tables at the moment. Please try again shortly." },
       { status: 500 }
     );
   }

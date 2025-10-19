@@ -26,11 +26,12 @@ export const menuCategories = mysqlTable('menu_categories', {
 export const menuItems = mysqlTable('menu_items', {
   id: int().autoincrement().primaryKey(),
   image: text(),
-  category_id: int().notNull().references(() => menuCategories.id),
+  category_id: int().references(() => menuCategories.id),
   name: varchar({ length: 255 }).notNull(),
   description: varchar({ length: 255 }),
   price: decimal({ precision: 10, scale: 2 }).notNull(),
   is_available: boolean().default(true),
+  isDeleted: boolean('is_deleted').default(false).notNull(),
 });
 
 
@@ -41,7 +42,7 @@ export const menuItems = mysqlTable('menu_items', {
  */
 export const menuItemOptions = mysqlTable('menu_item_options', {
   id: int().autoincrement().primaryKey(),
-  menu_item_id: int().notNull().references(() => menuItems.id),
+  menu_item_id: int().notNull().references(() => menuItems.id, { onDelete: 'cascade' }),
   option_name: varchar({ length: 255 }),
   price: decimal({ precision: 10, scale: 2 }).notNull(),
 });
@@ -60,6 +61,7 @@ export const restaurantTables = mysqlTable('restaurant_tables', {
   id: int().autoincrement().primaryKey(),
   table_number: varchar({ length: 50 }).notNull(),
   status: mysqlEnum(['booked', 'occupied', 'available']).notNull().default('available'),
+  isDeleted: boolean('is_deleted').default(false).notNull(),
 });
 
 
@@ -110,7 +112,7 @@ export const orderItemsTable = mysqlTable('order_items_table', {
   id: int('id').autoincrement().primaryKey(),
   menuItemImage: text('menu_item_image'),
   orderId: int('order_id').references(() => ordersTable.id).notNull(),
-  menuItemId: int('menu_item_id').references(() => menuItems.id),
+  menuItemId: int('menu_item_id').references(() => menuItems.id, { onDelete: 'set null' }),
   menuItemName: varchar('menu_item_name', { length: 255 }).notNull(),
   menuItemOptionId: int('menu_item_option_id').references(() => menuItemOptions.id),
   menuItemOptionName: varchar('menu_item_option_name', { length: 255 }),

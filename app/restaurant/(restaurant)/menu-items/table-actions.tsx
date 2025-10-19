@@ -92,12 +92,13 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
       )}
 
       {openDelete && (
-        <DeleteConfirmationDialog<ItemWithOptions>
-          open={openDelete}
-          onOpenChange={setOpenDelete}
-          data={data}
-          dbTable="roles"
-          tableName="Role"
+        <DeleteConfirmationDialog
+          isOpen={openDelete}
+          title={`Delete Menu Item "${data.item}"?`}
+          confirmMessage="Consider marking it unavailable instead of deleting. If you're sure, proceed. This action is irreversible."
+          setIsOpen={setOpenDelete}
+          deletePayload={{ id: data.id }}
+          deleteEndpoint="/api/menu-items"
         />
       )}
     </div>

@@ -87,15 +87,14 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
       </DropdownMenu>
 
       {openEdit && <RoleForm open={openEdit} onOpenChange={setOpenEdit} data={data} {...props} />}
-      {openDelete && (
-        <DeleteConfirmationDialog<ModuleInterface>
-          open={openDelete}
-          onOpenChange={setOpenDelete}
-          data={data}
-          dbTable="roles"
-          tableName="Role"
-        />
-      )}
+      {openDelete &&
+        <DeleteConfirmationDialog
+          isOpen={openDelete}
+          title="Are you sure you want to delete this module?"
+          confirmMessage="Deleting this module will remove all permissions and settings linked to it. This action is irreversible."
+          setIsOpen={setOpenDelete} deletePayload={{ id: data.id }}
+          deleteEndpoint="/api/module"
+        />}
     </div>
   );
 }

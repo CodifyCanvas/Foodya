@@ -86,30 +86,34 @@ export function DateTimeRangePicker({
 
         {/* Start Time */}
         <div className="flex flex-col group relative w-full gap-3">
-          <Label
-            htmlFor="time-from"
-            className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs"
-          >
+          <Label htmlFor="time-from" className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs" >
             {firstLabel || "Start Time"}
           </Label>
           <Controller
             name={nameStart}
             control={control}
-            render={({ field }) => {
+            render={({ field, fieldState }) => {
               const date = new Date(field.value || new Date())
               return (
-                <Input
-                  type="time"
-                  step="60"
-                  id="time-from"
-                  value={getTimeValue(date)}
-                  onChange={(e) => {
-                    const [h, m] = e.target.value.split(":").map(Number)
-                    const updated = new Date(date)
-                    updated.setHours(h, m)
-                    setValue(nameStart, updated)
-                  }}
-                />
+                <div className="flex flex-col gap-1 w-full">
+                  <Input
+                    type="time"
+                    step="60"
+                    id="time-from"
+                    value={getTimeValue(date)}
+                    onChange={(e) => {
+                      const [h, m] = e.target.value.split(":").map(Number)
+                      const updated = new Date(date)
+                      updated.setHours(h, m)
+                      setValue(nameStart, updated)
+                    }}
+                  />
+                  {fieldState.error && (
+                    <span className="text-sm text-destructive">
+                      {fieldState.error.message}
+                    </span>
+                  )}
+                </div>
               )
             }}
           />
@@ -117,35 +121,39 @@ export function DateTimeRangePicker({
 
         {/* End Time */}
         <div className="flex flex-col group relative w-full gap-3">
-          <Label
-            htmlFor="time-to"
-            className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs"
-          >
+          <Label htmlFor="time-to" className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs" >
             {secondLabel || "End Time"}
           </Label>
           <Controller
             name={nameEnd}
             control={control}
-            render={({ field }) => {
+            render={({ field, fieldState }) => {
               const date = new Date(field.value || new Date())
               return (
-                <Input
-                  type="time"
-                  step="60"
-                  id="time-to"
-                  value={getTimeValue(date)}
-                  onChange={(e) => {
-                    const [h, m] = e.target.value.split(":").map(Number)
-                    const updated = new Date(date)
-                    updated.setHours(h, m)
-                    setValue(nameEnd, updated)
-                  }}
-                />
+                <div className="flex flex-col gap-1 w-full">
+                  <Input
+                    type="time"
+                    step="60"
+                    id="time-to"
+                    value={getTimeValue(date)}
+                    onChange={(e) => {
+                      const [h, m] = e.target.value.split(":").map(Number)
+                      const updated = new Date(date)
+                      updated.setHours(h, m)
+                      setValue(nameEnd, updated)
+                    }}
+                  />
+                  {fieldState.error && (
+                    <span className="text-sm text-destructive">
+                      {fieldState.error.message}
+                    </span>
+                  )}
+                </div>
               )
             }}
           />
         </div>
       </div>
-    </div>
+    </div >
   )
 }

@@ -14,7 +14,7 @@ import ServiceUnavailable from '@/app/errors/service-unavailable';
 /* === Fetcher Function === */
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-const RolesPage = () => {
+const MenuCategoriesPage = () => {
   // Use permission hook
   const { canView, loading: permLoading } = useModulePermission();
 
@@ -53,10 +53,11 @@ const RolesPage = () => {
         data={roles ?? []}
         filterColumns={['name']}
         createComponent={<CreateForm />}
+        loading={isLoading}
       />
 
     </div>
   );
 };
 
-export default RolesPage;
+export default MenuCategoriesPage;

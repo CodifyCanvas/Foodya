@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
-import { checkDuplicate, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions";
+import { checkDuplicate, deleteData, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions";
+import { deleteRoleById } from "@/lib/crud-actions/roles";
 import { roleFormSchema } from "@/lib/zod-schema";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -136,6 +137,53 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(
       { error: "Something went wrong while updating the role. Please try again later." },
+      { status: 500 }
+    );
+  }
+}
+
+
+
+/* =========================
+=== [Delete] Delete Role ===
+========================= */
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await auth();
+    const userId = session?.user.id;
+
+    // === Authenticate User ===
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
+    // === Parse Request Body ===
+    const body = await req.json();
+
+    // === Validate ===
+    const { id, role } = body;
+    if (!id || !role) {
+      return NextResponse.json({ error: "Missing role ID or role name" }, { status: 400 });
+    }
+
+    // === Prevent deletion of admin role ===
+    if (role?.toLowerCase() === 'admin') {
+      return NextResponse.json(
+        { error: "Admin role cannot be deleted." },
+        { status: 409 }
+      );
+    }
+
+    // === Perform Delete Action ===
+    await deleteData('roles', "id", id);
+
+    // === Return Success Response ===
+    return NextResponse.json({ message: "Role deleted along with related users and settings." }, { status: 200 });
+  } catch (error) {
+    console.error("Failed to delete role: ", error);
+
+    return NextResponse.json(
+      { error: "Failed to delete role. Please try again." },
       { status: 500 }
     );
   }

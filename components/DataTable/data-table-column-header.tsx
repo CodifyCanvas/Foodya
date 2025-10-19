@@ -2,49 +2,30 @@
 
 import { useState } from "react"
 import { Column } from "@tanstack/react-table"
-import {
-  ArrowDown,
-  ArrowUp,
-  ChevronsUpDown,
-  EyeOff,
-  X,
-} from "lucide-react"
+import { ArrowDown, ArrowUp, ChevronsUpDown, EyeOff, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
+
+
+// === Props ===
 interface DataTableColumnHeaderProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {
   column: Column<TData, TValue>
   title: string
   search?: boolean
-  // filter?: string[]
   filter?: (string | { label: string; value: string })[]
-
 }
 
-export function DataTableColumnHeader<TData, TValue>({
-  column,
-  title,
-  className,
-  search = false,
-  filter,
-}: DataTableColumnHeaderProps<TData, TValue>) {
+
+// === Column Header Component ===
+export function DataTableColumnHeader<TData, TValue>({ column, title, className, search = false, filter }: DataTableColumnHeaderProps<TData, TValue>) {
+
+  // === States ===
   const [inputValue, setInputValue] = useState("")
   const [selectValue, setSelectValue] = useState("")
 
@@ -60,6 +41,7 @@ export function DataTableColumnHeader<TData, TValue>({
     column.setFilterValue(value)
   }
 
+  // Clear all filters
   const clearFilter = () => {
     setInputValue("")
     setSelectValue("")
@@ -70,11 +52,7 @@ export function DataTableColumnHeader<TData, TValue>({
     <div className={cn("flex items-center gap-2", className)}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="data-[state=open]:bg-accent -ml-3 h-8"
-          >
+          <Button variant="ghost" size="sm" className="data-[state=open]:bg-accent -ml-3 h-8" >
             <span className="text-[12px] font-rubik-500 uppercase">{title}</span>
             {sorted === "desc" ? (
               <ArrowDown className="ml-1 h-4 w-4" />
@@ -88,17 +66,12 @@ export function DataTableColumnHeader<TData, TValue>({
 
         <DropdownMenuContent align="start" className="w-56 p-2 space-y-1 font-rubik-400">
 
-          {/* 🔍 Text Search Input */}
+          {/* === Text Search Input === */}
           {!filter?.length && search && column.getCanFilter() ? (
-            <Input
-              placeholder={`Search ${title.charAt(0).toUpperCase() + title.slice(1)}...`}
-              value={inputValue}
-              onChange={(e) => handleInputChange(e.target.value)}
-              className="h-8"
-            />
+            <Input placeholder={`Search ${title.charAt(0).toUpperCase() + title.slice(1)}...`} value={inputValue} onChange={(e) => handleInputChange(e.target.value)} className="h-8" />
           ) : null}
 
-          {/* Filter Dropdown menu */}
+          {/* === Filter Dropdown menu === */}
           {filter?.length ? (
             <Select value={selectValue} onValueChange={handleSelectChange}>
               <SelectTrigger className="h-8 w-full capitalize">
@@ -121,10 +94,9 @@ export function DataTableColumnHeader<TData, TValue>({
           ) : null}
 
 
-          {/* ❌ reset columns Visibilty */}
+          {/* === Reset columns Visibilty === */}
           {(inputValue || selectValue) && (
             <DropdownMenuItem
-              // variant="ghost"
               className="px-2 text-xs font-medium"
               onClick={clearFilter}
             >
