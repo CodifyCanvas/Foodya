@@ -142,3 +142,42 @@ export async function PUT(req: NextRequest) {
     );
   }
 }
+
+
+
+/* ==========================
+=== [DELETE] Delete Users ===
+========================== */
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await auth();
+    const userId = session?.user.id;
+
+    // === Authenticate User ===
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
+    // === Parse Request Body ===
+    const body = await req.json();
+
+    // === Validate ===
+    const { id } = body;
+    if (!id || isNaN(id)) {
+      return NextResponse.json({ error: "Invalid or missing user ID." }, { status: 400 });
+    }
+
+    // === Perform Delete Action ===
+    await deleteData("users", "id", id)
+
+    // === Return Success Response ===
+    return NextResponse.json({ message: "User successfully deleted." }, { status: 200 });
+  } catch (error) {
+    console.error(`[DELETE ${path}] Failed to delete user: `, error);
+
+    return NextResponse.json(
+      { error: "Failed to delete employee. Please try again." },
+      { status: 500 }
+    );
+  }
+}

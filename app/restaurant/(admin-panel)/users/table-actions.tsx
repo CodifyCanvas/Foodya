@@ -49,9 +49,7 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
 
-  // const { permission } = useUserContext();
   const { canEdit, canDelete } = useModulePermission();
-  // const module = getLastPathSegment(usePathname()); // 🔄 Call usePathname once
 
   const handleEditClick = () => {
     if (canEdit) {
@@ -84,7 +82,7 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
             <PencilLine className="mr-2 size-4" />
             Edit
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleDeleteClick}>
+          <DropdownMenuItem variant="destructive" onClick={handleDeleteClick}>
             <Trash2 className="mr-2 size-4" />
             Delete
           </DropdownMenuItem>
@@ -96,12 +94,13 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
       )}
 
       {openDelete && (
-        <DeleteConfirmationDialog<User>
-          open={openDelete}
-          onOpenChange={setOpenDelete}
-          data={data}
-          dbTable="roles"
-          tableName="Role"
+        <DeleteConfirmationDialog
+          isOpen={openDelete}
+          setIsOpen={setOpenDelete}
+          title="Confirm User Deletion"
+          confirmMessage="This will permanently remove the user and all associated data. This action cannot be undone."
+          deletePayload={{ id: data.id }}
+          deleteEndpoint="/api/users"
         />
       )}
     </div>
@@ -111,9 +110,7 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
 /* === Create New User Button === */
 export function CreateForm({ props }: CreateFormMultiProps) {
   const [open, setOpen] = useState(false);
-  // const { permission } = useUserContext();
   const { canCreate } = useModulePermission();
-  // const module = getLastPathSegment(permission.); // 🔄 Only once
 
   const handleCreateClick = () => {
     if (canCreate) {

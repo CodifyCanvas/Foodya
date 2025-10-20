@@ -102,17 +102,17 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
       </DropdownMenu>
 
       {openEdit && <EditEmployeeForm open={openEdit} onOpenChange={setOpenEdit} data={data} {...props} />}
-      {openDelete &&
+      {openDelete && (
         <DeleteConfirmationDialog
           isOpen={openDelete}
           setIsOpen={setOpenDelete}
-          title='Are you Sure?'
-          confirmMessage='it will delete the employee with its records and the salary + transaction history'
+          title="Confirm Employee Deletion"
+          confirmMessage="This will permanently delete the employee along with all related records, salary changes, and pending payrolls. This action cannot be undone."
           deletePayload={{ id: data.employeeId }}
           deleteEndpoint={`/api/employees/${data.employeeId}`}
-          revalidateEndpoint='/api/employees/all'
+          revalidateEndpoint="/api/employees/all"
         />
-      }
+      )}
 
     </div>
   );
