@@ -120,7 +120,7 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
         <DeleteConfirmationDialog
           isOpen={openDelete}
           title={`Delete Invoice #${data.invoiceId}`}
-          confirmMessage="Consider marking it unavailable instead of deleting. If you're sure, proceed. This action is irreversible."
+          confirmMessage="Are you sure you want to delete this invoice? This action cannot be undone and will also permanently remove the associated transaction."
           setIsOpen={setOpenDelete}
           deletePayload={{ id: data.invoiceId }}
           deleteEndpoint={`/api/invoices/${data.invoiceId}`}

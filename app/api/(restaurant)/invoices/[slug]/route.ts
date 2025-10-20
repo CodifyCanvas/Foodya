@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 
 
-const path = '/api/invoices/[invoiceId]';
+const path = '/api/invoices/[slug]';
 
 
 
@@ -73,6 +73,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
 
     // === Parse and validate request body === 
     const body = await req.json();
+
     const parsed = invoiceActionFormSchema.parse(body);
 
     // === Check for duplicate order ID ===
@@ -87,6 +88,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     // === Create Invoice + Order + Items Transactionally ===
     const newInvoiceId = await upsertInvoiceOrderItemsTx(parsed, userId, 'insert');
 
+
     // === Return success response with invoice ID === 
     return NextResponse.json(
       { message: "Invoice created successfully.", invoiceId: newInvoiceId },
@@ -94,7 +96,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     );
 
   } catch (error) {
-    console.error(`[POST /api/invoices/[slug]] Invoice creation failed:`, error);
+    console.error(`[POST ${path}] Invoice creation failed:`, error);
 
     return NextResponse.json(
       { error: "An unexpected error occurred while creating the invoice. Please try again later." },
@@ -173,7 +175,14 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ s
     // === Return Success Response ===
     return NextResponse.json({ message: "Invoice deleted successfully." }, { status: 200 });
   } catch (error) {
-    console.error("Failed to delete invoice: ", error);
+    console.error(`[DELETE ${path}] Failed to delete invoice: `, error);
+
+    // === Custom Error Messages ===
+    const message = (error as Error)?.message ?? "Unexpected error";
+
+    if (message.includes("not found")) {
+      return NextResponse.json({ error: message }, { status: 404 });
+    }
 
     return NextResponse.json(
       { error: "Unable to delete the invoice at this time. Please try again later." },

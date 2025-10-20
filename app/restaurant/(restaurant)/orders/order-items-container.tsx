@@ -284,11 +284,11 @@ const OrderItemsContainer: React.FC<OrderItemsContainerProps> = ({ restaurantTab
             </span>
           </p>
 
-          {/* {advancePaid > subtotal && (
+          {advancePaid > subtotal && (
             <p className="text-orange-500 text-sm">
               You&apos;ve overpaid by {(advancePaid - subtotal).toFixed(2)} PKR.
             </p>
-          )} */}
+          )}
         </div>
 
         {/* === Action Buttons === */}

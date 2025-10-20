@@ -3,12 +3,12 @@
 import { DataTableColumnHeader } from "@/components/DataTable/data-table-column-header"
 import { RowActions } from "./table-actions"
 import { ExtendedColumnDef } from "@/types/columns.data-table"
-import { InvoiceDetail, ItemWithOptions, TablesSelectInput, WaiterSelectInput } from "@/lib/definations"
+import { InvoiceDetail, ItemWithOptions, TablesSelectInput } from "@/lib/definations"
 import { Badge } from "@/components/ui/badge"
 
-/* === Table Columns for Menu Categories === */
-export const columns = (props: { menuItems: ItemWithOptions[], tables: TablesSelectInput[], waiters: WaiterSelectInput[] }): ExtendedColumnDef<InvoiceDetail>[] => [
-  
+/* === Table Columns for Invoices === */
+export const columns = (props: { menuItems: ItemWithOptions[], tables: TablesSelectInput[] }): ExtendedColumnDef<InvoiceDetail>[] => [
+
   // === Invoice Id Column ===
   {
     accessorKey: "id",
@@ -42,13 +42,13 @@ export const columns = (props: { menuItems: ItemWithOptions[], tables: TablesSel
     },
     cell: ({ row }) => {
       const customerName = row.original.customerName;
-  const truncated = customerName.length > 30 
-    ? `${customerName.slice(0, 30)}...` 
-    : customerName;
-  return <div className="capitalize">{truncated}</div>
+      const truncated = customerName.length > 30
+        ? `${customerName.slice(0, 30)}...`
+        : customerName;
+      return <div className="capitalize">{truncated}</div>
+    },
   },
-  },
-  
+
   // === Order Id Column ===
   {
     accessorKey: "orderId",
@@ -73,13 +73,13 @@ export const columns = (props: { menuItems: ItemWithOptions[], tables: TablesSel
   {
     accessorKey: "paymentMethod",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Payment" filter={['cash', 'card', 'online']} />
+      <DataTableColumnHeader column={column} title="Payment" filter={['cash', 'card', 'online', 'unpaid']} />
     ),
     meta: {
       title: 'Payment Method'
     },
     cell: ({ row }) => {
-      const status = row.original.paymentMethod ? row.original.paymentMethod.toLowerCase() : 'unpaid';
+      const status = row.original.paymentMethod ? row.original.paymentMethod.toLowerCase() : 'unkown';
 
       const statusStyles: Record<string, string> = {
         card: "bg-amber-100 text-amber-800 dark:bg-amber-400/10 dark:text-amber-400",
@@ -141,8 +141,8 @@ export const columns = (props: { menuItems: ItemWithOptions[], tables: TablesSel
     ),
     cell: ({ row }) => (
       <RowActions
-        data={{ invoiceId : row.original.id }}
-        props={{ menuItems : props.menuItems, tables: props.tables, waiters: props.waiters}}
+        data={{ invoiceId: row.original.id }}
+        props={{ menuItems: props.menuItems, tables: props.tables }}
         className="pr-3 md:pr-5"
       />
     ),

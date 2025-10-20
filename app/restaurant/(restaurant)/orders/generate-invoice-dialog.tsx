@@ -17,7 +17,6 @@ import SelectInput from "@/components/ui/select-input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Loader } from "lucide-react";
 import { formatDateWithFns } from "@/lib/date-fns";
-import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 
 // --- Props Type ---
@@ -38,8 +37,6 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
   const isViewMode = mode === "view";
 
   useEffect(() => {
-    console.log("Generate Invoice\nInvoice Id is Change: ", invoiceId)
-
     const API_URL = `/api/invoices/${invoiceId}`;
 
     async function fetchInvoice() {
@@ -52,7 +49,6 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
           }
         })
         const result = await response.json();
-        console.log("result: ", result)
         setInvoiceDetail(result)
 
       } catch (e) {
@@ -115,13 +111,6 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
     },
   });
 
-  useEffect(() => {
-  if (invoiceDetail) {
-    console.log("Updated invoiceDetail:", invoiceDetail);
-  }
-}, [invoiceDetail]);
-
-
   // --- Reset Form When Dialog Opens ---
   useEffect(() => {
     form.reset({
@@ -137,8 +126,6 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
   }, [selectedOrderType, invoice, invoiceFooter, customerName, form]);
 
   function generateSlipHTML(invoiceId?: number) {
-    // Use the invoice data (invoiceDetail or data) to build HTML string
-    // Example (simplified):
 
     const displayInvoiceId = invoiceDetail?.invoice.id ?? invoiceId ?? "N/A";
     const slipHtml = `
@@ -155,46 +142,46 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
         </head>
         <body style="font-family: monospace, monospace; font-size: 12px; padding: 10px;">
 
-  <h1 style="margin: 0; padding-bottom: 5px;">Foodya Restaurant</h1>
-  <p style="margin: 0 0 10px 0;">Find it, Eat it, Love it</p>
+          <h1 style="margin: 0; padding-bottom: 5px;">Foodya Restaurant</h1>
+          <p style="margin: 0 0 10px 0;">Find it, Eat it, Love it</p>
 
-  <h2 style="margin: 0 0 5px 0;">Invoice #${displayInvoiceId}</h2>
+          <h2 style="margin: 0 0 5px 0;">Invoice #${displayInvoiceId}</h2>
 
-  <p style="margin: 0 0 5px 0;">Customer: ${customerName ? customerName : "Random"}</p>
-  <p style="margin: 0 0 5px 0;">Order Type: ${selectedOrderType ?? "N/A"}</p>
-  <p style="margin: 0 0 5px 0;">Payment: ${invoiceDetail?.invoice.paymentMethod ?? form.getValues("paymentMethod") ?? "N/A"}</p>
-  <p style="margin: 0 0 5px 0;">Order Date: ${formatDateWithFns(invoiceDetail?.order.createdAt || new Date()) ?? "N/A"}</p>
-  <p style="margin: 0 0 5px 0;">Invoice Date: ${formatDateWithFns(invoiceDetail?.invoice.createdAt || new Date()) ?? "N/A"}</p>
+          <p style="margin: 0 0 5px 0;">Customer: ${customerName ? customerName : "Random"}</p>
+          <p style="margin: 0 0 5px 0;">Order Type: ${selectedOrderType ?? "N/A"}</p>
+          <p style="margin: 0 0 5px 0;">Payment: ${invoiceDetail?.invoice.paymentMethod ?? form.getValues("paymentMethod") ?? "N/A"}</p>
+          <p style="margin: 0 0 5px 0;">Order Date: ${formatDateWithFns(invoiceDetail?.order.createdAt || new Date()) ?? "N/A"}</p>
+          <p style="margin: 0 0 5px 0;">Invoice Date: ${formatDateWithFns(invoiceDetail?.invoice.createdAt || new Date()) ?? "N/A"}</p>
 
-  <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
-    <thead>
-      <tr>
-        <th style="border-bottom: 1px solid #000; text-align: left;">Item</th>
-        <th style="border-bottom: 1px solid #000; text-align: right;">Qty</th>
-        <th style="border-bottom: 1px solid #000; text-align: right;">Price</th>
-        <th style="border-bottom: 1px solid #000; text-align: right;">Total</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${(menuItems ?? []).map((item: any) => `
-        <tr>
-          <td style="padding: 4px 0;">${item.menuItemName} ${item.menuItemOptionName ? `(${item.menuItemOptionName})` : ""}</td>
-          <td style="padding: 4px 0; text-align: right;">${item.quantity}</td>
-          <td style="padding: 4px 0; text-align: right;">${parseFloat(item.price).toFixed(2)}</td>
-          <td style="padding: 4px 0; text-align: right;">${(parseFloat(item.price) * item.quantity).toFixed(2)}</td>
-        </tr>
-      `).join('')}
-    </tbody>
-  </table>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+            <thead>
+              <tr>
+                <th style="border-bottom: 1px solid #000; text-align: left;">Item</th>
+                <th style="border-bottom: 1px solid #000; text-align: right;">Qty</th>
+                <th style="border-bottom: 1px solid #000; text-align: right;">Price</th>
+                <th style="border-bottom: 1px solid #000; text-align: right;">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${(menuItems ?? []).map((item: any) => `
+                <tr>
+                  <td style="padding: 4px 0;">${item.menuItemName} ${item.menuItemOptionName ? `(${item.menuItemOptionName})` : ""}</td>
+                  <td style="padding: 4px 0; text-align: right;">${item.quantity}</td>
+                  <td style="padding: 4px 0; text-align: right;">${parseFloat(item.price).toFixed(2)}</td>
+                  <td style="padding: 4px 0; text-align: right;">${(parseFloat(item.price) * item.quantity).toFixed(2)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
 
-  <p style="margin: 0 0 5px 0;">Subtotal: ${invoiceFooter.subtotal ?? 0}</p>
-  <p style="margin: 0 0 2px 0;">Discount: ${invoiceFooter.discount ?? 0}%</p>
-  <p style="margin: 0 0 2px 0;">Total: ${Math.round(invoiceFooter.total).toFixed(2) ?? 0}</p>
-  <p style="margin: 0 0 10px 0;">Advance Paid: ${invoiceFooter.advancePaid ?? 0}</p>
+          <p style="margin: 0 0 5px 0;">Subtotal: ${invoiceFooter.subtotal ?? 0}</p>
+          <p style="margin: 0 0 2px 0;">Discount: ${invoiceFooter.discount ?? 0}%</p>
+          <p style="margin: 0 0 2px 0;">Total: ${Math.round(invoiceFooter.total).toFixed(2) ?? 0}</p>
+          <p style="margin: 0 0 10px 0;">Advance Paid: ${invoiceFooter.advancePaid ?? 0}</p>
 
-  <h4 style="margin: 0;">Grand Total: ${Math.round(invoiceFooter.grandTotal ?? 0).toFixed(2)} PKR</h4>
+          <h4 style="margin: 0;">Grand Total: ${Math.round(invoiceFooter.grandTotal ?? 0).toFixed(2)} PKR</h4>
 
-</body>
+        </body>
       </html>
     `;
 
@@ -310,6 +297,18 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:min-w-6/7 md:min-w-2.5/3 max-h-[calc(100vh-2rem)] min-w-1/2 min-h-1/2 lg:min-w-fit font-rubik-400">
 
+        <DialogHeader>
+          <DialogTitle className="text-lg font-medium">
+            {mode === 'create'
+              ? "Generate Invoice"
+              : <>Invoice <span className="text-orange-500">#{invoiceDetail?.invoice.id}</span></>
+            }
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            Click on &apos;Confirm & Print&apos; to generate the invoice for the order.
+          </DialogDescription>
+        </DialogHeader>
+
         {invoicefetching ? (
           // Show loader while invoice is fetching
           <div className="flex h-full w-full justify-center items-center">
@@ -318,20 +317,6 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
         ) : (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-
-              <DialogHeader>
-                <DialogTitle className="text-lg font-medium">
-                  {mode === 'create'
-                    ? "Generate Invoice"
-                    : <>Invoice <span className="text-orange-500">#{invoiceDetail?.invoice.id}</span></>
-                  }
-                </DialogTitle>
-                <DialogDescription className="sr-only">
-                  Click on &apos;Confirm & Print&apos; to generate the invoice for the order.
-                </DialogDescription>
-              </DialogHeader>
-
-
 
               <div className={`w-full grid gap-4 text-sm items-start ${mode === 'view' ? 'grid-cols-2' : 'grid-cols-1'}`}>
 
@@ -442,9 +427,9 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
                 }
 
                 {/* --- Invoice Create By User --- */}
-                {invoiceDetail?.invoice && <div className="flex flex-row w-full col-span-2 text-neutral-500 justify-start">
+                {invoiceDetail?.invoice?.generatedByUserId && <div className="flex flex-row w-full col-span-2 text-neutral-500 justify-start">
                   <p className="text-black mr-2">Invoiced by: </p>
-                  <p>{invoiceDetail?.generatedBy.name}</p>
+                  <p>{invoiceDetail?.generatedBy?.name}</p>
                 </div>
                 }
 
@@ -515,8 +500,8 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
               </div>
 
               {/* --- Dialog Actions --- */}
-              <DialogFooter className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-                <div hidden={isViewMode} className="flex items-center space-x-2">
+              <DialogFooter className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2'>
+                {!isViewMode && <div hidden={isViewMode} className="flex items-center space-x-2">
                   <Checkbox
                     id="enableAutoPrint"
                     checked={enablePrintOnSubmit}
@@ -533,8 +518,8 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
                   <label htmlFor="enableAutoPrint" className="select-none text-sm">
                     Auto print on submit
                   </label>
-                </div>
-                <div className="flex w-full sm:w-auto gap-2">
+                </div>}
+                <div className="flex w-full ml-auto sm:w-auto gap-2">
                   <DialogClose asChild>
                     <Button variant="outline" onClick={() => setIsOpen(false)} className="w-1/2 sm:w-auto">Cancel</Button>
                   </DialogClose>

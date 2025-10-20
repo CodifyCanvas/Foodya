@@ -256,14 +256,14 @@ export interface OrderResponse {
 export interface InvoiceDetail {
   id: number;
   orderId: number;
-  generatedByUserId: number;
+  generatedByUserId: number | null;
   customerName: string;
   subTotalAmount: string;
   discount: string;
   totalAmount: string;
   advancePaid: string | null;
   grandTotal: string;
-  paymentMethod: 'cash' | 'card' | 'online';
+  paymentMethod: 'cash' | 'card' | 'online' | 'unpaid';
   isPaid: boolean;
   createdAt: string;
 }
@@ -277,7 +277,7 @@ export interface InvoiceResponse {
   invoice: InvoiceDetail;
   order: OrderDetail;
   items: OrderItem[];
-  generatedBy: GeneratedBy;
+  generatedBy: GeneratedBy | null;
 }
 
 
@@ -289,7 +289,6 @@ export interface InvoiceWithMenuItemsAndTablesInterface {
   invoices: InvoiceDetail[];
   menuItems: ItemWithOptions[];
   tables: TablesSelectInput[];
-  waiters: WaiterSelectInput[];
 }
 
 

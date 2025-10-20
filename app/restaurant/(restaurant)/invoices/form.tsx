@@ -48,7 +48,6 @@ interface FormDialogProps {
 interface Order {
   id: number;
   tableId: string;
-  waiterId: string;
   orderType: "dine_in" | "drive_thru" | "takeaway";
   status: string;
   description: string | null;
@@ -74,7 +73,7 @@ export interface InvoiceOrderItem {
   generatedBy: GeneratedBy;
 }
 
-export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], tables = [], waiters = [] }: FormDialogProps) {
+export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], tables = [] }: FormDialogProps) {
   /* === Local State === */
   const [manualReset, setManualReset] = useState(false)
   const [data, setData] = useState<InvoiceOrderItem | null>(null)
@@ -95,7 +94,6 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
 
       orderId: 0,
       tableId: "",
-      waiterId: "",
       orderType: "takeaway",
       orderCreatedAt: new Date(),
 
@@ -170,7 +168,6 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
 
         orderId: data.order.id ?? 0,
         tableId: data.order.tableId ?? "",
-        waiterId: data.order.waiterId ?? "",
         orderType: data.order.orderType ?? "takeaway",
         orderCreatedAt: new Date(data.order.createdAt) ?? new Date(),
 
@@ -297,7 +294,6 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
 
       orderId: 0,
       tableId: "",
-      waiterId: "",
       orderType: "takeaway",
       orderCreatedAt: new Date(),
 
@@ -489,32 +485,6 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
                               onChange={field.onChange}
                               placeholder="Cash, Cred..."
                               id="select_table_invoice_form"
-                              disabled={!isDineInVar}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  {/* === Waiter Id Select Field === */}
-                  <div className="w-full py-2">
-                    <FormField
-                      control={form.control}
-                      name="waiterId"
-                      render={({ field }) => (
-                        <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                          <FormLabel htmlFor="select_waiter_invoice_form" className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
-                            Select Waiter
-                          </FormLabel>
-                          <FormControl>
-                            <SelectInput options={waiters}
-                              value={field.value ?? ""}
-                              className="w-full rounded-lg"
-                              onChange={field.onChange}
-                              placeholder="Cash, Cred..."
-                              id="select_waiter_invoice_form"
                               disabled={!isDineInVar}
                             />
                           </FormControl>
@@ -762,7 +732,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
                 >
                   Reset
                 </Button>
-                <Button type="submit"  disabled={submitButtonLoading} variant="green" className="min-w-24 sm:w-auto">
+                <Button type="submit" disabled={submitButtonLoading} variant="green" className="min-w-24 sm:w-auto">
                   {dataProp ? "Update" : "Create"}
                 </Button>
               </div>

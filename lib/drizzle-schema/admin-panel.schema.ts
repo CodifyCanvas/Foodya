@@ -24,7 +24,7 @@ export const modules = mysqlTable('modules', {
 });
 
 
-7
+
 /**
  * === USERS TABLE ===
  * Stores user accounts and links each user to a role.

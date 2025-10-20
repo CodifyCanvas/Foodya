@@ -119,7 +119,6 @@ export const invoiceActionFormSchema = z.object({
   // === Order Info ===
   orderId: z.union([z.number(), z.string().transform(String)]).optional(),
   tableId: z.string().optional().nullable(),
-  waiterId: z.string().optional().nullable(),
   orderType: z.enum(["dine_in", "drive_thru", "takeaway"]),
   orderCreatedAt: z.preprocess((val) => typeof val === "string" || val instanceof Date ? new Date(val) : val, z.date({ error: issue => issue.input === undefined ? "Required" : "Invalid date" })),
 
@@ -145,7 +144,7 @@ export const invoiceActionFormSchema = z.object({
   advancePaid: z.string().refine(val => !isNaN(parseFloat(val)), { message: "Advance must be a number" }).transform(val => parseFloat(val).toFixed(2)),
   grandTotal: z.string().refine(val => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, { message: "Grand total must be 0 or more" }).transform(val => parseFloat(val).toFixed(2)),
 }).check((schema) => {
-  const { isPaid, paymentMethod, orderType, waiterId, tableId } = schema.value;
+  const { isPaid, paymentMethod, orderType, tableId } = schema.value;
 
   if (isPaid && !paymentMethod) {
     schema.issues.push({
@@ -165,22 +164,12 @@ export const invoiceActionFormSchema = z.object({
         input: tableId,
       });
     }
-
-    if (!waiterId) {
-      schema.issues.push({
-        code: "custom",
-        message: "Please select a waiter.",
-        path: ["waiterId"],
-        input: waiterId,
-      });
-    }
   }
 }).transform((data) => {
   return {
     ...data,
     paymentMethod: data.isPaid ? data.paymentMethod ?? "cash" : null,
     tableId: data.orderType === "dine_in" ? data.tableId : "",
-    waiterId: data.orderType === "dine_in" ? data.waiterId : "",
   };
 });
 

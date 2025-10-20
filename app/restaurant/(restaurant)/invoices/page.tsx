@@ -49,9 +49,9 @@ const InvoicePage = () => {
       <h3 className="text-3xl font-medium text-start px-4 pt-3 text-emerald-600">Manage Invoices</h3>
 
       <DataTable
-        columns={columns({ menuItems: invoices?.menuItems ?? [], tables: invoices?.tables ?? [], waiters: invoices?.waiters ?? [] })}
+        columns={columns({ menuItems: invoices?.menuItems ?? [], tables: invoices?.tables ?? [] })}
         data={invoices?.invoices ?? []}
-        createComponent={<CreateForm props={{ menuItems: invoices?.menuItems ?? [], tables: invoices?.tables ?? [], waiters: invoices?.waiters ?? [] }} />}
+        createComponent={<CreateForm props={{ menuItems: invoices?.menuItems ?? [], tables: invoices?.tables ?? [] }} />}
         loading={isLoading}
       />
 

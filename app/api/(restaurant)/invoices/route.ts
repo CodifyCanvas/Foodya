@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { updateTableAndBookingStatus } from "@/lib/crud-actions/bookings-tables";
 import { checkDuplicate, getAllData } from "@/lib/crud-actions/general-actions";
-import { getAllWaiters, upsertInvoiceOrderItemsTx } from "@/lib/crud-actions/invoices";
+import { upsertInvoiceOrderItemsTx } from "@/lib/crud-actions/invoices";
 import { getAllMenuItems } from "@/lib/crud-actions/menu-items";
 import { getAllActiveTable } from "@/lib/crud-actions/restaurant-tables";
 import { mapToLabelValue } from "@/lib/utils";
@@ -27,23 +27,22 @@ export async function GET() {
     }
 
     // === Fetch invoices and related data ===
-    const invoices = await getAllData("InvoicesTable");
+    const rawInvoices = await getAllData("InvoicesTable");
     const menuItems = await getAllMenuItems();
     const rawTables = await getAllActiveTable();
-    const rawWaiter = await getAllWaiters('waiter');
 
     const tables = mapToLabelValue(rawTables, {
       label: 'table_number',
       value: 'id'
     });
 
-    const waiters = (rawWaiter ?? []).map((user) => ({
-      label: user.name ?? "Unknown",
-      value: String(user.id),
-      role: user.role ?? null,
+    // === Normalize Invoice Data ===
+    const invoices = rawInvoices.map((invoice) => ({
+      ...invoice,
+      paymentMethod: invoice.paymentMethod ?? 'unpaid',
     }));
 
-    return NextResponse.json({ invoices, menuItems, tables, waiters }, { status: 200 });
+    return NextResponse.json({ invoices, menuItems, tables }, { status: 200 });
   } catch (error) {
     console.error(`[GET ${path}] Failed to fetch invoices and related data:`, error);
 
