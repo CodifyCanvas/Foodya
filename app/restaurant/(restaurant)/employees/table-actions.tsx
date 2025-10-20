@@ -15,7 +15,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import { useModulePermission } from '@/hooks/useModulePermission';
-import { EmployeeWithLatestRecord } from '@/lib/definations';
 import { CreateEmployeeForm } from './(forms)/create-employee-form';
 import { EditEmployeeForm } from './(forms)/edit-employee-form';
 import { usePathname, useRouter } from 'next/navigation';
@@ -26,7 +25,7 @@ interface CreateFormMultiProps {
 
 interface EditFormMultiProps {
   props?: Record<string, any>;
-  data: { employeeId : number };
+  data: { employeeId: number };
   className?: string;
 }
 
@@ -103,15 +102,18 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
       </DropdownMenu>
 
       {openEdit && <EditEmployeeForm open={openEdit} onOpenChange={setOpenEdit} data={data} {...props} />}
-      {openDelete && (
-        <DeleteConfirmationDialog<EmployeeWithLatestRecord>
-          open={openDelete}
-          onOpenChange={setOpenDelete}
-          data={data}
-          dbTable="roles"
-          tableName="Role"
+      {openDelete &&
+        <DeleteConfirmationDialog
+          isOpen={openDelete}
+          setIsOpen={setOpenDelete}
+          title='Are you Sure?'
+          confirmMessage='it will delete the employee with its records and the salary + transaction history'
+          deletePayload={{ id: data.employeeId }}
+          deleteEndpoint={`/api/employees/${data.employeeId}`}
+          revalidateEndpoint='/api/employees/all'
         />
-      )}
+      }
+
     </div>
   );
 }

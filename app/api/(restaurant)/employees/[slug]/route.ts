@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { fetchEmployee } from "@/lib/crud-actions/employees";
+import { deleteEmployeeWithRecord, fetchEmployee } from "@/lib/crud-actions/employees";
 import { updateData } from "@/lib/crud-actions/general-actions";
 import { uploadImage } from "@/lib/server/helpers/imageUpload";
 import { EmployeePersonalInfoFormSchema } from "@/lib/zod-schema/restaurant.zod";
@@ -118,6 +118,45 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug
 
     return NextResponse.json(
       { error: "Something went wrong while updating the employee's profile. Please try again shortly." },
+      { status: 500 }
+    );
+  }
+}
+
+
+
+/* ==========================================================================================
+=== [DELETE] Employee with Related Records (Employment, Salary Changes, Pending Payrolls) ===
+========================================================================================== */
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await auth();
+    const userId = session?.user.id;
+
+    // === Authenticate User ===
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
+    // === Parse Request Body ===
+    const body = await req.json();
+
+    // === Validate ===
+    const { id } = body;
+    if (!id || isNaN(id)) {
+      return NextResponse.json({ error: "Invalid or missing employee ID." }, { status: 400 });
+    }
+
+    // === Perform Delete Action ===
+    await deleteEmployeeWithRecord(id)
+
+    // === Return Success Response ===
+    return NextResponse.json({ message: "Employee deleted along with employment records, salary changes, and payrolls." }, { status: 200 });
+  } catch (error) {
+    console.error(`[DELETE ${path}] Failed to delete employee: `, error);
+
+    return NextResponse.json(
+      { error: "Failed to delete employee. Please try again." },
       { status: 500 }
     );
   }

@@ -477,7 +477,7 @@ export interface PayrollWithEmployeeDetails {
  */
 export interface PayrollDialogSalaryRow {
   id: number | string;
-  employeeId: number | string;
+  employeeId: number | null;
   description: string | null;
   basicPay: string;
   bonus: string | null;
@@ -531,7 +531,7 @@ export interface TransactionsTablesInterface {
 export interface EmployeePayrollInterface {
   id: number;
   employeeImage: string | null;
-  employeeId: number;
+  employeeId: number | null;
   employeeName: string;
   employeeCNIC: string;
   employeeEmail: string;

@@ -171,7 +171,7 @@ export const employeesTable = mysqlTable('employees', {
  */
 export const employmentRecordsTable = mysqlTable('employment_records', {
   id: int('id').autoincrement().primaryKey(),
-  employeeId: int('employee_id').references(() => employeesTable.id).notNull(),
+  employeeId: int('employee_id').references(() => employeesTable.id, { onDelete: 'cascade' }).notNull(),
   designation: varchar('designation', { length: 100 }).notNull(),
   shift: varchar('shift', { length: 100 }).notNull(),
   status: mysqlEnum('status', ['active', 'resigned', 'terminated', 'rejoined']).default('active').notNull(),
@@ -189,7 +189,7 @@ export const employmentRecordsTable = mysqlTable('employment_records', {
  */
 export const salaryChangesTable = mysqlTable('salary_changes', {
   id: int('id').autoincrement().primaryKey(),
-  employeeId: int('employee_id').references(() => employeesTable.id).notNull(),
+  employeeId: int('employee_id').references(() => employeesTable.id, { onDelete: 'cascade' }).notNull(),
   previousSalary: decimal('previous_salary', { precision: 10, scale: 2 }),
   newSalary: decimal('new_salary', { precision: 10, scale: 2 }).notNull(),
   reason: text('reason'),
@@ -209,7 +209,13 @@ export const salaryChangesTable = mysqlTable('salary_changes', {
  */
 export const payrollsTable = mysqlTable('payrolls', {
   id: int('id').autoincrement().primaryKey(),
-  employeeId: int('employee_id').references(() => employeesTable.id).notNull(),
+
+  employeeId: int('employee_id').references(() => employeesTable.id, { onDelete: 'set null' }),
+  image: text(),
+  name: varchar('name', { length: 50 }),
+  CNIC: varchar('cnic', { length: 15 }).notNull(),
+  email: varchar('email', { length: 50 }),
+
   description: text('description'),
   basicPay: decimal('basic_pay', { precision: 10, scale: 2 }).notNull(),
   bonus: decimal('bonus', { precision: 10, scale: 2 }).default('0.00'),

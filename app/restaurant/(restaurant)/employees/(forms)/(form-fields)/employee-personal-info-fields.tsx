@@ -83,7 +83,7 @@ export function EmployeePersonalInfo({ image, previewUrl, control, registerWithM
                   type="text"
                   {...field}
                   className="h-10 w-full"
-                  placeholder="John Doe"  
+                  placeholder="John Doe"
                 />
               </FormControl>
               <FormMessage />
@@ -187,7 +187,7 @@ export function EmployeePersonalInfo({ image, previewUrl, control, registerWithM
           )}
         />
       </div>
-            
+
     </div>
   );
 }

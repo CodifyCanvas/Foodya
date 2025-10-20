@@ -2,8 +2,9 @@
 
 import { schema } from "@/lib/drizzle-schema";
 import { db } from "../db";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { EmployeeCompleteDetailsInterface, EmployeeWithLatestRecord } from "../definations";
+import { deleteData } from "./general-actions";
 
 
 
@@ -11,6 +12,7 @@ import { EmployeeCompleteDetailsInterface, EmployeeWithLatestRecord } from "../d
 const employees = schema.employeesTable;
 const employmentRecords = schema.employmentRecordsTable;
 const employeeSalaryChangesRecord = schema.salaryChangesTable;
+const employeePayrolls = schema.payrollsTable;
 
 
 
@@ -173,4 +175,30 @@ export const fetchEmployee = async (employeeId: number): Promise<EmployeeComplet
   };
 
   return normalizedEmployee;
+};
+
+
+
+export const deleteEmployeeWithRecord = async (employeeId: number) => {
+
+  await db.transaction(async (tx) => {
+    // === Delete employment records ===
+    await deleteData("employmentRecordsTable", "employeeId", employeeId, tx);
+
+    // === Delete salary change history ===
+    await deleteData("salaryChangesTable", "employeeId", employeeId, tx);
+
+    // === Delete pending payroll entries for the employee ===
+    await tx
+      .delete(employeePayrolls)
+      .where(
+        and(
+          eq(employeePayrolls.employeeId, employeeId),
+          eq(employeePayrolls.status, 'pending')
+        )
+      );
+
+    // === Finally, delete the employee record ===
+    await deleteData("employeesTable", "id", employeeId, tx);
+  });
 };

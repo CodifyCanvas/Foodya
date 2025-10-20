@@ -18,7 +18,7 @@ export function EmployeeSalaryInfo({ control, mode = 'edit' }: EmployeeSalaryInf
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 px-1 items-center gap-2 py-2">
 
       {/* === Employee Previous Salary Field === */}
-      <div className="w-full py-2" hidden={mode==='create'}>
+      <div className="w-full py-2" hidden={mode === 'create'}>
         <FormField
           control={control}
           name={`${fieldPrefix}previousSalary`}
@@ -31,6 +31,7 @@ export function EmployeeSalaryInfo({ control, mode = 'edit' }: EmployeeSalaryInf
                 <Input
                   type="number"
                   {...field}
+                  value={field.value ?? ''}
                   className="h-10 w-full"
                   readOnly
                   placeholder="XXXX"
@@ -102,18 +103,18 @@ export function EmployeeSalaryInfo({ control, mode = 'edit' }: EmployeeSalaryInf
               </FormLabel>
               <FormControl>
                 <SelectInput options={[
-                              { label: 'Initial', value: 'initial' },
-                              { label: 'Raise', value: 'raise' },
-                              { label: 'Promotion', value: 'promotion' },
-                              { label: 'Adjustment', value: 'adjustment' },
-                              { label: 'Correction', value: 'correction', optDisabled: mode === 'create' },
-                            ]}
-                              value={field.value}
-                              className="w-full rounded-lg"
-                              onChange={field.onChange}
-                              placeholder="Initial, Raise, Prom..."
-                              id="select_changeType_empolyee_salary_info_form"
-                            />
+                  { label: 'Initial', value: 'initial' },
+                  { label: 'Raise', value: 'raise' },
+                  { label: 'Promotion', value: 'promotion' },
+                  { label: 'Adjustment', value: 'adjustment' },
+                  { label: 'Correction', value: 'correction', optDisabled: mode === 'create' },
+                ]}
+                  value={field.value}
+                  className="w-full rounded-lg"
+                  onChange={field.onChange}
+                  placeholder="Initial, Raise, Prom..."
+                  id="select_changeType_empolyee_salary_info_form"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

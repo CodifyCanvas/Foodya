@@ -13,6 +13,7 @@ import { Loader, OctagonAlert } from "lucide-react";
 import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import { refreshData } from "@/lib/swr";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface DeleteConfirmationDialogProps<T> {
     isOpen: boolean;
@@ -22,6 +23,12 @@ interface DeleteConfirmationDialogProps<T> {
     title?: string;
     confirmMessage?: string;
     revalidateEndpoint?: string;
+    checkbox?: {
+        id?: string
+        label: string;
+        checked: boolean;
+        onChange: (checked: boolean) => void;
+    };
 }
 
 export default function DeleteConfirmationDialog<T>({
@@ -32,6 +39,7 @@ export default function DeleteConfirmationDialog<T>({
     title,
     confirmMessage,
     revalidateEndpoint,
+    checkbox
 }: DeleteConfirmationDialogProps<T>) {
     const [isDeleting, setIsDeleting] = useState(false);
 
@@ -80,6 +88,23 @@ export default function DeleteConfirmationDialog<T>({
                             "This action cannot be undone. This will permanently delete the selected item."}
                     </DialogDescription>
                 </DialogHeader>
+
+                {checkbox && (
+                    <div className="flex items-center space-x-2 mt-4">
+                        <Checkbox
+                            id={checkbox.id ?? checkbox.label}
+                            checked={checkbox.checked}
+                            onCheckedChange={(checked) => {
+                                if (checked === "indeterminate") return;
+                                checkbox.onChange(checked);
+                            }}
+                            className="mx-auto data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600 border-emerald-600"
+                        />
+                        <label htmlFor={checkbox.id ?? checkbox.label} className="text-sm">
+                            {checkbox.label}
+                        </label>
+                    </div>
+                )}
 
                 <DialogFooter className="mt-2 sm:justify-center">
                     <Button

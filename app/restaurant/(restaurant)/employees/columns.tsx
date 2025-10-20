@@ -54,7 +54,7 @@ export const columns = (): ExtendedColumnDef<EmployeeWithLatestRecord>[] => [
       return (
         <div className="flex flex-row gap-2 items-center">
           <Avatar>
-            <AvatarImage src={image} />
+            <AvatarImage src={image ?? undefined} />
             <AvatarFallback className="bg-indigo-500/35 text-indigo-600">
               {name?.charAt(0)?.toUpperCase()}
             </AvatarFallback>

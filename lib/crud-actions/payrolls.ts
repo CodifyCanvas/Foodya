@@ -62,6 +62,8 @@ export const getAllPayrollsWithEmployeeDetails = async () => {
 
   // === Group payrolls by employeeId for faster access ===
   const payrollsByEmployee = allPayrolls.reduce((acc, payroll) => {
+    if (payroll.employeeId === null) return acc;
+
     const empId = payroll.employeeId;
     if (!acc[empId]) acc[empId] = [];
     acc[empId].push(payroll);
@@ -196,6 +198,11 @@ export async function refreshPayrolls(): Promise<{ success: boolean }> {
       for (const month of unpaidMonths) {
         await db.insert(payrollsTable).values({
           employeeId: emp.id,
+          image: emp.image,
+          name: emp.name,
+          CNIC: emp.CNIC,
+          email: emp.email,
+
           month,
           basicPay: salary.toString(),
           totalPay: salary.toString(),
@@ -372,17 +379,22 @@ export async function markUnpaidPayrollsAsPaid(salaries: PayrollDialogSalaryRow[
  * or an empty object if no record is found.
  */
 export async function fetchPayrollWithDetail(payrollId: number): Promise<EmployeePayrollInterface> {
-
-  // === Query payroll with joined employee details ===
+  // === Fetch payroll with left join ===
   const [payroll] = await db
     .select({
       id: payrollsTable.id,
 
-      employeeImage: employeesTable.image,
       employeeId: payrollsTable.employeeId,
+      employeeImage: employeesTable.image,
       employeeName: employeesTable.name,
       employeeCNIC: employeesTable.CNIC,
       employeeEmail: employeesTable.email,
+
+      // Preset embedded fields from payrolls table
+      presetImage: payrollsTable.image,
+      presetName: payrollsTable.name,
+      presetCNIC: payrollsTable.CNIC,
+      presetEmail: payrollsTable.email,
 
       basicPay: payrollsTable.basicPay,
       bonus: payrollsTable.bonus,
@@ -395,26 +407,35 @@ export async function fetchPayrollWithDetail(payrollId: number): Promise<Employe
     })
     .from(payrollsTable)
     .leftJoin(employeesTable, eq(employeesTable.id, payrollsTable.employeeId))
-    .where(
-      and(
-        eq(payrollsTable.id, payrollId),
-      )
-    ).orderBy(desc(payrollsTable.id));
+    .where(eq(payrollsTable.id, payrollId))
+    .orderBy(desc(payrollsTable.id));
 
-  // === Format payroll & normalize fields ===
-  const formattedPayroll = {
-    ...payroll,
-    employeeName: payroll.employeeName ?? "",
-    employeeCNIC: payroll.employeeCNIC ?? "",
-    employeeEmail: payroll.employeeEmail ?? "",
-
-    bonus: payroll.bonus ?? "0.00",
-    penalty: payroll.penalty ?? "0.00",
-
-    description: payroll.description ?? "",
-    paidAt: payroll.paidAt ? payroll.paidAt.toISOString() : '',
+  if (!payroll) {
+    throw new Error("Payroll not found");
   }
 
-  // === Return payroll or empty object if not found ===
-  return formattedPayroll ?? {};
+  const isLinkedEmployee = payroll.employeeId !== null;
+
+  // === Normalize + return ===
+  const formattedPayroll = {
+    id: payroll.id,
+    employeeId: payroll.employeeId,
+
+    employeeImage: isLinkedEmployee ? payroll.employeeImage ?? null : payroll.presetImage ?? null,
+    employeeName: isLinkedEmployee ? payroll.employeeName ?? '' : payroll.presetName ?? '',
+    employeeCNIC: isLinkedEmployee ? payroll.employeeCNIC ?? '' : payroll.presetCNIC ?? '',
+    employeeEmail: isLinkedEmployee ? payroll.employeeEmail ?? '' : payroll.presetEmail ?? '',
+
+    basicPay: payroll.basicPay,
+    bonus: payroll.bonus ?? '0.00',
+    penalty: payroll.penalty ?? '0.00',
+    totalPay: payroll.totalPay,
+
+    description: payroll.description ?? '',
+    month: payroll.month,
+    status: payroll.status,
+    paidAt: payroll.paidAt ? payroll.paidAt.toISOString() : '',
+  };
+
+  return formattedPayroll;
 }

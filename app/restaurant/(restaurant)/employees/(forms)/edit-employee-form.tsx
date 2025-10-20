@@ -59,15 +59,15 @@ export function EditEmployeeForm({ open, onOpenChange, data: dataProp }: FormDia
         const result = await response.json();
 
         // Destructure to separate nested objects for form consumption
-      const { employmentRecord, salaryChanges, ...personalInfoRaw } = result;
+        const { employmentRecord, salaryChanges, ...personalInfoRaw } = result;
 
-      const transformedData = {
-        personalInfo: {
-          ...personalInfoRaw,
-        },
-        employmentRecord,
-        salaryChanges,
-      };
+        const transformedData = {
+          personalInfo: {
+            ...personalInfoRaw,
+          },
+          employmentRecord,
+          salaryChanges,
+        };
 
 
         setData(transformedData ?? null);
@@ -88,56 +88,56 @@ export function EditEmployeeForm({ open, onOpenChange, data: dataProp }: FormDia
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="p-0 grid grid-cols-1 grid-rows-[minmax(auto,4rem)_auto_minmax(15rem,1fr)_auto] " variant="full-screen">
 
-            {/* === Dialog Header === */}
-            <DialogHeader className="p-6 pb-0">
-              <DialogTitle>Edit Employee <span className="text-orange-500">#{dataProp?.employeeId}</span></DialogTitle>
-              <DialogDescription className="sr-only">
-                Update Employee
-              </DialogDescription>
-            </DialogHeader>
+        {/* === Dialog Header === */}
+        <DialogHeader className="p-6 pb-0">
+          <DialogTitle>Edit Employee <span className="text-orange-500">#{dataProp?.employeeId}</span></DialogTitle>
+          <DialogDescription className="sr-only">
+            Update Employee
+          </DialogDescription>
+        </DialogHeader>
 
-            {/* Stepper Navigation */}
-            <div className="w-full flex justify-center">
-              <Stepper currentStep={currentStep} steps={steps} />
-            </div>
+        {/* Stepper Navigation */}
+        <div className="w-full flex justify-center">
+          <Stepper currentStep={currentStep} steps={steps} />
+        </div>
 
 
-            {/* === Scrollable Form Area === */}
-            {employeeFetching ? <div className="h-full w-full bg-white flex justify-center items-center">
-              <Loader className="animate-spin size-5 md:size-8 text-gray-500" />
-            </div> : <ScrollArea className="flex h-full flex-col justify-between overflow-hidden p-3">
+        {/* === Scrollable Form Area === */}
+        {employeeFetching ? <div className="h-full w-full bg-white flex justify-center items-center">
+          <Loader className="animate-spin size-5 md:size-8 text-gray-500" />
+        </div> : <ScrollArea className="flex h-full flex-col justify-between overflow-hidden p-3">
 
-              {currentStep === 1 && <EmployeePersonalInfoForm data={data?.personalInfo ?? null} />}
-              {currentStep === 2 && <EmployeeRecordsInfoForm data={{ employeeId : data?.personalInfo.id ?? null, joiningAt: data?.employmentRecord[0].joinedAt ?? null }} />}
-              {currentStep === 3 && <EmployeeSalaryInfoForm data={{ employeeId : data?.personalInfo.id ?? null, currentSalary: data?.personalInfo.salary ?? null }} />}
+          {currentStep === 1 && <EmployeePersonalInfoForm data={data?.personalInfo ?? null} />}
+          {currentStep === 2 && <EmployeeRecordsInfoForm data={{ employeeId: data?.personalInfo.id ?? null, designation: data?.employmentRecord[0]?.designation ?? null, joiningAt: data?.employmentRecord[0].joinedAt ?? null }} />}
+          {currentStep === 3 && <EmployeeSalaryInfoForm data={{ employeeId: data?.personalInfo.id ?? null, currentSalary: data?.personalInfo.salary ?? null }} />}
 
-            </ScrollArea>}
+        </ScrollArea>}
 
-            {/* === Dialog Footer Buttons === */}
-            <DialogFooter className="p-6 justify-between pt-0">
-              <DialogClose asChild>
-                <Button variant="outline">Close</Button>
-              </DialogClose>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={currentStep === 1}
-                onClick={() => setCurrentStep((prev) => prev - 1)}
-              >
-                Back
-              </Button>
+        {/* === Dialog Footer Buttons === */}
+        <DialogFooter className="p-6 justify-between pt-0">
+          <DialogClose asChild>
+            <Button variant="outline">Close</Button>
+          </DialogClose>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={currentStep === 1}
+            onClick={() => setCurrentStep((prev) => prev - 1)}
+          >
+            Back
+          </Button>
 
-              
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={currentStep === steps.length}
-                  onClick={() => setCurrentStep((prev) => prev + 1)}
-                >
-                  Next
-                </Button>
-              
-            </DialogFooter>
+
+          <Button
+            type="button"
+            variant="outline"
+            disabled={currentStep === steps.length}
+            onClick={() => setCurrentStep((prev) => prev + 1)}
+          >
+            Next
+          </Button>
+
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

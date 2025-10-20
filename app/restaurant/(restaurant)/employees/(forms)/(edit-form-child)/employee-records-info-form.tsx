@@ -18,10 +18,11 @@ import { EmployeeRecords } from "../(form-fields)/employee-records-fields"
 
 /* === Props Interface === */
 interface FormDialogProps {
-  data: { 
+  data: {
     employeeId: number | null;
+    designation: string | null;
     joiningAt?: string | null;
-   };
+  };
   [key: string]: any;
 }
 
@@ -35,9 +36,9 @@ export function EmployeeRecordsInfoForm({ data }: FormDialogProps) {
   const form = useForm<z.infer<typeof EmploymentRecordFormSchema>>({
     resolver: zodResolver(EmploymentRecordFormSchema),
     defaultValues: {
-      designation: '',
+      designation: data?.designation ?? '',
       shift: '',
-      status: 'active', 
+      status: 'active',
       joinedAt: data?.joiningAt ?? '',
       resignedAt: null,
       changeType: 'valid',

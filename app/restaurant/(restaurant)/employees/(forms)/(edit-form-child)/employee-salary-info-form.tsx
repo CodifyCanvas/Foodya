@@ -18,10 +18,10 @@ import { EmployeeSalaryInfo } from "../(form-fields)/employee-salary-info-fields
 
 /* === Props Interface === */
 interface FormDialogProps {
-  data: { 
+  data: {
     employeeId: number | null;
     currentSalary: string | null;
-   };
+  };
   [key: string]: any;
 }
 
@@ -35,13 +35,13 @@ export function EmployeeSalaryInfoForm({ data }: FormDialogProps) {
   const form = useForm<z.infer<typeof SalaryChangeFormSchema>>({
     resolver: zodResolver(SalaryChangeFormSchema),
     defaultValues: {
-      previousSalary: data.currentSalary ?? null,
+      previousSalary: data.currentSalary ? String(data.currentSalary) : '',
       newSalary: "",
       reason: '',
       changeType: 'initial',
     },
   })
-   
+
 
   /* === Submit Handler === */
   async function onSubmit(formValues: z.infer<typeof SalaryChangeFormSchema>) {
