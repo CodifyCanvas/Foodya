@@ -8,16 +8,23 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
-import { ChevronRight, TriangleAlert } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import gsap from "gsap";
 import { navLink } from "@/constants";
 import { usePathname } from "next/navigation";
-import { cn, getLastPathSegment } from "@/lib/utils";
-import { useUserContext } from "@/hooks/context/useUserContext";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import { cn } from "@/lib/utils";
+import { usePermissionNavigation } from "@/hooks/usePermissionNavigation";
+import { Kbd, KbdGroup } from "./ui/kbd";
+
+
+
+export type NavSubItem = {
+  title: string;
+  url: string;
+  shortcuts?: string[];
+};
 
 type NavLinks =
   | { heading: string }
@@ -26,44 +33,21 @@ type NavLinks =
     url: string;
     icon?: LucideIcon;
     isActive?: boolean;
-    items?: {
-      title: string;
-      url: string;
-    }[];
+    items?: NavSubItem[];
   };
+
+
 
 export function NavMain() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const router = useRouter();
-  const { permission } = useUserContext();
   const path = usePathname();
 
   /**
    * Handles navigation with permission check.
    * If permission is missing, shows error toast.
    */
-  const handleNavigation = useCallback(
-  (url: string) => {
-    const lastSegment = getLastPathSegment(url)
-
-    if (permission?.[lastSegment]?.can_view) {
-      router.push(url);
-    } else {
-      toast.custom(
-        <div className="flex items-center gap-3 bg-red-500 text-white px-5 py-3 rounded-lg shadow-lg">
-          <TriangleAlert className="w-5 h-5 text-white" />
-          <span>You don&apos;t have permission.</span>
-        </div>,
-        {
-          position: 'top-right',
-          duration: 4000,
-        }
-      );
-    }
-  },
-  [permission, router]
-);
+  const { handleNavigation } = usePermissionNavigation();
 
 
   /**
@@ -157,7 +141,7 @@ export function NavMain() {
                 }}
               >
                 <SidebarMenuSub>
-                  {item.items?.map((subItem) => {
+                  {item.items?.map((subItem: NavSubItem) => {
                     const isActivePath = path === subItem.url;
 
                     return (
@@ -173,9 +157,15 @@ export function NavMain() {
                             "bg-emerald-600 text-white hover:bg-emerald-500 hover:text-white"
                           )}
                         >
-                          <span className="font-rubik-400 text-[13px]">
-                            {subItem.title}
-                          </span>
+                          <p className="font-rubik-400 text-[13px] flex flex-row justify-between">
+                            <span
+                              className="truncate max-w-[160px]"
+                              title={subItem.title} // Shows full title on hover
+                            >
+                              {subItem.title}
+                            </span>
+                            <ShortcutHint shortcuts={subItem.shortcuts} />
+                          </p>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     );
@@ -187,5 +177,25 @@ export function NavMain() {
         )}
       </SidebarMenu>
     </SidebarGroup>
+  );
+}
+
+
+function ShortcutHint({ shortcuts }: { shortcuts?: string[] }) {
+  if (!shortcuts?.length) return null;
+
+  return (
+    <KbdGroup>
+      {shortcuts.map((key, index) => (
+        <React.Fragment key={index}>
+          <Kbd className="text-xs">{key}</Kbd>
+          {index < shortcuts.length - 1 && (
+            <span className="px-0.5 text-xs text-gray-800 dark:text-white">
+              +
+            </span>
+          )}
+        </React.Fragment>
+      ))}
+    </KbdGroup>
   );
 }

@@ -25,7 +25,7 @@ export const imageSchema = z
  */
 export const signInFormSchema = z.object({
   email: z.email({ error: "Email is required" })
-          .min(1, "Email is required"),
+    .min(1, "Email is required"),
   password: z.string({ error: "Password is required" })
     .min(1, "Password is required")
     .min(6, "Password must be more than 6 characters")
@@ -63,11 +63,12 @@ export const moduleFormSchema = z.object({
  */
 export const userFormSchema = z.object({
   id: z.union([z.number(), z.string().transform(String)]).optional(),
+  image: imageSchema,
   name: z.string().min(2, { error: "Required" }).max(50),
-  email: z.email({ error: "A valid email address is required"}),
+  email: z.email({ error: "A valid email address is required" }),
   password: z.string().min(6, { error: "Password must be greater than 5 characters" }).max(50, { error: "Password must be less than 50 characters" }),
   is_active: z.boolean().optional(),
-  role_id: z.string().min(1, { error: "Required"}),
+  role_id: z.string().min(1, { error: "Required" }),
 })
 
 

@@ -15,9 +15,9 @@ import useSWR from "swr"
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 export function HeaderSectionCards() {
-  
+
   // Fetch metrics data,
-  const { data, error, isLoading } = useSWR<ReportsMetricCard[]>('/api/reports?fetch=header-cards', fetcher)
+  const { data, error, isLoading } = useSWR<ReportsMetricCard[]>('/api/reports/header-cards', fetcher)
 
   if (isLoading) return <ReportsHeaderCardSkeleton />
   if (error) return <div>Failed to load</div>

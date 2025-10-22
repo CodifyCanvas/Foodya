@@ -1,4 +1,4 @@
-import { boolean, int, mysqlTable, timestamp, varchar } from 'drizzle-orm/mysql-core';
+import { boolean, int, mysqlTable, text, timestamp, varchar } from 'drizzle-orm/mysql-core';
 
 
 
@@ -31,6 +31,7 @@ export const modules = mysqlTable('modules', {
  */
 export const users = mysqlTable('users', {
   id: int().autoincrement().primaryKey(),
+  image: text(),
   name: varchar({ length: 255 }),
   email: varchar({ length: 255 }).notNull().unique(),
   password: varchar({ length: 50 }).notNull(),

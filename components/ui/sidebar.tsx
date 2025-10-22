@@ -27,7 +27,7 @@ import {
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = "17rem" // 16rem is defualt
+const SIDEBAR_WIDTH = "18rem" // 16rem is defualt
 const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "4rem" // 3rem is defualt
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
@@ -242,16 +242,16 @@ function Sidebar({
         {...props}
       >
         <div
-  data-sidebar="sidebar"
-  data-slot="sidebar-inner"
-  className={cn(
-    "bg-sidebar flex h-full w-full flex-col",
-    "group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:shadow-sm",
-    "group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:text-center"
-  )}
->
-  {children}
-</div>
+          data-sidebar="sidebar"
+          data-slot="sidebar-inner"
+          className={cn(
+            "bg-sidebar flex h-full w-full flex-col",
+            "group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:shadow-sm",
+            "group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:text-center"
+          )}
+        >
+          {children}
+        </div>
       </div>
     </div>
   )
@@ -372,7 +372,7 @@ function SidebarSeparator({
   )
 }
 
-function SidebarContent({ className, ...props }: React.ComponentProps<"div">)  {
+function SidebarContent({ className, ...props }: React.ComponentProps<"div">) {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
 
@@ -587,7 +587,7 @@ function SidebarMenuAction({
         "peer-data-[size=lg]/menu-button:top-2.5",
         "group-data-[collapsible=icon]:hidden",
         showOnHover &&
-          "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0",
+        "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0",
         className
       )}
       {...props}

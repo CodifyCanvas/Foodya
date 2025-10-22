@@ -1,16 +1,19 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { DbChecker } from "@/components/custom/Db/db-health-checker";
-import { HeaderMenu, HeaderMenuMobile } from "@/components/custom/layouts/HeaderMenu";
+import ShortcutsHook from "@/components/custom/hookswrapper/shortcuts";
+import { MainHeaderMenu } from "@/components/custom/layouts/HeaderMenu";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { UserProvider } from "@/hooks/context/useUserContext";
 
 export default function Applayout({ children }: { children: React.ReactNode }) {
 
+
+
   return (
     <UserProvider>
       <SidebarProvider className="bg-blue-100 font-rubik">
-
+        <ShortcutsHook />
         {/* Database Health Checker  */}
         <DbChecker />
 
@@ -26,8 +29,7 @@ export default function Applayout({ children }: { children: React.ReactNode }) {
               <SidebarTrigger className="-ml-1" />
               <Separator orientation="vertical" className="mr-2 h-4" />
               <div className="w-full flex items-center pt-1 md:pt-0 justify-end md:justify-start">
-                <HeaderMenu />
-                <HeaderMenuMobile />
+                <MainHeaderMenu />
               </div>
             </div>
           </header>

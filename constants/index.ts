@@ -14,6 +14,13 @@ export const logo = {
 
 
 
+export const appConfigurations = {
+  loginURL: '/restaurant/dashboard',  // <- redirect here after successful login
+  logoutURL: '/login'                  // <- redirect here after logout
+};
+
+
+
 /**
  * === Navigation Sidebar Links ===
  * Defines the sidebar structure, including headings, groups, icons, and child routes.
@@ -26,7 +33,7 @@ export const navLink = [
     url: "#",
     icon: LayoutDashboard,
     items: [
-      { title: 'Dashboard', url: '/restaurant/dashboard' },
+      { title: 'Dashboard', url: '/restaurant/dashboard', shortcuts: ['Alt', 'D'] },
     ],
   },
 
@@ -38,10 +45,10 @@ export const navLink = [
     icon: ShieldCheck,
     isActive: true,
     items: [
-      { title: "Users", url: "/restaurant/users" },
-      { title: 'Roles', url: '/restaurant/roles' },
-      { title: 'Permissions', url: '/restaurant/permissions' },
-      { title: 'Modules', url: '/restaurant/modules' },
+      { title: "Users", url: "/restaurant/users", shortcuts: ['Alt', 'U'] },
+      { title: 'Roles', url: '/restaurant/roles', shortcuts: ['Alt', 'R'] },
+      { title: 'Permissions', url: '/restaurant/permissions', shortcuts: ['Alt', 'P'] },
+      { title: 'Modules', url: '/restaurant/modules', shortcuts: ['Alt', 'M'] },
     ],
   },
 
@@ -52,8 +59,8 @@ export const navLink = [
     url: "#",
     icon: Utensils,
     items: [
-      { title: 'Menu Categories', url: '/restaurant/menu-categories' },
-      { title: 'Menu Items', url: '/restaurant/menu-items' },
+      { title: 'Menu Categories', url: '/restaurant/menu-categories', shortcuts: ['Alt', 'C'] },
+      { title: 'Menu Items', url: '/restaurant/menu-items', shortcuts: ['Alt', 'I'] },
     ],
   },
   {
@@ -61,10 +68,10 @@ export const navLink = [
     url: "#",
     icon: Store,
     items: [
-      { title: 'Tables', url: '/restaurant/tables' },
-      { title: 'Bookings', url: '/restaurant/bookings' },
-      { title: 'Orders', url: '/restaurant/orders' },
-      { title: 'Invoices', url: '/restaurant/invoices' },
+      { title: 'Tables', url: '/restaurant/tables', shortcuts: ['Alt', 'T'] },
+      { title: 'Bookings', url: '/restaurant/bookings', shortcuts: ['Alt', 'B'] },
+      { title: 'Orders', url: '/restaurant/orders', shortcuts: ['Alt', 'O'] },
+      { title: 'Invoices', url: '/restaurant/invoices', shortcuts: ['Alt', 'N'] },
     ],
   },
   {
@@ -72,8 +79,8 @@ export const navLink = [
     url: "#",
     icon: Users,
     items: [
-      { title: 'Employees', url: '/restaurant/employees' },
-      { title: 'Salaries', url: '/restaurant/salaries' },
+      { title: 'Employees', url: '/restaurant/employees', shortcuts: ['Alt', 'E'] },
+      { title: 'Salaries', url: '/restaurant/salaries', shortcuts: ['Alt', 'S'] },
     ],
   },
 
@@ -84,10 +91,10 @@ export const navLink = [
     url: "#",
     icon: Banknote,
     items: [
-      { title: 'Transaction Categories', url: '/restaurant/transaction-categories' },
-      { title: 'Expenses', url: '/restaurant/expenses' },
-      { title: 'Incomes', url: '/restaurant/incomes' },
-      { title: 'Reports', url: '/restaurant/reports' },
+      { title: 'Transaction Categories', url: '/restaurant/transaction-categories', shortcuts: ['Alt', 'X'] },
+      { title: 'Expenses', url: '/restaurant/expenses', shortcuts: ['Alt', 'Q'] },
+      { title: 'Incomes', url: '/restaurant/incomes', shortcuts: ['Alt', 'Z'] },
+      { title: 'Reports', url: '/restaurant/reports', shortcuts: ['Alt', 'L'] },
     ],
   },
 ]

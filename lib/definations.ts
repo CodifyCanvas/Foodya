@@ -50,6 +50,7 @@ export interface WaiterSelectInput {
  */
 export interface User {
   id?: number;
+  image?: null | string;
   name: string;
   password: string;
   email: string;
@@ -581,9 +582,9 @@ export interface FinancialChartDataEntry {
  * Summary totals for the chart (bottom section)
  */
 export interface FinancialChartSummary {
-  incomes: string;          // Total incomes
-  expense: string;          // Total expenses
-  revenue: string;          // Incomes - Expenses
+  incomes: string;
+  expense: string;
+  revenue: string;          // <- (Incomes - Expenses)
 }
 
 
@@ -592,6 +593,20 @@ export interface FinancialChartSummary {
  * Final response object from API for financial reports chart
  */
 export interface FinancialChartResponse {
-  data: FinancialChartDataEntry[];  // Chart data entries
-  summary: FinancialChartSummary;   // Totals summary
+  data: FinancialChartDataEntry[];  // <- Chart data entries
+  summary: FinancialChartSummary;   // <- Totals summary
+}
+
+
+
+/**
+ * Transaction Reports Response Type For Transaction Table
+ */
+export interface TransactionsReportResult {
+  query: string | null;
+  totalRecords: number;
+  page: number;
+  totalPages: number;
+  pageSize: number;
+  transactions: TransactionsTablesInterface[];
 }

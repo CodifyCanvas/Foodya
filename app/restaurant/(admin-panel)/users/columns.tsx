@@ -5,6 +5,7 @@ import { RowActions } from "./table-actions"
 import { ExtendedColumnDef } from "@/types/columns.data-table"
 import { Badge } from "@/components/ui/badge"
 import { RoleSelectInput, User } from "@/lib/definations"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 // ================================
 // Type Definitions
@@ -38,7 +39,12 @@ export const columns = (props: { roles: RoleSelectInput[] }): ExtendedColumnDef<
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
-    cell: ({ row }) => <div className="capitalize">{row.original.name}</div>,
+    cell: ({ row }) => <div className="capitalize flex flex-row gap-2 items-center">
+      <Avatar>
+        <AvatarImage src={row.original.image ?? undefined} alt={row.original.name} />
+        <AvatarFallback className='text-xs'>{row.original?.name.charAt(0).toUpperCase()}</AvatarFallback>
+      </Avatar>
+      {row.original.name}</div>,
   },
 
   // === Email Column ===

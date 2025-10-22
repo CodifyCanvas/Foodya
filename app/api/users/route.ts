@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { checkDuplicate, deleteData, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions";
 import { getAllUserWithRole } from "@/lib/crud-actions/users";
+import { uploadImage } from "@/lib/server/helpers/imageUpload";
 import { mapToLabelValue } from "@/lib/utils";
 import { userFormSchema } from "@/lib/zod-schema";
 import { NextRequest, NextResponse } from "next/server";
@@ -58,21 +59,51 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    // === Parse and validate request body ===
-    const body = await req.json();
-    const { name, email, password, is_active, role_id } = userFormSchema.parse(body);
+    // === Parse Form Data ===
+    const formData = await req.formData();
+    const jsonData = formData.get("data");
+    const image = formData.get("image") as File | null;
+
+    if (typeof jsonData !== "string") {
+      return NextResponse.json({ error: "Invalid form submission. Please try again." }, { status: 400 });
+    }
+
+    // === Validate Data using Zod ===
+    const parsed = userFormSchema.safeParse(JSON.parse(jsonData));
+
+    if (!parsed.success) {
+      console.error(`[POST ${path}] Validation failed:`, parsed.error);
+      return NextResponse.json(
+        { error: "Form validation failed.", details: parsed.error },
+        { status: 400 }
+      );
+    }
+
+    const { name, email, password, is_active, role_id } = parsed.data;
 
     // === Check for duplicate email ===
     const duplicate = await checkDuplicate("users", "email", email);
     if (duplicate) {
       return NextResponse.json(
-        { message: "The email address is already in use." },
+        { message: "Email already exists. Please use another." },
         { status: 409 }
       );
     }
 
+    // === Upload Profile Image (If Any) ===
+    let imagePath: string | null = null;
+    if (image && image instanceof File) {
+      try {
+        imagePath = await uploadImage(image, "users"); // <- use helper
+      } catch (err) {
+        console.error(`[POST ${path}] Image upload failed:`, err);
+        return NextResponse.json({ error: "Image upload failed. Please try again." }, { status: 500 });
+      }
+    }
+
     // === Insert new user into DB ===
     await insertData("users", {
+      image: imagePath,
       name: name.trim(),
       email,
       password,
@@ -109,15 +140,44 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    // === Parse and validate request body ===
-    const body = await req.json();
-    const { id, name, email, password, is_active, role_id } = userFormSchema.parse(body);
+    // === Parse Form Data ===
+    const formData = await req.formData();
+    const jsonData = formData.get("data");
+    const image = formData.get("image") as File | null;
+
+    if (typeof jsonData !== "string") {
+      return NextResponse.json({ error: "Invalid form submission. Please try again." }, { status: 400 });
+    }
+
+    // === Validate Data using Zod ===
+    const parsed = userFormSchema.safeParse(JSON.parse(jsonData));
+
+    if (!parsed.success) {
+      console.error(`[POST ${path}] Validation failed:`, parsed.error);
+      return NextResponse.json(
+        { error: "Form validation failed.", details: parsed.error },
+        { status: 400 }
+      );
+    }
+
+    const { id, name, email, password, is_active, role_id } = parsed.data;
 
     if (!id) {
       return NextResponse.json(
-        { message: "User ID is missing; update cannot proceed." },
+        { error: "User ID is missing. Cannot perform update." },
         { status: 400 }
       );
+    }
+
+    // === Upload Profile Image (If Any) ===
+    let imagePath: string | null = null;
+    if (image && image instanceof File) {
+      try {
+        imagePath = await uploadImage(image, "users"); // <- use helper
+      } catch (err) {
+        console.error(`[POST ${path}] Image upload failed:`, err);
+        return NextResponse.json({ error: "Image upload failed. Please try again." }, { status: 500 });
+      }
     }
 
     // === Update user ===
@@ -127,6 +187,7 @@ export async function PUT(req: NextRequest) {
       password,
       is_active,
       role_id: Number(role_id),
+      ...(imagePath && { image: imagePath })
     });
 
     return NextResponse.json(

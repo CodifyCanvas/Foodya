@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -26,6 +26,7 @@ import {
 import SwitchInput from "@/components/ui/switch-input"
 import { ComboboxInput } from "@/components/ui/combobox-input"
 import { User } from "@/lib/definations"
+import Image from "next/image"
 
 interface FormDialogProps {
   open: boolean
@@ -45,6 +46,7 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
     resolver: zodResolver(userFormSchema),
     defaultValues: {
       id: undefined,
+      image: undefined as unknown as File,
       name: "",
       email: "",
       password: "",
@@ -67,6 +69,16 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
     }
   }, [data, manualReset, form])
 
+  const selectedFile = form.watch("image");
+
+  // 👇 File preview URL
+  const previewUrl = useMemo(() => {
+    if (selectedFile instanceof File) {
+      return URL.createObjectURL(selectedFile);
+    }
+    return null;
+  }, [selectedFile]);
+
   {/* === Toggle Password Visibilty === */ }
   const togglePasswordVisibility = useCallback(() => {
     setIsVisible(prev => !prev)
@@ -77,10 +89,22 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
     const API_URL = "/api/users"
     const isEditing = !!data?.id
 
+    const formData = new FormData();
+
+    // Destructure image out
+    const { image, ...rest } = formValues;
+
+    // Send Zod values (without image) as JSON string
+    formData.append("data", JSON.stringify(rest));
+
+    // Add image file if available
+    if (image instanceof File) {
+      formData.append("image", image);
+    }
+
     const requestOptions = {
       method: isEditing ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formValues),
+      body: formData,
     }
 
     try {
@@ -126,6 +150,7 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
     setManualReset(true)
     form.reset({
       id: data?.id ?? 0,
+      image: undefined as unknown as File,
       name: "",
       email: "",
       password: "",
@@ -149,6 +174,54 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
 
             {/* === Form Content === */}
             <ScrollArea className="p-3 flex flex-col justify-between overflow-hidden">
+
+              {/* === Image Input Field === */}
+              <div className="w-fit flex flex-col items-center justify-center">
+                <div className="flex justify-start">
+                  {previewUrl ? (
+                    <div className="relative w-40 h-40 rounded-lg outline outline-gray-300 dark:outline-gray-600 overflow-hidden">
+                      <Image src={previewUrl} alt="New preview" fill style={{ objectFit: "cover" }} priority />
+                    </div>
+                  ) : data?.image ? (
+                    <div className="relative w-40 h-40 rounded-lg outline outline-gray-300 dark:outline-gray-600 overflow-hidden">
+                      <Image src={data.image} alt="Current profile" fill style={{ objectFit: "cover" }} priority />
+                    </div>
+                  ) : (
+                    <div className="w-40 h-40 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400 dark:text-gray-600">
+                      No Image
+                    </div>
+                  )}
+                </div>
+
+                {/* === Item Image Field === */}
+                <div className="w-full py-2">
+                  <FormField
+                    control={form.control}
+                    name="image"
+                    render={({ field }) => (
+                      <FormItem className="group relative w-auto sm:max-w-sm m-1">
+                        <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                          Image
+                        </FormLabel>
+                        <FormControl>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            id="image-select-field"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0] ?? null;
+                              field.onChange(file);
+                            }}
+                            className="cursor-pointer text-neutral-700 h-10 w-full bg-white/5 backdrop-blur-xl rounded-lg content-center px-3"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
               {/* === Name Input Field === */}
               <div className="w-full py-2">
                 <FormField

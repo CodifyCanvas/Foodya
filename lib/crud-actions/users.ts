@@ -33,6 +33,7 @@ export const getAllUserWithRole = async (): Promise<User[]> => {
   const formattedResult: User[] = result.map((row) => ({
     id: row.users.id,
     name: row.users.name ?? "",
+    image: row.users.image ?? null,
     password: row.users.password,
     email: row.users.email,
     is_active: row.users.is_active ?? false,
@@ -75,6 +76,7 @@ export const getUserWithRole = async (id: number): Promise<User> => {
   // === Format and normalize the user data ===
   return {
     id: result.users.id,
+    image: result.users.image ?? null,
     name: result.users.name ?? '',
     password: result.users.password,
     email: result.users.email,

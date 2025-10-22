@@ -7,7 +7,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import { cn } from "@/lib/utils"
-import { Icons } from "@/constants"
+import { appConfigurations, Icons } from "@/constants"
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle,
 } from "@/components/ui/card"
@@ -37,31 +37,32 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
     },
   })
 
-  async function onSubmit (values: z.infer<typeof signInFormSchema>) {
+  async function onSubmit(values: z.infer<typeof signInFormSchema>) {
     try {
       setIsLoading(true)
       toast.loading("Logging in...", {
         id: "login-loading",
       })
 
-    const result = await signIn('credentials', {
-      email: values.email,
-      password: values.password,
-      redirect: false,
-      callbackUrl: '/restaurant/dashboard',
-    });
+      const result = await signIn('credentials', {
+        email: values.email,
+        password: values.password,
+        redirect: false,
+        callbackUrl: appConfigurations.loginURL,
+      });
 
-    if (result?.error) {
-      if (result.error === 'CredentialsSignin') {
-        toast.error("Oops! We couldn't log you in. Double-check your email and password.");
-        
-      } else {
-        toast.error(`We're having trouble: ${result.error}. Check logs or try again.`);
+      if (result?.error) {
+        if (result.error === 'CredentialsSignin') {
+          toast.error("Oops! We couldn't log you in. Double-check your email and password.");
+
+        } else {
+          toast.error(`We're having trouble: ${result.error}. Check logs or try again.`);
+        }
+      } else if (result?.ok) {
+        toast.success(`Successfully logged in. Welcome back!`);
+        router.push(result.url || appConfigurations.loginURL);
+        window.location.href = appConfigurations.loginURL;
       }
-    } else if (result?.ok) {
-      toast.success(`Successfully logged in. Welcome back!`);
-      router.push(result.url || '/restaurant/dashboard'); 
-    }
 
     } catch (e) {
       console.log("Error from login page: ", e)
@@ -133,7 +134,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                     <FormControl>
                       <div className="relative">
                         <Input
-                        id="password"
+                          id="password"
                           type={isVisible ? "text" : "password"}
                           className="pe-10 pt-2 border-b"
                           placeholder="●●●●●●"
@@ -162,7 +163,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 
               {/* Submit Button */}
               <Button type="submit" disabled={isLoading} variant="green" className="w-full max-w-sm mx-auto">
-                {isLoading && <Loader className="animate-spin size-4 text-white" />} Login 
+                {isLoading && <Loader className="animate-spin size-4 text-white" />} Login
               </Button>
 
               {/* Separator */}

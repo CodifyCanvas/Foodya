@@ -2,14 +2,15 @@
 
 import { schema } from "@/lib/drizzle-schema";
 import { db } from "../db";
-import { and, count, eq, gt, gte, lt, lte } from "drizzle-orm";
+import { and, count, desc, eq, gt, gte, like, lt, lte, or } from "drizzle-orm";
 import { addMonths, eachMonthOfInterval, format, endOfMonth, startOfMonth, subMonths } from "date-fns";
-import { FinancialChartResponse, ReportsMetricCard } from "../definations";
+import { FinancialChartResponse, ReportsMetricCard, TransactionsReportResult } from "../definations";
 
 
 
 // === Drizzle table schemas ===
 const transactions = schema.transactionsTable;
+const transactionsCategories = schema.transactionCategoriesTable;
 const employeesTable = schema.employeesTable;
 
 
@@ -319,4 +320,91 @@ export const loadFinancialChartData = async (view: "month" | "year", duration: s
     default:
       throw new Error("Invalid view parameter. Only 'month' or 'year' is supported.");
   }
+};
+
+
+
+/**
+ * === Fetch paginated transactions with optional search filtering. ===
+ * 
+ * Retrieves a paginated list of transactions, optionally filtered by a search term.
+ * Also calculates the total number of matching records and total pages.
+ *
+ * @param searchTerm - Filter transactions by title or description (optional).
+ * @param pageNumber - Current page number (1-based).
+ * @param pageSize - Number of records per page.
+ * @returns {Promise<TransactionsReportResult>} A structured transaction report including pagination data.
+ * 
+ * @example 
+ * const result = await getTransactionsForReports("salary", 1, 10);
+ */
+export const getTransactionsForReports = async (
+  searchTerm: string = "",
+  pageNumber: number,
+  pageSize: number
+): Promise<TransactionsReportResult> => {
+
+  // === Calculate offset for pagination ===
+  const offset = (pageNumber - 1) * pageSize;
+
+  // === Build where clause for search ===
+  const whereClause = searchTerm
+    ? or(
+      like(transactions.id, `%${searchTerm}%`),
+      like(transactions.title, `%${searchTerm}%`),
+      like(transactions.description, `%${searchTerm}%`),
+      like(transactions.amount, `%${searchTerm}%`),
+      like(transactions.type, `%${searchTerm}%`),
+      like(transactions.sourceType, `%${searchTerm}%`),
+    )
+    : undefined;
+
+  // === Get total count (with filter if needed) ===
+  const totalResult = await db
+    .select({ total: count() })
+    .from(transactions)
+    .where(whereClause);
+
+  const totalRecords = totalResult[0]?.total ?? 0;
+
+  // === Get paginated transactions with join ===
+  const data = await db
+    .select({
+      id: transactions.id,
+      title: transactions.title,
+      description: transactions.description,
+      amount: transactions.amount,
+      categoryId: transactions.categoryId,
+      category: transactionsCategories.category,
+      categoryDescription: transactionsCategories.description,
+      type: transactions.type,
+      sourceType: transactions.sourceType,
+      sourceId: transactions.sourceId,
+      createdAt: transactions.createdAt,
+    })
+    .from(transactions)
+    .leftJoin(transactionsCategories, eq(transactions.categoryId, transactionsCategories.id))
+    .where(whereClause)
+    .limit(pageSize)
+    .offset(offset)
+    .orderBy(desc(transactions.id));
+
+  // === Calculate total pages based on total records and page size ===
+  const totalPages = Math.ceil(totalRecords / pageSize);
+
+  // === Normalize the transactions ===
+  const mappedData = data.map((txn) => ({
+    ...txn,
+    createdAt: txn.createdAt.toISOString(),
+  }));
+
+  // === Return structured result ===
+  return {
+    query: searchTerm || null,
+    totalRecords,
+    page: pageNumber,
+    totalPages,
+    pageSize,
+    transactions: mappedData,
+  };
 };
