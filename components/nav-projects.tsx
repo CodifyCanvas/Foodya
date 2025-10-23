@@ -1,33 +1,8 @@
 "use client";
 
-import {
-  Folder,
-  Forward,
-  Frame,
-  MoreHorizontal,
-  PieChart,
-  Trash2,
-  Map,
-  type LucideIcon,
-} from "lucide-react";
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
-import {
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuAction,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar";
+import { Folder, Forward, Frame, MoreHorizontal, PieChart, Trash2, Map, type LucideIcon } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuAction, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 
 type Project = {
   name: string;
@@ -77,11 +52,7 @@ export function NavProjects() {
                 </SidebarMenuAction>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent
-                className="w-48 rounded-lg"
-                side={isMobile ? "bottom" : "right"}
-                align={isMobile ? "end" : "start"}
-              >
+              <DropdownMenuContent className="w-48 rounded-lg" side={isMobile ? "bottom" : "right"} align={isMobile ? "end" : "start"} >
                 <DropdownMenuItem>
                   <Folder className="text-muted-foreground mr-2 size-4" />
                   <span>View Project</span>

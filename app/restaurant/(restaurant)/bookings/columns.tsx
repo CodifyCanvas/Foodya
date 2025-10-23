@@ -6,6 +6,7 @@ import { ExtendedColumnDef } from "@/types/columns.data-table"
 import { BookingsTablesInterface, TablesSelectInput } from "@/lib/definations"
 import { Badge } from "@/components/ui/badge"
 import { formatDateWithFns } from "@/lib/date-fns"
+import { truncateText } from "@/lib/utils"
 
 /* === Table Columns for Tables === */
 export const columns = (props: { tables: TablesSelectInput[] }): ExtendedColumnDef<BookingsTablesInterface>[] => [
@@ -17,7 +18,7 @@ export const columns = (props: { tables: TablesSelectInput[] }): ExtendedColumnD
       <DataTableColumnHeader
         column={column}
         title="#"
-        className="ml-2 md:ml-5"
+        className="ml-2 justify-start"
         search
       />
     ),
@@ -33,11 +34,15 @@ export const columns = (props: { tables: TablesSelectInput[] }): ExtendedColumnD
       <DataTableColumnHeader
         column={column}
         title="Customer"
+        className="justify-start"
       />
     ),
-    cell: ({ row }) => (
-      <div>{row.original.customerName}</div>
-    ),
+    cell: ({ row }) => {
+      const name = row.original.customerName
+      return (
+        <div className="text-start" title={name}>{truncateText(name)}</div>
+      )
+    },
     meta: {
       title: "Customer"
     }
@@ -50,12 +55,13 @@ export const columns = (props: { tables: TablesSelectInput[] }): ExtendedColumnD
       <DataTableColumnHeader
         column={column}
         title="Table"
+        className="justify-center"
       />
     ),
     cell: ({ row }) => {
       const status = row.original.tableName
 
-      return <div className="font-rubik-400 w-24 flex flex-row justify-center">
+      return <div className="font-rubik-400 w-full text-center">
         <Badge className="rounded-full capitalize font-rubik-400 border-none bg-purple-600/10 min-w-16 text-purple-600 dark:bg-purple-400/10 dark:text-purple-400 focus-visible:ring-purple-600/20 dark:focus-visible:ring-purple-400/40 focus-visible:outline-none [a&]:hover:bg-purple-600/5 dark:[a&]:hover:bg-purple-400/5">
           <span className="size-1.5 rounded-full bg-purple-600 dark:bg-purple-400" aria-hidden="true" />
           {status}
@@ -71,7 +77,7 @@ export const columns = (props: { tables: TablesSelectInput[] }): ExtendedColumnD
   {
     accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" filter={['scheduled', 'booked', 'cancelled', 'expired', 'completed', 'processing']} />
+      <DataTableColumnHeader column={column} title="Status" filter={['scheduled', 'booked', 'cancelled', 'expired', 'completed', 'processing']} className="justify-center" />
     ),
     cell: ({ row }) => {
       const status = row.original.status.toLowerCase();
@@ -98,13 +104,15 @@ export const columns = (props: { tables: TablesSelectInput[] }): ExtendedColumnD
       [a&]:hover:bg-opacity-20 dark:[a&]:hover:bg-opacity-20`;
 
       return (
-        <Badge className={badgeClass}>
-          <span
-            className={`size-1.5 rounded-full inline-block ${dotColors[status] || dotColors.expired}`}
-            aria-hidden="true"
-          />
-          {status}
-        </Badge>
+        <div className="w-full text-center">
+          <Badge className={badgeClass}>
+            <span
+              className={`size-1.5 rounded-full inline-block ${dotColors[status] || dotColors.expired}`}
+              aria-hidden="true"
+            />
+            {status}
+          </Badge>
+        </div>
       );
     },
   },
@@ -116,10 +124,11 @@ export const columns = (props: { tables: TablesSelectInput[] }): ExtendedColumnD
       <DataTableColumnHeader
         column={column}
         title="Res Start"
+        className="justify-center"
       />
     ),
     cell: ({ row }) => (
-      <div>{formatDateWithFns(row.original.reservationStart, { showTime: true, yearFormat: 'short' })}</div>
+      <div className="w-full text-center">{formatDateWithFns(row.original.reservationStart, { showTime: true, yearFormat: 'short' })}</div>
     ),
     meta: {
       title: "Res Start"
@@ -133,10 +142,11 @@ export const columns = (props: { tables: TablesSelectInput[] }): ExtendedColumnD
       <DataTableColumnHeader
         column={column}
         title="Res End"
+        className="justify-center"
       />
     ),
     cell: ({ row }) => (
-      <div>{formatDateWithFns(row.original.reservationEnd, { showTime: true, yearFormat: 'short' })}</div>
+      <div className="w-full text-center">{formatDateWithFns(row.original.reservationEnd, { showTime: true, yearFormat: 'short' })}</div>
     ),
     meta: {
       title: "Res End"

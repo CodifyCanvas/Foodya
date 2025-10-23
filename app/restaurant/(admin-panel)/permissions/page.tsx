@@ -6,7 +6,7 @@ import { Loader } from 'lucide-react';
 import { DataTable } from '@/components/DataTable/data-table';
 import { columns } from './columns';
 import { useModulePermission } from '@/hooks/useModulePermission';
-import AccessDenied from '@/app/errors/access-control-view/access-denied';
+import AccessDenied from '@/app/errors/403/page';
 import { Role } from '@/lib/definations';
 import { useUserContext } from '@/hooks/context/useUserContext';
 import ServiceUnavailable from '@/app/errors/service-unavailable';

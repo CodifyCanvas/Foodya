@@ -4,10 +4,11 @@ import { DataTableColumnHeader } from "@/components/DataTable/data-table-column-
 import { RowActions } from "./table-actions"
 import { ExtendedColumnDef } from "@/types/columns.data-table"
 import { TransactionCategoriesTablesInterface } from "@/lib/definations"
+import { truncateText } from "@/lib/utils"
 
 /* === Columns for Transaction Categories === */
 export const columns = (): ExtendedColumnDef<TransactionCategoriesTablesInterface>[] => [
-  
+
   // === Id Column ===
   {
     accessorKey: "id",
@@ -15,7 +16,7 @@ export const columns = (): ExtendedColumnDef<TransactionCategoriesTablesInterfac
       <DataTableColumnHeader
         column={column}
         title="#"
-        className="ml-2 md:ml-5"
+        className="ml-2 justify-start"
         search
       />
     ),
@@ -31,14 +32,15 @@ export const columns = (): ExtendedColumnDef<TransactionCategoriesTablesInterfac
       <DataTableColumnHeader
         column={column}
         title="Category"
+        className="justify-start"
         search
       />
     ),
     cell: ({ row }) => (
-      <div className="capitalize">{row.original.category}</div>
+      <div className="capitalize text-left">{row.original.category}</div>
     ),
   },
-  
+
   // === Category Description Column ===
   {
     accessorKey: "description",
@@ -46,13 +48,14 @@ export const columns = (): ExtendedColumnDef<TransactionCategoriesTablesInterfac
       <DataTableColumnHeader
         column={column}
         title="Description"
+        className="justify-center"
       />
     ),
     cell: ({ row }) => (
-      <div className="capitalize">{row.original.description}</div>
+      <div className="capitalize text-center" title={row.original.description}>{truncateText(row.original.description)}</div>
     ),
   },
-  
+
   // === Actions Column ===
   {
     id: "actions",

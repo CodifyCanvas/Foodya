@@ -49,10 +49,10 @@ export function DataTableColumnHeader<TData, TValue>({ column, title, className,
   }
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className="flex items-center gap-2">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="data-[state=open]:bg-accent -ml-3 h-8" >
+          <Button variant="ghost" size="sm" className={cn("data-[state=open]:bg-accent -ml-3 h-8 w-full", className)} >
             <span className="text-[12px] font-rubik-500 uppercase">{title}</span>
             {sorted === "desc" ? (
               <ArrowDown className="ml-1 h-4 w-4" />

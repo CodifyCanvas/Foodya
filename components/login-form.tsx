@@ -7,28 +7,28 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import { cn } from "@/lib/utils"
-import { appConfigurations, Icons } from "@/constants"
-import {
-  Card, CardContent, CardDescription, CardHeader, CardTitle,
-} from "@/components/ui/card"
+import { appConfigurations, HelpLinks } from "@/constants"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import {
-  Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
-} from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { EyeIcon, EyeOffIcon, Loader } from "lucide-react"
 import { signInFormSchema } from "@/lib/zod-schema"
 import { signIn } from "next-auth/react"
 import toast from "react-hot-toast"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
+
+  // === Local states ===
   const [isVisible, setIsVisible] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter();
 
+  /* === React Hook Form Setup === */
   const form = useForm<z.infer<typeof signInFormSchema>>({
     resolver: zodResolver(signInFormSchema),
     defaultValues: {
@@ -37,6 +37,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
     },
   })
 
+  /* === Submit Handler === */
   async function onSubmit(values: z.infer<typeof signInFormSchema>) {
     try {
       setIsLoading(true)
@@ -51,6 +52,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
         callbackUrl: appConfigurations.loginURL,
       });
 
+      // === Handle sign-in result ===
       if (result?.error) {
         if (result.error === 'CredentialsSignin') {
           toast.error("Oops! We couldn't log you in. Double-check your email and password.");
@@ -72,12 +74,14 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
     }
   }
 
-
+  // === Toggle password visibility ===
   const togglePasswordVisibility = () => setIsVisible(prev => !prev)
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="bg-white font-rubik-400">
+
+        {/* === Header Section === */}
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-semibold">Welcome Back</CardTitle>
           <CardDescription>
@@ -85,10 +89,12 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
           </CardDescription>
         </CardHeader>
 
+        {/* === Login Form Section === */}
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-              {/* Email Field */}
+
+              {/* === Email Field === */}
               <FormField
                 control={form.control}
                 name="email"
@@ -110,7 +116,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                 )}
               />
 
-              {/* Password Field */}
+              {/* === Password Field === */}
               <FormField
                 control={form.control}
                 name="password"
@@ -142,13 +148,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                           variant="minimal"
                           {...field}
                         />
-                        <Button
-                          type="button"
-                          size="icon"
-                          variant="ghost"
-                          onClick={togglePasswordVisibility}
-                          className="absolute inset-y-0 end-0 text-muted-foreground hover:bg-transparent"
-                        >
+                        <Button type="button" size="icon" variant="ghost" onClick={togglePasswordVisibility} className="absolute inset-y-0 end-0 text-muted-foreground hover:bg-transparent" >
                           {isVisible ? <EyeOffIcon /> : <EyeIcon />}
                           <span className="sr-only">
                             {isVisible ? "Hide password" : "Show password"}
@@ -161,49 +161,20 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                 )}
               />
 
-              {/* Submit Button */}
+              {/* === Submit Button === */}
               <Button type="submit" disabled={isLoading} variant="green" className="w-full max-w-sm mx-auto">
                 {isLoading && <Loader className="animate-spin size-4 text-white" />} Login
               </Button>
 
-              {/* Separator */}
+              {/* === Separator === */}
               <div className="text-center text-sm text-gray-500">Or</div>
 
-              {/* Social / Contact Links */}
+              {/* === Social / Help Links === */}
               <div className="flex justify-center gap-3">
-                {[
-                  {
-                    href: "https://mail.google.com/mail/?view=cm&fs=1&to=shahzaibawan1357@gmail.com",
-                    icon: Icons.gmail,
-                    alt: "Gmail",
-                  },
-                  {
-                    href: "https://web.whatsapp.com/send?phone=+923118480102",
-                    icon: Icons.whatsapp,
-                    alt: "WhatsApp",
-                  },
-                  {
-                    href: "https://github.com/CodifyCanvas",
-                    icon: Icons.github,
-                    alt: "GitHub",
-                  },
-                ].map(({ href, icon, alt }) => (
-                  <a
-                    key={alt}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={alt}
-                    className="rounded-sm bg-black/5 hover:bg-black/10 transition-all duration-300 scale-80 hover:scale-100 flex items-center justify-center w-10 h-10 overflow-hidden"
-                  >
-                    <Image
-                      src={icon}
-                      alt={alt}
-                      width={28}
-                      height={28}
-                      className="object-contain"
-                    />
-                  </a>
+                {HelpLinks.map(({ href, icon, title }) => (
+                  <Link key={title} href={href} target="_blank" rel="noopener noreferrer" aria-label={title} className="rounded-sm bg-black/5 hover:bg-black/10 transition-all duration-300 scale-80 hover:scale-100 flex items-center justify-center w-10 h-10 overflow-hidden">
+                    <Image src={icon} alt={title} width={28} height={28} className="object-contain" />
+                  </Link>
                 ))}
               </div>
             </form>

@@ -11,6 +11,7 @@ import { HeaderMenuCards as cards } from "@/constants";
 import { usePermissionNavigation } from "@/hooks/usePermissionNavigation";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { HelpLinks as ContactLinks } from '@/constants'
 
 
 
@@ -33,8 +34,9 @@ export function MainHeaderMenu() {
 // --------------------- Main Header Desktop ---------------------
 export function HeaderMenuDesktop({ handleNavigation }: { handleNavigation: (url: string) => void }) {
   return (
-    <NavigationMenu viewport={true} className="hidden md:block">
+    <NavigationMenu viewport={true}>
       <NavigationMenuList>
+
         <NavigationMenuItem>
           <NavigationMenuTrigger>Dashboard</NavigationMenuTrigger>
           <NavigationMenuContent>
@@ -62,9 +64,10 @@ export function HeaderMenuDesktop({ handleNavigation }: { handleNavigation: (url
         </NavigationMenuItem>
 
         <NavigationMenuItem>
-          <NavigationMenuLink asChild>
-            <Link href="#" className="font-rubik-500">Help</Link>
-          </NavigationMenuLink>
+          <NavigationMenuTrigger>Help</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <HelpLinks device="desktop" />
+          </NavigationMenuContent>
         </NavigationMenuItem>
 
       </NavigationMenuList>
@@ -77,7 +80,7 @@ export function HeaderMenuDesktop({ handleNavigation }: { handleNavigation: (url
 // --------------------- Main Header Mobile ---------------------
 export function HeaderMenuMobile({ handleNavigation }: { handleNavigation: (url: string) => void }) {
   return (
-    <div className="md:hidden">
+    <div>
       <Sheet>
         <SheetTrigger asChild>
           <button aria-label="Open menu">
@@ -109,7 +112,7 @@ export function HeaderMenuMobile({ handleNavigation }: { handleNavigation: (url:
             <AccordionItem value="item-3">
               <AccordionTrigger>Help</AccordionTrigger>
               <AccordionContent>
-                <p>Contact us</p>
+                <HelpLinks device="mobile" />
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -165,6 +168,71 @@ function DashboardLinks({ handleNavigation }: { handleNavigation: (url: string) 
           </div>
           <span className="font-rubik-500">{c.title}</span>
         </Button>
+      ))}
+    </nav>
+  );
+}
+
+
+
+// --------------------- Help Links ---------------------
+export function HelpLinks({
+  device,
+  ...props
+}: React.ComponentPropsWithoutRef<"li"> & { device: "desktop" | "mobile" }) {
+
+  // ---------------- Desktop Layout ----------------
+  if (device === "desktop") {
+    return (
+      <ul className="grid w-52 gap-2 grid-cols-1">
+        {ContactLinks.map(({ title, icon, href }) => (
+          <li key={title} {...props}>
+            <NavigationMenuLink asChild>
+              <Button
+                asChild
+                variant="ghost"
+                className="flex py-7 cursor-pointer w-full flex-row items-center justify-start gap-3"
+              >
+                <Link href={href}>
+                  {icon && (
+                    <div className="min-w-10 min-h-10 flex items-center justify-center relative overflow-hidden rounded-sm bg-black/5 transition-colors duration-200">
+                      <Image
+                        src={icon}
+                        alt={`${title} icon`}
+                        width={48}
+                        height={48}
+                        className="object-contain absolute w-7 h-7"
+                      />
+                    </div>
+                  )}
+                  <div className="flex flex-col">
+                    <div className="text-sm font-medium text-left font-rubik-500 leading-none">
+                      {title}
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+            </NavigationMenuLink>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  // ---------------- Mobile Layout ----------------
+  return (
+    <nav className="p-2 flex flex-col gap-2">
+      {ContactLinks.map(({ title, icon, href }) => (
+        <Link
+          key={title}
+          href={href}
+          className="flex items-center justify-start gap-2 h-12 p-2 hover:bg-accent rounded"
+        >
+          <div className="bg-black/5 w-8 h-8 items-center justify-center flex rounded-sm">
+            <Image src={icon} width={24} height={24} alt={`${title} icon`} />
+          </div>
+          <span className="font-rubik-500">{title}</span>
+        </Link>
       ))}
     </nav>
   );

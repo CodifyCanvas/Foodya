@@ -11,6 +11,7 @@ import { Search } from "lucide-react"
 import { DataTableExport } from "./data-table-export"
 import { ExtendedColumnDef } from "@/types/columns.data-table"
 import { ScrollArea, ScrollBar } from "../ui/scroll-area"
+import { useSidebar } from "../ui/sidebar"
 
 interface DataTableProps<TData, TValue> {
   columns: ExtendedColumnDef<TData, TValue>[]
@@ -64,6 +65,7 @@ export function DataTable<TData, TValue>({
   );
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(defaultVisibility);
+  const { open } = useSidebar();
 
   // Determine which columns to apply global filtering, except "actions" column
   const effectiveFilterColumns =
@@ -142,7 +144,7 @@ export function DataTable<TData, TValue>({
 
       {/* Table */}
       <div className="border-y overflow-x-auto" id="table-to-print">
-        <ScrollArea className="w-[calc(100vw-1rem)] md:w-[calc(100vw-18rem)] overflow-x-auto">
+        <ScrollArea className={`w-[calc(100vw-1rem)] ${open ? 'md:w-[calc(100vw-19rem)]' : 'md:w-[calc(100vw-6rem)]'} overflow-x-auto`}>
           <Table className="min-w-full">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (

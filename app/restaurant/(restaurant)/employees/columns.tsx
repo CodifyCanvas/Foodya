@@ -34,7 +34,7 @@ export const columns = (): ExtendedColumnDef<EmployeeWithLatestRecord>[] => [
       <DataTableColumnHeader
         column={column}
         title="#"
-        className="ml-2 md:ml-5"
+        className="ml-2 justify-start"
         search
       />
     ),
@@ -47,7 +47,7 @@ export const columns = (): ExtendedColumnDef<EmployeeWithLatestRecord>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Name" />
+      <DataTableColumnHeader column={column} title="Name" className="justify-start" />
     ),
     cell: ({ row }) => {
       const { name, image } = row.original
@@ -69,10 +69,10 @@ export const columns = (): ExtendedColumnDef<EmployeeWithLatestRecord>[] => [
   {
     accessorKey: "CNIC",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="CNIC" />
+      <DataTableColumnHeader column={column} title="CNIC" className="justify-center" />
     ),
     cell: ({ row }) => (
-      <span className="capitalize">{row.original.CNIC}</span>
+      <div className="capitalize text-center">{row.original.CNIC}</div>
     ),
   },
 
@@ -91,15 +91,17 @@ export const columns = (): ExtendedColumnDef<EmployeeWithLatestRecord>[] => [
       const status = rawStatus?.toLowerCase() || "unknown"
 
       return (
-        <Badge
-          className={`rounded-full capitalize font-rubik-400 border-none min-w-16 focus-visible:outline-none focus-visible:ring-2 flex items-center justify-center focus-visible:ring-opacity-20 ${statusStyles[status]}`}
-        >
-          <span
-            className={`size-1.5 rounded-full inline-block ${dotColors[status]}`}
-            aria-hidden="true"
-          />
-          {status}
-        </Badge>
+        <div className="w-full flex justify-center">
+          <Badge
+            className={`rounded-full capitalize font-rubik-400 border-none min-w-16 focus-visible:outline-none focus-visible:ring-2 flex items-center justify-center focus-visible:ring-opacity-20 ${statusStyles[status]}`}
+          >
+            <span
+              className={`size-1.5 rounded-full inline-block ${dotColors[status]}`}
+              aria-hidden="true"
+            />
+            {status}
+          </Badge>
+        </div>
       )
     },
   },
@@ -108,10 +110,10 @@ export const columns = (): ExtendedColumnDef<EmployeeWithLatestRecord>[] => [
   {
     accessorKey: "designation",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Designation" />
+      <DataTableColumnHeader column={column} title="Designation" className="justify-center" />
     ),
     cell: ({ row }) => (
-      <span className="capitalize">{row.original.designation}</span>
+      <div className="capitalize text-center">{row.original.designation}</div>
     ),
   },
 
@@ -119,10 +121,10 @@ export const columns = (): ExtendedColumnDef<EmployeeWithLatestRecord>[] => [
   {
     accessorKey: "shift",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Shift" />
+      <DataTableColumnHeader column={column} title="Shift" className="justify-center" />
     ),
     cell: ({ row }) => (
-      <span className="capitalize">{row.original.shift}</span>
+      <div className="capitalize text-center">{row.original.shift}</div>
     ),
   },
 

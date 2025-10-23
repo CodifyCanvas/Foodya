@@ -24,7 +24,7 @@ const dotColors: Record<string, string> = {
 
 /* === Payroll Table Columns === */
 export const columns = (): ExtendedColumnDef<EmployeesSalaryGeneralDetails>[] => [
-  
+
   // === Id Column ===
   {
     accessorKey: "id",
@@ -32,7 +32,7 @@ export const columns = (): ExtendedColumnDef<EmployeesSalaryGeneralDetails>[] =>
       <DataTableColumnHeader
         column={column}
         title="#"
-        className="ml-2 md:ml-5"
+        className="ml-2 justify-start"
         search
       />
     ),
@@ -48,13 +48,14 @@ export const columns = (): ExtendedColumnDef<EmployeesSalaryGeneralDetails>[] =>
       <DataTableColumnHeader
         column={column}
         title="Employee"
+        className="justify-start"
       />
     ),
     cell: ({ row }) => (
-      <div className="capitalize">{row.original.employee}</div>
+      <div className="capitalize text-left">{row.original.employee}</div>
     ),
   },
-  
+
   // === Employee Designation Column ===
   {
     accessorKey: "designation",
@@ -62,132 +63,135 @@ export const columns = (): ExtendedColumnDef<EmployeesSalaryGeneralDetails>[] =>
       <DataTableColumnHeader
         column={column}
         title="Designation"
+        className="justify-center"
       />
     ),
     cell: ({ row }) => (
-      <div className="capitalize">{row.original.designation}</div>
+      <div className="capitalize text-center">{row.original.designation}</div>
     ),
   },
-  
+
   // === Employee Unpaid Months Column ===
-{
-  accessorKey: "unpaidMonths",
-  header: ({ column }) => (
-    <DataTableColumnHeader
-      column={column}
-      title="Unpaid Months"
-    />
-  ),
-  cell: ({ row }) => {
-    const months: string[] = row.original.unpaidMonths;
+  {
+    accessorKey: "unpaidMonths",
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title="Unpaid Months"
+        className="justify-center"
+      />
+    ),
+    cell: ({ row }) => {
+      const months: string[] = row.original.unpaidMonths;
 
-    // Format each "YYYY-MM" to "MMM yyyy"
-    const formattedMonths = months.map((ym) => {
-      const parsedDate = parse(ym, "yyyy-MM", new Date());
-      return format(parsedDate, "MMM yyyy");
-    });
+      // Format each "YYYY-MM" to "MMM yyyy"
+      const formattedMonths = months.map((ym) => {
+        const parsedDate = parse(ym, "yyyy-MM", new Date());
+        return format(parsedDate, "MMM yyyy");
+      });
 
-    const count = months.length;
-    const label = count === 0 ? "—" : `${count} Month${count > 1 ? "s" : ""}`;
+      const count = months.length;
+      const label = count === 0 ? "—" : `${count} Month${count > 1 ? "s" : ""}`;
 
-    return count > 0 ? (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="text-center cursor-default">
-            {label}
-          </div>
-        </TooltipTrigger>
-        <TooltipContent className="text-sm max-w-xs text-center">
-          {formattedMonths.join(", ")}
-        </TooltipContent>
-      </Tooltip>
-    ) : (
-      <div className="text-center">—</div>
-    );
+      return count > 0 ? (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="text-center cursor-default">
+              {label}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent className="text-sm max-w-xs text-center">
+            {formattedMonths.join(", ")}
+          </TooltipContent>
+        </Tooltip>
+      ) : (
+        <div className="text-center">—</div>
+      );
+    },
   },
-},
 
   // === Employee Current Salary Column ===
-{
-  accessorKey: "currentSalary",
-  header: ({ column }) => (
-    <DataTableColumnHeader column={column} title="Current Salary" />
-  ),
-  cell: ({ row }) => {
-    const value = row.original.currentSalary;
-    const tooltipText = value ? toCapitalizedWords(value) : null;
+  {
+    accessorKey: "currentSalary",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Current Salary" className="justify-center" />
+    ),
+    cell: ({ row }) => {
+      const value = row.original.currentSalary;
+      const tooltipText = value ? toCapitalizedWords(value) : null;
 
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="text-center cursor-default">
-            {value ?? "—"}
-          </div>
-        </TooltipTrigger>
-        {tooltipText && (
-          <TooltipContent className="text-sm max-w-xs text-center">
-            <p>{tooltipText}</p>
-          </TooltipContent>
-        )}
-      </Tooltip>
-    );
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="text-center cursor-default">
+              {value ? `${value} PKR` : "—"}
+            </div>
+          </TooltipTrigger>
+          {tooltipText && (
+            <TooltipContent className="text-sm max-w-xs text-center">
+              <p>{tooltipText}</p>
+            </TooltipContent>
+          )}
+        </Tooltip>
+      );
+    },
   },
-},
 
-// === Employee Previous Balance Column ===
-{
-  accessorKey: "prevBalance",
-  header: ({ column }) => (
-    <DataTableColumnHeader column={column} title="Previous Balance" />
-  ),
-  cell: ({ row }) => {
-    const value = row.original.prevBalance;
-    const tooltipText = value ? toCapitalizedWords(value) : null;
+  // === Employee Previous Balance Column ===
+  {
+    accessorKey: "prevBalance",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Previous Balance" className="justify-end" />
+    ),
+    cell: ({ row }) => {
+      const value = row.original.prevBalance;
+      const tooltipText = value ? toCapitalizedWords(value) : null;
 
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="text-center cursor-default">
-            {value ?? "—"}
-          </div>
-        </TooltipTrigger>
-        {tooltipText && (
-          <TooltipContent className="text-sm max-w-xs text-center">
-            <p>{tooltipText}</p>
-          </TooltipContent>
-        )}
-      </Tooltip>
-    );
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="text-center cursor-default">
+              {value ? `${value} PKR` : "—"}
+            </div>
+          </TooltipTrigger>
+          {tooltipText && (
+            <TooltipContent className="text-sm max-w-xs text-center">
+              <p>{tooltipText}</p>
+            </TooltipContent>
+          )}
+        </Tooltip>
+      );
+    },
   },
-},
 
   // === Salaries Paid Status Column ===
   {
-      accessorKey: "status",
-      header: ({ column }) => (
-        <DataTableColumnHeader
-          column={column}
-          title="Status"
-          filter={["paid", "pending"]}
-        />
-      ),
-      cell: ({ row }) => {
-        const rawStatus = row.original.status
-        const status = rawStatus?.toLowerCase() || "unknown"
-  
-        return (
-          <Badge
-            className={`rounded-full capitalize font-rubik-400 border-none min-w-16 focus-visible:outline-none focus-visible:ring-2 flex items-center justify-center focus-visible:ring-opacity-20 ${statusStyles[status]}`}
-          >
+    accessorKey: "status",
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title="Status"
+        className="justify-center"
+        filter={["paid", "pending"]}
+      />
+    ),
+    cell: ({ row }) => {
+      const rawStatus = row.original.status
+      const status = rawStatus?.toLowerCase() || "unknown"
+
+      return (
+        <div className="w-full flex justify-center">
+          <Badge className={`rounded-full capitalize font-rubik-400 border-none min-w-16 focus-visible:outline-none focus-visible:ring-2 flex items-center justify-center focus-visible:ring-opacity-20 ${statusStyles[status]}`}>
             <span
               className={`size-1.5 rounded-full inline-block ${dotColors[status]}`}
               aria-hidden="true"
             />
             {status}
           </Badge>
-        )
-      },
+        </div>
+      )
     },
+  },
 
   // === Actions Column ===
   {

@@ -7,10 +7,6 @@ import { Badge } from "@/components/ui/badge"
 import { RoleSelectInput, User } from "@/lib/definations"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-// ================================
-// Type Definitions
-// ================================
-
 // API response structure
 export interface UsersWithRolesResponse {
   users: User[];
@@ -20,13 +16,12 @@ export interface UsersWithRolesResponse {
 // ================================
 // Column Definitions
 // ================================
-
 export const columns = (props: { roles: RoleSelectInput[] }): ExtendedColumnDef<User>[] => [
   // === Index Column ===
   {
     accessorKey: "id",
     header: ({ column }) => (
-      <DataTableColumnHeader className="ml-2 md:ml-5" column={column} title="#" search />
+      <DataTableColumnHeader className="ml-2 justify-start" column={column} title="#" search />
     ),
     cell: ({ row }) => (
       <div className="pl-3 md:pl-5">{row.index + 1}</div> // Show row index starting at 1
@@ -37,9 +32,9 @@ export const columns = (props: { roles: RoleSelectInput[] }): ExtendedColumnDef<
   {
     accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Name" />
+      <DataTableColumnHeader column={column} title="Name" className="justify-start" />
     ),
-    cell: ({ row }) => <div className="capitalize flex flex-row gap-2 items-center">
+    cell: ({ row }) => <div className="capitalize flex flex-row gap-2  items-center">
       <Avatar>
         <AvatarImage src={row.original.image ?? undefined} alt={row.original.name} />
         <AvatarFallback className='text-xs'>{row.original?.name.charAt(0).toUpperCase()}</AvatarFallback>
@@ -53,7 +48,7 @@ export const columns = (props: { roles: RoleSelectInput[] }): ExtendedColumnDef<
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Email" />
     ),
-    cell: ({ row }) => <div>{row.original.email}</div>,
+    cell: ({ row }) => <div className="text-center">{row.original.email}</div>,
   },
 
   // === Role Column ===
@@ -62,7 +57,7 @@ export const columns = (props: { roles: RoleSelectInput[] }): ExtendedColumnDef<
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Role" filter={props.roles} />
     ),
-    cell: ({ row }) => <div className="capitalize">{row.original.role_name}</div>,
+    cell: ({ row }) => <div className="capitalize text-center">{row.original.role_name}</div>,
   },
 
   // === Status Column (Active/Inactive) ===
@@ -75,7 +70,7 @@ export const columns = (props: { roles: RoleSelectInput[] }): ExtendedColumnDef<
       const isActive = row.original.is_active;
 
       return (
-        <div className="font-rubik-400">
+        <div className="font-rubik-400 w-full flex flex-row justify-center items-center">
           {isActive ? (
             <Badge className="rounded-full font-rubik-400 border-none bg-green-600/10 text-green-600 dark:bg-green-400/10 dark:text-green-400 focus-visible:ring-green-600/20 dark:focus-visible:ring-green-400/40 focus-visible:outline-none [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5">
               <span className="size-1.5 rounded-full bg-green-600 dark:bg-green-400" aria-hidden="true" />

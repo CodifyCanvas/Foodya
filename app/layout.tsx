@@ -2,6 +2,8 @@
 import { Geist_Mono, Rubik } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import { logo } from "@/constants";
+import { Metadata } from "next";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -15,10 +17,14 @@ const rubik = Rubik({
   weight: ['300', '400', '500', '600', '700', '800', '900'],
 });
 
-export const metadata = {
-  title: 'Foodya',
-  description: 'Restaurant management web application',
-}
+export const metadata: Metadata = {
+  title: 'Foodya Restaurant POS System | Smart Restaurant Management Software',
+  description: 'Foodya is a powerful cloud-based restaurant POS system designed to simplify order management, billing, inventory tracking, and staff operations. Streamline your restaurant business with an all-in-one POS solution.',
+  icons: {
+    icon: `${logo.favicon}`,
+  },
+};
+
 
 export default function RootLayout({
   children,

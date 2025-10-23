@@ -9,14 +9,16 @@ import { Banknote, LayoutDashboard, ShieldCheck, Store, Users, Utensils } from "
  * Stores all app logos used throughout the UI.
  */
 export const logo = {
-  main: '/Foodya-logo-transparent.png'
+  favicon: '/Foodya-favicon-transparent.png',
+  main: '/Foodya-logo.png'
 }
 
 
 
 export const appConfigurations = {
   loginURL: '/restaurant/dashboard',  // <- redirect here after successful login
-  logoutURL: '/login'                  // <- redirect here after logout
+  logoutURL: '/login',                  // <- redirect here after logout
+  SideBarIconURL: '/restaurant/dashboard'                  // <- redirect here after click on sidebar main logo
 };
 
 
@@ -147,4 +149,17 @@ export const HeaderMenuCards = [
   { title: "Expenses", icon: Icons.expenses, href: "/restaurant/expenses", description: "Track Spending" },
   { title: "Incomes", icon: Icons.incomes, href: "/restaurant/incomes", description: "View Earnings" },
   { title: "Reports", icon: Icons.reports, href: "/restaurant/reports", description: "Insights & Stats" },
+];
+
+
+
+/**
+ * === Help Links ===
+ * 
+ * Used in header dropdowns (help) or login page contact us.
+ */
+export const HelpLinks = [
+  { title: "Gmail", icon: Icons.gmail, href: "https://mail.google.com/mail/?view=cm&fs=1&to=shahzaibawan1357@gmail.com" },
+  { title: "Whatsapp", icon: Icons.whatsapp, href: "https://web.whatsapp.com/send?phone=+923118480102" },
+  { title: "Github", icon: Icons.github, href: "https://github.com/CodifyCanvas" },
 ];

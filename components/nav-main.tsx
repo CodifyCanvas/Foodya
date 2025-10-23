@@ -164,7 +164,7 @@ export function NavMain() {
                             >
                               {subItem.title}
                             </span>
-                            <ShortcutHint shortcuts={subItem.shortcuts} />
+                            <ShortcutHint shortcuts={subItem.shortcuts} active={isActivePath} />
                           </p>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
@@ -181,18 +181,16 @@ export function NavMain() {
 }
 
 
-function ShortcutHint({ shortcuts }: { shortcuts?: string[] }) {
+function ShortcutHint({ shortcuts, active = false }: { shortcuts?: string[], active?: boolean }) {
   if (!shortcuts?.length) return null;
 
   return (
-    <KbdGroup>
+    <KbdGroup >
       {shortcuts.map((key, index) => (
         <React.Fragment key={index}>
-          <Kbd className="text-xs">{key}</Kbd>
+          <Kbd className={`text-[0.70rem] ${active ? 'bg-emerald-200 text-black' : ''}`}>{key}</Kbd>
           {index < shortcuts.length - 1 && (
-            <span className="px-0.5 text-xs text-gray-800 dark:text-white">
-              +
-            </span>
+            <span className={`px-0.5 text-xs text-black ${active ? 'text-white' : ''} `}>+</span>
           )}
         </React.Fragment>
       ))}

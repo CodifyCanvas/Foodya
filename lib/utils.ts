@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import {format, parse } from 'date-fns'
+import { format, parse } from 'date-fns'
 import numWords from "num-words";
 
 
@@ -31,7 +31,7 @@ export function mapToLabelValue<
   L extends keyof T,
   V extends keyof T,
   B extends keyof T | undefined = undefined
->( data: T[], keys: { label: L; value: V; badge?: B; }): { label: string; value: string; badge?: string | null }[] {
+>(data: T[], keys: { label: L; value: V; badge?: B; }): { label: string; value: string; badge?: string | null }[] {
 
   return data.map((item) => {
     const mappedItem: { label: string; value: string; badge?: string | null } = {
@@ -177,3 +177,22 @@ export function getCurrentMonthValue(): string {
   const month = String(now.getMonth() + 1).padStart(2, "0")
   return `${year}-${month}` // Format: "YYYY-MM"
 }
+
+
+
+/**
+ * Truncates a given text string to a specified maximum length and appends an ellipsis ("...") if it exceeds that length.
+ *
+ * @param {string} [text=""] - The input text to be truncated.
+ * @param {number} [maxLength=30] - The maximum allowed length of the text before truncation.
+ * @returns {string} The truncated text with an ellipsis if it was longer than the specified max length,
+ * or the original text if it's within the limit.
+ *
+ * @example
+ * truncateText("Hello world, this is a long sentence.", 15);
+ * Returns: "Hello world, thi..."
+ */
+export const truncateText = (text: string = "", maxLength: number = 30): string => {
+  if (!text) return "";
+  return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+};

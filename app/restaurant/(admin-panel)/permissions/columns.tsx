@@ -7,7 +7,7 @@ import { Role } from "@/lib/definations"
 
 /* === Table Columns for Roles === */
 export const columns = ({ refetchPermissions }: { refetchPermissions: () => void; }): ExtendedColumnDef<Role>[] => [
-  
+
   // === Id Column ===
   {
     accessorKey: "id",
@@ -15,12 +15,12 @@ export const columns = ({ refetchPermissions }: { refetchPermissions: () => void
       <DataTableColumnHeader
         column={column}
         title="#"
-        className="ml-2 md:ml-5"
+        className="ml-2 justify-start"
         search
       />
     ),
     cell: ({ row }) => (
-      <div className="pl-3 md:pl-5">{row.index + 1}</div>
+      <div className="pl-3 md:pl-5 text-left">{row.index + 1}</div>
     ),
   },
 
@@ -31,10 +31,11 @@ export const columns = ({ refetchPermissions }: { refetchPermissions: () => void
       <DataTableColumnHeader
         column={column}
         title="role"
+        className="justify-start"
       />
     ),
     cell: ({ row }) => (
-      <div className="capitalize">{row.original.role}</div>
+      <div className="capitalize text-left">{row.original.role}</div>
     ),
   },
 

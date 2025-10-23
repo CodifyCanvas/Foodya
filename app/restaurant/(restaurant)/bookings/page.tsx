@@ -7,7 +7,7 @@ import { DataTable } from '@/components/DataTable/data-table';
 import { columns } from './columns';
 import { CreateForm } from './table-actions';
 import { useModulePermission } from '@/hooks/useModulePermission';
-import AccessDenied from '@/app/errors/access-control-view/access-denied';
+import AccessDenied from '@/app/errors/403/page';
 import { BookingsWithTablesInterface } from '@/lib/definations';
 import ServiceUnavailable from '@/app/errors/service-unavailable';
 

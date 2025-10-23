@@ -17,7 +17,7 @@ export const columns = (props: { categories: TablesSelectInput[] }): ExtendedCol
       <DataTableColumnHeader
         column={column}
         title="TID"
-        className="ml-2 md:ml-5"
+        className="ml-2 justify-start"
         search
       />
     ),
@@ -30,10 +30,11 @@ export const columns = (props: { categories: TablesSelectInput[] }): ExtendedCol
   {
     accessorKey: "title",
     header: ({ column }) => (
-      
+
       <DataTableColumnHeader
         column={column}
         title="Title"
+        className="justify-start"
         search
       />
     ),
@@ -48,10 +49,11 @@ export const columns = (props: { categories: TablesSelectInput[] }): ExtendedCol
         column={column}
         title="Category"
         filter={props.categories}
+        className="justify-center"
       />
     ),
     cell: ({ row }) => (
-      <div className="capitalize">{row.original.category}</div>
+      <div className="capitalize text-center">{row.original.category}</div>
     ),
   },
 
@@ -62,10 +64,11 @@ export const columns = (props: { categories: TablesSelectInput[] }): ExtendedCol
       <DataTableColumnHeader
         column={column}
         title="Amount"
+        className="justify-end"
       />
     ),
     cell: ({ row }) => (
-      <div className="capitalize">{row.original.amount}</div>
+      <div className="capitalize text-right">{row.original.amount} PKR</div>
     ),
   },
 
@@ -76,10 +79,11 @@ export const columns = (props: { categories: TablesSelectInput[] }): ExtendedCol
       <DataTableColumnHeader
         column={column}
         title="Date"
+        className="justify-center"
       />
     ),
     cell: ({ row }) => (
-      <div className="capitalize">{formatDateWithFns(row.original.createdAt, { showTime: true })}</div>
+      <div className="capitalize text-center">{formatDateWithFns(row.original.createdAt, { showTime: true })}</div>
     ),
     meta: {
       title: 'Date'

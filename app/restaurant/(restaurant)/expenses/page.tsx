@@ -7,7 +7,7 @@ import { DataTable } from '@/components/DataTable/data-table';
 import { columns } from './columns';
 import { CreateForm } from './table-actions';
 import { useModulePermission } from '@/hooks/useModulePermission';
-import AccessDenied from '@/app/errors/access-control-view/access-denied';
+import AccessDenied from '@/app/errors/403/page';
 import { TransactionsTablesInterface, TablesSelectInput } from '@/lib/definations';
 import ServiceUnavailable from '@/app/errors/service-unavailable';
 
@@ -39,7 +39,7 @@ const ExpensePage = () => {
   if (!canView) {
     return <AccessDenied />;
   }
-  
+
   if (error) {
     console.error(error);
     return <ServiceUnavailable title='Service Unavailable' description='Please try again later or check your connection.' />;
@@ -49,16 +49,16 @@ const ExpensePage = () => {
     <div className="bg-white rounded-lg min-h-[50vh] flex flex-col">
       {/* Page Header */}
       <h3 className="text-3xl font-medium text-start px-4 pt-3 text-emerald-600">
-        Expenses 
+        Expenses
       </h3>
 
-        <DataTable
-          columns={columns({categories: data?.categories ?? [] })}
-          data={data?.transactions ?? []}
-          filterColumns={[]}
-          createComponent={<CreateForm props={{ categories: data?.categories ?? [] }} />}
-          loading={isLoading}
-        />
+      <DataTable
+        columns={columns({ categories: data?.categories ?? [] })}
+        data={data?.transactions ?? []}
+        filterColumns={[]}
+        createComponent={<CreateForm props={{ categories: data?.categories ?? [] }} />}
+        loading={isLoading}
+      />
     </div>
   );
 };

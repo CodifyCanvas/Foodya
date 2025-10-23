@@ -7,7 +7,7 @@ import { Role } from "@/lib/definations"
 
 /* === Table Columns for Roles === */
 export const columns = (): ExtendedColumnDef<Role>[] => [
-  
+
   // === Id Column ===
   {
     accessorKey: "id",
@@ -15,7 +15,7 @@ export const columns = (): ExtendedColumnDef<Role>[] => [
       <DataTableColumnHeader
         column={column}
         title="#"
-        className="ml-2 md:ml-5"
+        className="ml-2 justify-start"
         search
       />
     ),
@@ -31,10 +31,11 @@ export const columns = (): ExtendedColumnDef<Role>[] => [
       <DataTableColumnHeader
         column={column}
         title="role"
+        className="justify-start"
       />
     ),
     cell: ({ row }) => (
-      <div className="capitalize">{row.original.role}</div>
+      <div className="capitalize text-left">{row.original.role}</div>
     ),
   },
 

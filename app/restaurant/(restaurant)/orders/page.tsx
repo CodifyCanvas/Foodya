@@ -3,7 +3,7 @@
 import useSWR from 'swr';
 import { Loader } from 'lucide-react';
 import { useModulePermission } from '@/hooks/useModulePermission';
-import AccessDenied from '@/app/errors/access-control-view/access-denied';
+import AccessDenied from '@/app/errors/403/page';
 import { MenuCategories, RestaurantTablesInterface } from '@/lib/definations';
 import { useEffect } from 'react';
 import { useSidebar } from '@/components/ui/sidebar';
@@ -45,20 +45,20 @@ const OrdersPage = () => {
 
   return (
     <OrderCartProvider>
-    <div className="bg-transparent rounded-lg min-h-[50vh] flex w-full flex-1 flex-col gap-2">
-      <div className='flex flex-col md:flex-row gap-2'>
+      <div className="bg-transparent rounded-lg min-h-[50vh] flex w-full flex-1 flex-col gap-2">
+        <div className='flex flex-col md:flex-row gap-2'>
 
-        <div className='bg-white w-full h-16 rounded-lg flex items-center justify-center md:justify-end gap-2 px-2'>
-          <OrderCategoryTags categories={categories ?? []} />
+          <div className='bg-white w-full h-16 rounded-lg flex items-center justify-center md:justify-end gap-2 px-2'>
+            <OrderCategoryTags categories={categories ?? []} />
+          </div>
         </div>
-      </div>
 
-      <div className='w-full min-h-full flex flex-1 flex-col-reverse lg:flex-row gap-2'>
-        <div className='w-full lg:w-2/3 min-h-96 rounded-lg p-1'><MenuCardsContainer /></div>
-        <div className='w-full lg:w-1/3 min-w-80 min-h-96 h-fit rounded-lg bg-white p-1'><OrderItemsContainer restaurantTables={tables ?? []} /></div>
-      </div>
+        <div className='w-full min-h-full flex flex-1 flex-col-reverse lg:flex-row gap-2'>
+          <div className='w-full lg:w-2/3 min-h-96 rounded-lg p-1'><MenuCardsContainer /></div>
+          <div className='w-full lg:w-1/3 min-w-80 min-h-96 h-fit rounded-lg bg-white p-1'><OrderItemsContainer restaurantTables={tables ?? []} /></div>
+        </div>
 
-    </div>
+      </div>
     </OrderCartProvider>
   );
 };

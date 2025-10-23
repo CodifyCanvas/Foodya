@@ -4,10 +4,11 @@ import { DataTableColumnHeader } from "@/components/DataTable/data-table-column-
 import { RowActions } from "./table-actions"
 import { ExtendedColumnDef } from "@/types/columns.data-table"
 import { MenuCategories } from "@/lib/definations"
+import { truncateText } from "@/lib/utils"
 
 /* === Table Columns for Menu Categories === */
 export const columns = (): ExtendedColumnDef<MenuCategories>[] => [
-  
+
   // === Id Column ===
   {
     accessorKey: "id",
@@ -15,12 +16,12 @@ export const columns = (): ExtendedColumnDef<MenuCategories>[] => [
       <DataTableColumnHeader
         column={column}
         title="#"
-        className="ml-2 md:ml-5"
+        className="ml-2 justify-start"
         search
       />
     ),
     cell: ({ row }) => (
-      <div className="pl-3 md:pl-5">{row.index + 1}</div>
+      <div className="pl-3 md:pl-5 justify-start">{row.index + 1}</div>
     ),
   },
 
@@ -31,10 +32,11 @@ export const columns = (): ExtendedColumnDef<MenuCategories>[] => [
       <DataTableColumnHeader
         column={column}
         title="Category"
+        className="justify-start"
       />
     ),
     cell: ({ row }) => (
-      <div>{row.original.name}</div>
+      <div className="capitalize justify-start">{row.original.name}</div>
     ),
   },
 
@@ -42,15 +44,12 @@ export const columns = (): ExtendedColumnDef<MenuCategories>[] => [
   {
     accessorKey: "description",
     header: () => (
-      <div>Description</div>
+      <div className="w-full text-left">Description</div>
     ),
     cell: ({ row }) => {
-  const description = row.original.description;
-  const truncated = description.length > 30 
-    ? `${description.slice(0, 30)}...` 
-    : description;
-  return <div>{truncated}</div>;
-},
+      const description = row.original.description;
+      return <div title={description} className="w-full text-start">{truncateText(description, 30)}</div>;
+    },
   },
 
   // === Actions Column ===

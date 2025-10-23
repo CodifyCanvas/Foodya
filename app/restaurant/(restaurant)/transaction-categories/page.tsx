@@ -7,7 +7,7 @@ import { DataTable } from '@/components/DataTable/data-table';
 import { columns } from './columns';
 import { CreateForm } from './table-actions';
 import { useModulePermission } from '@/hooks/useModulePermission';
-import AccessDenied from '@/app/errors/access-control-view/access-denied';
+import AccessDenied from '@/app/errors/403/page';
 import { TransactionCategoriesTablesInterface } from '@/lib/definations';
 import ServiceUnavailable from '@/app/errors/service-unavailable';
 
@@ -34,7 +34,7 @@ const TransactionsCategoriesPage = () => {
   if (!canView) {
     return <AccessDenied />;
   }
-  
+
   if (error) {
     console.error(error);
     return <ServiceUnavailable title='Service Unavailable' description='Please try again later or check your connection.' />;
@@ -47,13 +47,13 @@ const TransactionsCategoriesPage = () => {
         Transaction Categories
       </h3>
 
-        <DataTable
-          columns={columns()}
-          data={modules ?? []}
-          filterColumns={['category', 'description']}
-          createComponent={<CreateForm />}
-          loading={isLoading}
-        />
+      <DataTable
+        columns={columns()}
+        data={modules ?? []}
+        filterColumns={['category', 'description']}
+        createComponent={<CreateForm />}
+        loading={isLoading}
+      />
     </div>
   );
 };

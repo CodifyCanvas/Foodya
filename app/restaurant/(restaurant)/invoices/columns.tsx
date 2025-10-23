@@ -5,6 +5,7 @@ import { RowActions } from "./table-actions"
 import { ExtendedColumnDef } from "@/types/columns.data-table"
 import { InvoiceDetail, ItemWithOptions, TablesSelectInput } from "@/lib/definations"
 import { Badge } from "@/components/ui/badge"
+import { truncateText } from "@/lib/utils"
 
 /* === Table Columns for Invoices === */
 export const columns = (props: { menuItems: ItemWithOptions[], tables: TablesSelectInput[] }): ExtendedColumnDef<InvoiceDetail>[] => [
@@ -16,7 +17,7 @@ export const columns = (props: { menuItems: ItemWithOptions[], tables: TablesSel
       <DataTableColumnHeader
         column={column}
         title="#"
-        className="ml-2 md:ml-5"
+        className="ml-2 justify-start"
         search
       />
     ),
@@ -35,6 +36,7 @@ export const columns = (props: { menuItems: ItemWithOptions[], tables: TablesSel
       <DataTableColumnHeader
         column={column}
         title="Customer Name"
+        className="justify-start"
       />
     ),
     meta: {
@@ -42,10 +44,7 @@ export const columns = (props: { menuItems: ItemWithOptions[], tables: TablesSel
     },
     cell: ({ row }) => {
       const customerName = row.original.customerName;
-      const truncated = customerName.length > 30
-        ? `${customerName.slice(0, 30)}...`
-        : customerName;
-      return <div className="capitalize">{truncated}</div>
+      return <div className="capitalize w-full text-start" title={customerName}>{truncateText(customerName)}</div>
     },
   },
 
@@ -56,7 +55,7 @@ export const columns = (props: { menuItems: ItemWithOptions[], tables: TablesSel
       <DataTableColumnHeader
         column={column}
         title="Order Id"
-        className="ml-2 md:ml-5"
+        className="ml-2 md:ml-5 justify-center"
         search
       />
     ),
@@ -65,7 +64,7 @@ export const columns = (props: { menuItems: ItemWithOptions[], tables: TablesSel
       title: 'Order ID'
     },
     cell: ({ row }) => (
-      <div className="pl-3 md:pl-5">{String(row.original.orderId).padStart(4, '0')}</div>
+      <div className="pl-3 md:pl-5 w-full text-center">{String(row.original.orderId).padStart(4, '0')}</div>
     ),
   },
 
@@ -73,7 +72,7 @@ export const columns = (props: { menuItems: ItemWithOptions[], tables: TablesSel
   {
     accessorKey: "paymentMethod",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Payment" filter={['cash', 'card', 'online', 'unpaid']} />
+      <DataTableColumnHeader column={column} title="Payment" filter={['cash', 'card', 'online', 'unpaid']} className="justify-center" />
     ),
     meta: {
       title: 'Payment Method'
@@ -101,13 +100,15 @@ export const columns = (props: { menuItems: ItemWithOptions[], tables: TablesSel
       [a&]:hover:bg-opacity-20 dark:[a&]:hover:bg-opacity-20`;
 
       return (
-        <Badge className={badgeClass}>
-          <span
-            className={`size-1.5 rounded-full inline-block ${dotColors[status]}`}
-            aria-hidden="true"
-          />
-          {status}
-        </Badge>
+        <div className="w-full justify-center flex">
+          <Badge className={badgeClass}>
+            <span
+              className={`size-1.5 rounded-full inline-block ${dotColors[status]}`}
+              aria-hidden="true"
+            />
+            {status}
+          </Badge>
+        </div>
       );
     },
   },
@@ -119,7 +120,7 @@ export const columns = (props: { menuItems: ItemWithOptions[], tables: TablesSel
       <DataTableColumnHeader
         column={column}
         title="Total Amount"
-        className="ml-2 md:ml-5"
+        className="ml-2 md:ml-5 justify-end"
         search
       />
     ),
@@ -127,7 +128,7 @@ export const columns = (props: { menuItems: ItemWithOptions[], tables: TablesSel
       title: 'Total amount'
     },
     cell: ({ row }) => (
-      <div className="pl-3 md:pl-5">{row.original.totalAmount}</div>
+      <div className="pl-3 md:pl-5 w-full text-right">{row.original.totalAmount} PKR</div>
     ),
   },
 

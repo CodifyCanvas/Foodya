@@ -7,7 +7,7 @@ import { ModuleInterface } from "@/lib/definations"
 
 /* === Table Columns for Roles === */
 export const columns = (): ExtendedColumnDef<ModuleInterface>[] => [
-  
+
   // === Id Column ===
   {
     accessorKey: "id",
@@ -15,7 +15,7 @@ export const columns = (): ExtendedColumnDef<ModuleInterface>[] => [
       <DataTableColumnHeader
         column={column}
         title="#"
-        className="ml-2 md:ml-5"
+        className="ml-2 justify-start"
         search
       />
     ),
@@ -31,13 +31,14 @@ export const columns = (): ExtendedColumnDef<ModuleInterface>[] => [
       <DataTableColumnHeader
         column={column}
         title="Label"
+        className="justify-start"
       />
     ),
     cell: ({ row }) => (
-      <div className="capitalize">{row.original.label}</div>
+      <div className="capitalize text-left">{row.original.label}</div>
     ),
   },
-  
+
   // === Role Column ===
   {
     accessorKey: "name",
@@ -45,10 +46,11 @@ export const columns = (): ExtendedColumnDef<ModuleInterface>[] => [
       <DataTableColumnHeader
         column={column}
         title="page"
+        className="justify-center"
       />
     ),
     cell: ({ row }) => (
-      <div className="capitalize">{row.original.name}</div>
+      <div className="capitalize text-center">{row.original.name}</div>
     ),
   },
 
