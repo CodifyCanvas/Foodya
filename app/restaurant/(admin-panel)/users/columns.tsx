@@ -36,8 +36,8 @@ export const columns = (props: { roles: RoleSelectInput[] }): ExtendedColumnDef<
     ),
     cell: ({ row }) => <div className="capitalize flex flex-row gap-2  items-center">
       <Avatar>
-        <AvatarImage src={row.original.image ?? undefined} alt={row.original.name} />
-        <AvatarFallback className='text-xs'>{row.original?.name.charAt(0).toUpperCase()}</AvatarFallback>
+        <AvatarImage src={row.original.image ?? undefined} loading="lazy" alt={row.original.name} />
+        <AvatarFallback>{row.original?.name.charAt(0).toUpperCase()}</AvatarFallback>
       </Avatar>
       {row.original.name}</div>,
   },

@@ -114,7 +114,7 @@ export const orderItemsTable = mysqlTable('order_items_table', {
   orderId: int('order_id').references(() => ordersTable.id, { onDelete: 'cascade' }).notNull(),
   menuItemId: int('menu_item_id').references(() => menuItems.id, { onDelete: 'set null' }),
   menuItemName: varchar('menu_item_name', { length: 255 }).notNull(),
-  menuItemOptionId: int('menu_item_option_id').references(() => menuItemOptions.id),
+  menuItemOptionId: int('menu_item_option_id').references(() => menuItemOptions.id, { onDelete: 'set null' }),
   menuItemOptionName: varchar('menu_item_option_name', { length: 255 }),
   quantity: int('quantity').notNull().default(1),
   price: decimal('price', { precision: 10, scale: 2 }).notNull(),

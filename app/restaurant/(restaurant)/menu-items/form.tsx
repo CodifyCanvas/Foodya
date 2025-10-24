@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -33,8 +33,8 @@ import { refreshData } from "@/lib/swr"
 import { ItemWithOptions } from "@/lib/definations"
 import { ComboboxInput } from "@/components/ui/combobox-input"
 import SwitchInput from "@/components/ui/switch-input"
-import { Plus, Trash2 } from "lucide-react"
-import Image from "next/image"
+import { Loader, Plus, Trash2 } from "lucide-react"
+import { ImagePicker } from "@/components/custom/inputs/image-picker"
 
 /* === Props Interface === */
 interface FormDialogProps {
@@ -58,7 +58,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
     resolver: zodResolver(menuItemFormSchema),
     defaultValues: {
       id: 0,
-      image: undefined as unknown as File,
+      image: null,
       item: "",
       description: "",
       category_id: "",
@@ -93,34 +93,26 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
     }
   }, [data, manualReset, form])
 
-  const selectedFile = form.watch("image");
-
-  // 👇 File preview URL
-  const previewUrl = useMemo(() => {
-    if (selectedFile instanceof File) {
-      return URL.createObjectURL(selectedFile);
-    }
-    return null;
-  }, [selectedFile]);
-
   /* === Submit Handler === */
   async function onSubmit(formValues: z.infer<typeof menuItemFormSchema>) {
     const API_URL = "/api/menu-items";
     const isEditing = !!data?.id;
 
+    {/* === Prepare FormData === */ }
     const formData = new FormData();
-
-    // Destructure image out
     const { image, ...rest } = formValues;
 
-    // Send Zod values (without image) as JSON string
+    {/* === Send Zod values (without image) as JSON string === */ }
     formData.append("data", JSON.stringify(rest));
 
-    // Add image file if available
+    {/* === Handle image === */ }
     if (image instanceof File) {
-      formData.append("image", image);
+      formData.append("image", image);  // <- New file uploaded
+    } else if (image === null) {
+      formData.append("image", ""); // <- Signal to remove existing image
     }
 
+    {/* === Request options for fetch === */ }
     const requestOptions = {
       method: isEditing ? "PUT" : "POST",
       body: formData,
@@ -129,31 +121,35 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
     try {
       setSubmitButtonLoading(true)
 
+      {/* === Send request === */ }
       const response = await fetch(API_URL, requestOptions)
       const result = await response.json()
 
-      {/* === Show warning toast for duplicate/409 error === */ }
+      {/* === Handle duplicate (409) errors === */ }
       if (result.status === 409) {
-        toast.error(result?.message ?? "Duplicate value found.");
+        toast.error(result?.error ?? "Duplicate value found.");
         return;
       }
 
+      {/* === Handle other errors === */ }
       if (!response.ok) {
-        toast.error(result?.message ?? (isEditing
+        toast.error(result?.error ?? (isEditing
           ? "Category can't be updated. Please try again."
           : "Category can't be created. Please try again."))
         return
       }
 
+      {/* === Success toast === */ }
       toast.success(result?.message ?? (isEditing
         ? "Category updated successfully."
         : "New Category created successfully."))
 
-      // Reset form only after successful create
+      {/* === Reset form only on create === */ }
       if (!isEditing) {
         form.reset()
       }
 
+      {/* === Refresh data and close modal === */ }
       refreshData(API_URL)
       onOpenChange(false)
     } catch (error) {
@@ -183,7 +179,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="p-0" variant="full-screen">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="h-[calc(100vh-1rem)] grid grid-rows-[auto_1fr_auto]">
 
             {/* === Dialog Header === */}
             <DialogHeader className="p-6 pb-0">
@@ -194,46 +190,54 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
             </DialogHeader>
 
             {/* === Scrollable Form Area === */}
-            <ScrollArea className="flex flex-col max-h-[75vh] justify-between overflow-hidden p-3">
+            <ScrollArea className="flex flex-col min-h-[50vh] max-w-[100vw-2rem] justify-between p-3">
 
-              <div className="flex flex-col md:flex-row w-full">
-                <div className=" w-fit">
-                  <div className="flex justify-start">
-                    {previewUrl ? (
-                      <div className="relative w-40 h-40 rounded-lg outline outline-gray-300 dark:outline-gray-600 overflow-hidden">
-                        <Image src={previewUrl} alt="New preview" fill style={{ objectFit: "cover" }} priority />
-                      </div>
-                    ) : data?.image ? (
-                      <div className="relative w-40 h-40 rounded-lg outline outline-gray-300 dark:outline-gray-600 overflow-hidden">
-                        <Image src={data.image} alt="Current profile" fill style={{ objectFit: "cover" }} priority />
-                      </div>
-                    ) : (
-                      <div className="w-40 h-40 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400 dark:text-gray-600">
-                        No Image
-                      </div>
+              <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr] items-center gap-2 grid-rows-1 w-full">
+                {/* === Item Image Field === */}
+                <div className="w-full justify-center flex py-2">
+                  <FormField
+                    control={form.control}
+                    name="image"
+                    render={() => (
+                      <FormItem className="group relative w-auto sm:max-w-sm m-1">
+                        <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                          Item Image
+                        </FormLabel>
+                        <FormControl>
+                          <ImagePicker
+                            control={form.control}
+                            name="image"
+                            allowedTypes={["png", "jpg", "jpeg", "webp"]}
+                            currentImageUrl={data?.image ?? undefined} // <- optional existing image
+                            className="rounded-lg size-30 sm:size-40"
+                            imageClassName="rounded-lg"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
-                  </div>
+                  />
+                </div>
 
-                  {/* === Item Image Field === */}
+                <div className=" w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3  items-end ">
+
+
+                  {/* === Item Name Field === */}
                   <div className="w-full py-2">
                     <FormField
                       control={form.control}
-                      name="image"
+                      name="item"
                       render={({ field }) => (
                         <FormItem className="group relative w-auto sm:max-w-sm m-1">
                           <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
-                            Image
+                            Item Name
                           </FormLabel>
                           <FormControl>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              id="image-select-field"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0] ?? null;
-                                field.onChange(file);
-                              }}
-                              className="cursor-pointer text-neutral-700 h-10 w-full bg-white/5 backdrop-blur-xl rounded-lg content-center px-3"
+                            <Input
+                              type="text"
+                              placeholder="e.g. Cheeseburger"
+                              {...field}
+                              className="h-10"
                             />
                           </FormControl>
                           <FormMessage />
@@ -241,132 +245,101 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
                       )}
                     />
                   </div>
-                </div>
 
-                <div className=" w-full flex flex-col justify-evenly">
-                  <div className="flex flex-col sm:flex-row justify-between">
+                  {/* === Category Select Field === */}
+                  <div className="w-full py-2">
+                    <FormField
+                      control={form.control}
+                      name="category_id"
+                      render={({ field }) => (
+                        <FormItem className="group relative w-auto sm:max-w-sm m-1">
+                          <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                            Category
+                          </FormLabel>
+                          <FormControl>
+                            <ComboboxInput
+                              {...field}
+                              value={field.value ?? ""}
+                              onSelect={field.onChange}
+                              options={categories}
+                              placeholder="Select a category"
+                              className="font-rubik-400 h-10 cursor-pointer"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-                    {/* === Item Name Field === */}
-                    <div className="w-full py-2">
-                      <FormField
-                        control={form.control}
-                        name="item"
-                        render={({ field }) => (
-                          <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                            <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
-                              Item Name
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                type="text"
-                                placeholder="e.g. Cheeseburger"
-                                {...field}
-                                className="h-10"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    {/* === Category Select Field === */}
-                    <div className="w-full py-2">
-                      <FormField
-                        control={form.control}
-                        name="category_id"
-                        render={({ field }) => (
-                          <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                            <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
-                              Category
-                            </FormLabel>
-                            <FormControl>
-                              <ComboboxInput
-                                {...field}
-                                value={field.value ?? ""}
-                                onSelect={field.onChange}
-                                options={categories}
-                                placeholder="Select a category"
-                                className="font-rubik-400 cursor-pointer"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    {/* === General Price Field === */}
-                    <div className="w-full py-2">
-                      <FormField
-                        control={form.control}
-                        name="price"
-                        render={({ field }) => (
-                          <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                            <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
-                              Price
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                {...field}
-                                className="h-10 hide-spinner"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
+                  {/* === General Price Field === */}
+                  <div className="w-full py-2">
+                    <FormField
+                      control={form.control}
+                      name="price"
+                      render={({ field }) => (
+                        <FormItem className="group relative w-auto sm:max-w-sm m-1">
+                          <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                            Price
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              {...field}
+                              className="h-10 hide-spinner"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
 
                   {/* === Description Field === */}
-                  <div className="flex flex-col sm:flex-row">
-                    <div className="w-full py-2">
-                      <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-                          <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                            <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
-                              Description
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                type="text"
-                                {...field}
-                                className="h-10"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    {/* === Available Switch Field === */}
-                    <div className="w-full py-2">
-                      <FormField
-                        control={form.control}
-                        name="is_available"
-                        render={({ field }) => (
-                          <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                            <FormLabel className="text-xs px-4">Available</FormLabel>
-                            <FormControl>
-                              <SwitchInput
-                                {...field}
-                                value={!!field.value}
-                                onChange={(checked: boolean) => field.onChange(checked)}
-                                className="px-2"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                  <div className="w-full py-2">
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem className="group relative w-auto sm:max-w-sm m-1">
+                          <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                            Description
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="text"
+                              {...field}
+                              className="h-10"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
+
+                  {/* === Available Switch Field === */}
+                  <div className="w-full py-2">
+                    <FormField
+                      control={form.control}
+                      name="is_available"
+                      render={({ field }) => (
+                        <FormItem className="group relative w-auto sm:max-w-sm m-1">
+                          <FormLabel className="text-xs px-4">Available</FormLabel>
+                          <FormControl>
+                            <SwitchInput
+                              {...field}
+                              value={!!field.value}
+                              onChange={(checked: boolean) => field.onChange(checked)}
+                              className="px-2"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
 
                 </div>
               </div>
@@ -437,18 +410,28 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
             </ScrollArea>
 
             {/* === Dialog Footer Buttons === */}
-            <DialogFooter className="p-6  flex flex-row justify-end pt-0 w-full fixed bottom-0 right-0">
+            <DialogFooter className="p-6 pt-0 flex flex-col gap-3 w-full">
+              {/* === Submit Button === */}
+              <Button type="submit" className="w-full sm:w-32" disabled={submitButtonLoading} variant="green" >
+                {submitButtonLoading ? (
+                  <p className="flex flex-row gap-2">
+                    <Loader className="animate-spin duration-300" /> {data ? "Updating" : "Creating"}
+                  </p>
+                ) : data ? "Update" : "Create"}
+              </Button>
 
-              {/* === Cancel Form to and Close the Dialog Button === */}
-              <DialogClose asChild>
-                <Button className="w-24" variant="outline">Cancel</Button>
-              </DialogClose>
+              {/* === Reset + Cancel Buttons === */}
+              <div className="flex w-full gap-2">
+                <Button type="button" className="flex-1 sm:flex-none sm:w-32" variant="secondary" onClick={ResetForm} >
+                  Reset
+                </Button>
 
-              {/* === Reset Form to Defualt Button === */}
-              <Button type="button" variant="secondary" className="w-24" onClick={() => ResetForm()}>Reset</Button>
-
-              {/* === Form Submit Button === */}
-              <Button type="submit" className="w-24" disabled={submitButtonLoading} variant="green">{data ? "Update" : "Create"}</Button>
+                <DialogClose asChild>
+                  <Button className="flex-1 sm:flex-none sm:w-32" variant="outline">
+                    Cancel
+                  </Button>
+                </DialogClose>
+              </div>
             </DialogFooter>
           </form>
         </Form>

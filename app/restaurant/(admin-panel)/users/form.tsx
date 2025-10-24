@@ -6,7 +6,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import toast from "react-hot-toast"
-import { EyeIcon, EyeOffIcon } from "lucide-react"
+import { EyeIcon, EyeOffIcon, Loader } from "lucide-react"
 
 import { userFormSchema } from "@/lib/zod-schema"
 import { refreshData } from "@/lib/swr"
@@ -163,31 +163,31 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="p-0">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-rows-[auto_1fr_auto]">
             {/* === Dialog Header === */}
             <DialogHeader className="p-6 pb-0">
-              <DialogTitle>{data ? "Edit User" : "Create User"}</DialogTitle>
+              <DialogTitle>{data ? "Edit User" : "Create New User"}</DialogTitle>
               <DialogDescription className="sr-only">
                 Create or update user information
               </DialogDescription>
             </DialogHeader>
 
             {/* === Form Content === */}
-            <ScrollArea className="p-3 flex flex-col justify-between overflow-hidden">
+            <ScrollArea className="p-3 flex flex-col justify-between">
 
               {/* === Image Input Field === */}
-              <div className="w-fit flex flex-col items-center justify-center">
+              <div className="w-full flex flex-col items-center justify-center">
                 <div className="flex justify-start">
                   {previewUrl ? (
-                    <div className="relative w-40 h-40 rounded-lg outline outline-gray-300 dark:outline-gray-600 overflow-hidden">
-                      <Image src={previewUrl} alt="New preview" fill style={{ objectFit: "cover" }} priority />
+                    <div className="relative size-24 sm:size-40 rounded-lg outline outline-gray-300 dark:outline-gray-600 overflow-hidden">
+                      <Image src={previewUrl} alt="New preview" sizes="(min-width: 640px) 160px, 96px" fill style={{ objectFit: "cover" }} loading="lazy" />
                     </div>
                   ) : data?.image ? (
-                    <div className="relative w-40 h-40 rounded-lg outline outline-gray-300 dark:outline-gray-600 overflow-hidden">
-                      <Image src={data.image} alt="Current profile" fill style={{ objectFit: "cover" }} priority />
+                    <div className="relative size-24 sm:size-40 rounded-lg outline outline-gray-300 dark:outline-gray-600 overflow-hidden">
+                      <Image src={data.image} alt="Current profile" sizes="(min-width: 640px) 160px, 96px" fill style={{ objectFit: "cover" }} loading="lazy" />
                     </div>
                   ) : (
-                    <div className="w-40 h-40 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400 dark:text-gray-600">
+                    <div className="size-24 sm:size-40 rounded-lg text-sm bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400 dark:text-gray-600">
                       No Image
                     </div>
                   )}
@@ -204,7 +204,7 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
                           Image
                         </FormLabel>
                         <FormControl>
-                          <input
+                          <Input
                             type="file"
                             accept="image/*"
                             id="image-select-field"
@@ -212,7 +212,7 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
                               const file = e.target.files?.[0] ?? null;
                               field.onChange(file);
                             }}
-                            className="cursor-pointer text-neutral-700 h-10 w-full bg-white/5 backdrop-blur-xl rounded-lg content-center px-3"
+                            className="h-10 text-xs"
                           />
                         </FormControl>
                         <FormMessage />
@@ -273,7 +273,7 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
                       <FormControl>
                         <div className="relative">
                           <Input id="password" type={isVisible ? "text" : "password"} className="pe-10 pt-2 h-10 border-b" placeholder="●●●●●●" autoComplete="current-password" {...field} />
-                          <Button type="button" size="icon" variant="ghost" onClick={togglePasswordVisibility} className="absolute inset-y-0.5 end-0 text-muted-foreground hover:bg-transparent" >
+                          <Button title={isVisible ? "Hide password" : "Show password"} type="button" size="icon" variant="ghost" onClick={togglePasswordVisibility} className="absolute inset-y-0.5 end-0 text-muted-foreground hover:bg-transparent" >
                             {isVisible ? <EyeOffIcon /> : <EyeIcon />}
                             <span className="sr-only">
                               {isVisible ? "Hide password" : "Show password"}
@@ -340,17 +340,30 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
             </ScrollArea>
 
             {/* === Footer Buttons === */}
-            <DialogFooter className="p-6 justify-between pt-0">
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button type="button" variant="secondary" onClick={ResetForm}>
-                Reset
+            <DialogFooter className="p-6 pt-0 flex flex-col sm:flex-col gap-3 w-full">
+              {/* === Submit Button === */}
+              <Button type="submit" className="w-full" disabled={submitButtonLoading} variant="green" >
+                {submitButtonLoading ? (
+                  <p className="flex flex-row gap-2">
+                    <Loader className="animate-spin duration-300" /> {data ? "Updating" : "Creating"}
+                  </p>
+                ) : data ? "Update" : "Create"}
               </Button>
-              <Button type="submit" disabled={submitButtonLoading} variant="green">
-                {data ? "Update" : "Create"}
-              </Button>
+
+              {/* === Reset + Cancel Buttons === */}
+              <div className="flex w-full gap-2">
+                <Button type="button" className="flex-1" variant="secondary" onClick={ResetForm} >
+                  Reset
+                </Button>
+
+                <DialogClose asChild>
+                  <Button className="flex-1" variant="outline">
+                    Cancel
+                  </Button>
+                </DialogClose>
+              </div>
             </DialogFooter>
+
           </form>
         </Form>
       </DialogContent>

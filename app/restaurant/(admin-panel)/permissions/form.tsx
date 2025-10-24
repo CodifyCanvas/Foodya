@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   Table,
   TableBody,
@@ -144,91 +144,90 @@ export function RoleForm({ open, onOpenChange, data, refetchPermissions }: FormD
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="p-0 font-rubik-400" variant="full-screen">
         <Form {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="h-[calc(100vh-1rem)] grid grid-rows-[auto_1fr_auto]">
             {/* === Header === */}
             <DialogHeader className="p-6 pb-0">
               <DialogTitle className="font-medium">Manage Permissions</DialogTitle>
               <DialogDescription className="sr-only">
                 Create or Update your role
               </DialogDescription>
-              <h3 className="md:text-2xl font-semibold opacity-95 text-emerald-600">
+              <h3 className="md:text-2xl font-semibold capitalize opacity-95 text-emerald-600">
                 Role: {data?.role}
               </h3>
             </DialogHeader>
 
             {/* === Permissions Table === */}
-            <ScrollArea className="flex max-h-[75vh] flex-col justify-between overflow-hidden p-3">
+            <ScrollArea className="overflow-auto p-3">
               {fetchLoading ? (
-                <div className="flex-1 min-h-[20vh] flex justify-center items-center">
+                <div className="flex w-full min-h-[50vh] justify-center items-center">
                   <Loader className="animate-spin size-6 text-gray-500" />
                 </div>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="sm:text-center">Module</TableHead>
-                      <TableHead className="text-center">View</TableHead>
-                      <TableHead className="text-center">Create</TableHead>
-                      <TableHead className="text-center">Edit</TableHead>
-                      <TableHead className="text-center">Delete</TableHead>
-                    </TableRow>
-                  </TableHeader>
-
-                  <TableBody>
-                    {fields.length > 0 ? (
-                      fields.map((field, idx) => (
-                        <TableRow key={field.id} className="sm:text-center">
-                          {/* === Module Label === */}
-                          <TableCell className="capitalize">
-                            {field.label || "N/A"}
-                          </TableCell>
-
-                          {/* === Permission Checkboxes === */}
-                          {(["can_view", "can_create", "can_edit", "can_delete"] as const).map(
-                            (permKey) => (
-                              <TableCell key={permKey}>
-                                <FormField
-                                  control={control}
-                                  name={`permissions.${idx}.${permKey}`}
-                                  render={({ field }) => (
-                                    <FormItem className="flex justify-center">
-                                      <FormControl>
-                                        <Checkbox
-                                          checked={field.value === true}
-                                          onCheckedChange={(checked) =>
-                                            field.onChange(checked === true)
-                                          }
-                                          className="mx-auto data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600 border-emerald-600"
-                                        />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                              </TableCell>
-                            )
-                          )}
-                        </TableRow>
-                      ))
-                    ) : (
+                <div className="min-w-max">
+                  <Table className="w-full">
+                    <TableHeader>
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center">
-                          No permissions found.
-                        </TableCell>
+                        <TableHead className="sm:text-center">Module</TableHead>
+                        <TableHead className="text-center">View</TableHead>
+                        <TableHead className="text-center">Create</TableHead>
+                        <TableHead className="text-center">Edit</TableHead>
+                        <TableHead className="text-center">Delete</TableHead>
                       </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+
+                    <TableBody>
+                      {fields.length > 0 ? (
+                        fields.map((field, idx) => (
+                          <TableRow key={field.id} className="sm:text-center">
+                            <TableCell className="capitalize">{field.label || "N/A"}</TableCell>
+                            {(["can_view", "can_create", "can_edit", "can_delete"] as const).map(
+                              (permKey) => (
+                                <TableCell key={permKey}>
+                                  <FormField
+                                    control={control}
+                                    name={`permissions.${idx}.${permKey}`}
+                                    render={({ field }) => (
+                                      <FormItem className="flex justify-center">
+                                        <FormControl>
+                                          <Checkbox
+                                            checked={field.value === true}
+                                            onCheckedChange={(checked) =>
+                                              field.onChange(checked === true)
+                                            }
+                                            className="mx-auto data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600 border-emerald-600"
+                                          />
+                                        </FormControl>
+                                        <FormMessage />
+                                      </FormItem>
+                                    )}
+                                  />
+                                </TableCell>
+                              )
+                            )}
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center">
+                            No permissions found.
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
               )}
+              <ScrollBar orientation="horizontal" />
             </ScrollArea>
 
+
             {/* === Footer Actions === */}
-            <DialogFooter className="p-6 justify-between pt-0 w-full fixed bottom-0 right-0">
+            <DialogFooter className="p-3 z-20 md:mb-3 border-t border-dashed justify-between bottom-0 flex flex-col-reverse sm:flex-row  pt-0">
               <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
+                <Button variant="outline" className="sm:w-32">Cancel</Button>
               </DialogClose>
-              <Button type="submit" disabled={submitLoading} variant="green">
-                Update
+              <Button type="submit" className="sm:w-32" disabled={submitLoading} variant="green">
+                {submitLoading ? <p className="flex flex-row gap-2"><Loader className="animate-spin duration-300" /> Updating</p> : 'Update'}
               </Button>
             </DialogFooter>
           </form>

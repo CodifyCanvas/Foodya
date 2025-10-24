@@ -172,6 +172,8 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Invalid form submission. Please try again." }, { status: 400 });
     }
 
+
+
     // === Validate with Zod ===
     let parsed;
     try {
@@ -187,6 +189,18 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Missing menu item ID." }, { status: 400 });
     }
 
+    /* ====================================================
+    === Handle Image Cases ===
+    - Case 01: No image in formData → keep existing
+    - Case 02: Image removed → file is string ''
+    - Case 03: New image uploaded → file is File instance
+    ===================================================== */
+
+    // === Case 02 ===
+    if (typeof file === "string" && file !== null) {
+      await updateData("menuItems", "id", id, { image: null })
+    }
+
     // === Upload Profile Image (If Any) ===
     let imagePath: string | undefined = undefined;
     if (file && file instanceof File) {
@@ -197,6 +211,7 @@ export async function PUT(req: NextRequest) {
         return NextResponse.json({ error: "We couldn't upload the image. Please try again." }, { status: 500 });
       }
     }
+
 
     // === Update Menu Item ===
     await updateData("menuItems", "id", id, {
@@ -210,6 +225,7 @@ export async function PUT(req: NextRequest) {
 
     // === Replace Item Options ===
     await deleteData("menuItemOptions", "menu_item_id", id);
+
     if (options?.length) {
       await Promise.all(
         options.map(opt =>
@@ -223,7 +239,6 @@ export async function PUT(req: NextRequest) {
     }
 
     return NextResponse.json({ message: "Menu item updated successfully." }, { status: 202 });
-
   } catch (error) {
     console.error(`[PUT ${path}] menu item update failed:`, error);
 

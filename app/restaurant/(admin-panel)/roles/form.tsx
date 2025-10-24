@@ -31,6 +31,7 @@ import { roleFormSchema } from "@/lib/zod-schema"
 import toast from 'react-hot-toast'
 import { refreshData } from "@/lib/swr"
 import { Role } from "@/lib/definations"
+import { Loader } from "lucide-react"
 
 /* === Props Interface === */
 interface FormDialogProps {
@@ -74,7 +75,7 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(isEditing ? {id : values.id, role: values.role, previousRole: data.role } : values ),
+      body: JSON.stringify(isEditing ? { id: values.id, role: values.role, previousRole: data.role } : values),
     }
 
     try {
@@ -167,20 +168,28 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
             </ScrollArea>
 
             {/* === Dialog Footer Buttons === */}
-            <DialogFooter className="p-6 justify-between pt-0">
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => ResetForm()}
-              >
-                Reset
+            <DialogFooter className="p-6 pt-0 flex flex-col sm:flex-col gap-3 w-full">
+              {/* === Submit Button === */}
+              <Button type="submit" className="w-full" disabled={submitButtonLoading} variant="green" >
+                {submitButtonLoading ? (
+                  <p className="flex flex-row gap-2">
+                    <Loader className="animate-spin duration-300" /> {data ? "Updating" : "Creating"}
+                  </p>
+                ) : data ? "Update" : "Create"}
               </Button>
-              <Button type="submit" disabled={submitButtonLoading} variant="green">
-                {data ? "Update" : "Create"}
-              </Button>
+
+              {/* === Reset + Cancel Buttons === */}
+              <div className="flex w-full  gap-2">
+                <Button type="button" className="flex-1" variant="secondary" onClick={ResetForm} >
+                  Reset
+                </Button>
+
+                <DialogClose asChild>
+                  <Button className="flex-1" variant="outline">
+                    Cancel
+                  </Button>
+                </DialogClose>
+              </div>
             </DialogFooter>
           </form>
         </Form>

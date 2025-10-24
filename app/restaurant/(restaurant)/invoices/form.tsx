@@ -35,7 +35,7 @@ import { DateInput } from "@/components/custom/date-picker"
 import SwitchInput from "@/components/ui/switch-input"
 import { Loader, Plus } from "lucide-react"
 import { DynamicOrderItemRow } from './dynamic-order-item-row'
-import { GeneratedBy, InvoiceDetail } from "@/lib/definations"
+import { GeneratedBy, InvoiceDetail, InvoiceResponse } from "@/lib/definations"
 
 /* === Props Interface === */
 interface FormDialogProps {
@@ -45,38 +45,38 @@ interface FormDialogProps {
   [key: string]: any
 }
 
-interface Order {
-  id: number;
-  tableId: string;
-  orderType: "dine_in" | "drive_thru" | "takeaway";
-  status: string;
-  description: string | null;
-  createdAt: string; // ISO date string
-}
+// interface Order {
+//   id: number;
+//   tableId: string;
+//   orderType: "dine_in" | "drive_thru" | "takeaway";
+//   status: string;
+//   description: string | null;
+//   createdAt: string; // ISO date string
+// }
 
-interface Item {
-  id: number;
-  menuItemImage: string | null;
-  orderId: number;
-  menuItemId: string;
-  menuItemName: string;
-  menuItemOptionId: string | null;
-  menuItemOptionName: string | null;
-  quantity: number;
-  price: string;
-}
+// interface Item {
+//   id: number;
+//   menuItemImage: string | null;
+//   orderId: number;
+//   menuItemId: string;
+//   menuItemName: string;
+//   menuItemOptionId: string | null;
+//   menuItemOptionName: string | null;
+//   quantity: number;
+//   price: string;
+// }
 
-export interface InvoiceOrderItem {
-  invoice: InvoiceDetail;
-  order: Order;
-  items: Item[];
-  generatedBy: GeneratedBy;
-}
+// export interface InvoiceOrderItem {
+//   invoice: InvoiceDetail;
+//   order: Order;
+//   items: Item[];
+//   generatedBy: GeneratedBy;
+// }
 
 export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], tables = [] }: FormDialogProps) {
   /* === Local State === */
   const [manualReset, setManualReset] = useState(false)
-  const [data, setData] = useState<InvoiceOrderItem | null>(null)
+  const [data, setData] = useState<InvoiceResponse | null>(null)
   const [submitButtonLoading, setSubmitButtonLoading] = useState<boolean>(false)
   const [invoiceFetching, setInvoiceFetching] = useState<boolean>(false)
   const invoiceIdProp = dataProp?.invoiceId ?? 0;
@@ -162,7 +162,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
       form.reset({
         invoiceId: invoiceIdProp,
         customerName: data?.invoice.customerName ?? "",
-        paymentMethod: data.invoice.paymentMethod ?? null,
+        paymentMethod: data.invoice.paymentMethod === 'unpaid' ? null : data.invoice.paymentMethod,
         isPaid: data.invoice.isPaid ?? false,
         invoiceCreatedAt: data.invoice.createdAt ? new Date(data.invoice.createdAt) : new Date(),
 

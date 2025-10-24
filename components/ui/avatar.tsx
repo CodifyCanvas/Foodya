@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
-
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 
 function Avatar({
@@ -21,16 +21,29 @@ function Avatar({
   )
 }
 
-function AvatarImage({
-  className,
-  ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Image>) {
+interface AvatarImageProps extends Omit<React.ComponentProps<typeof Image>, "src"> {
+  src?: string | null
+}
+
+function AvatarImage({ className, src, alt, ...props }: AvatarImageProps) {
+  if (!src) return null
+
   return (
-    <AvatarPrimitive.Image
-      data-slot="avatar-image"
-      className={cn("aspect-square size-full", className)}
-      {...props}
-    />
+    <div className={cn("relative aspect-square size-full", className)}>
+      <Image
+        src={src}
+        alt={alt ?? "Avatar"}
+        fill
+        sizes="32px"
+        loading="lazy"
+        className="object-cover"
+        onError={(e) => {
+          const target = e.target as HTMLImageElement
+          target.style.display = "none"
+        }}
+        {...props}
+      />
+    </div>
   )
 }
 
@@ -42,7 +55,7 @@ function AvatarFallback({
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
       className={cn(
-        "bg-muted flex size-full items-center font-rubik-400 justify-center rounded-full",
+        "bg-muted flex size-full items-center justify-center rounded-full font-medium",
         className
       )}
       {...props}
