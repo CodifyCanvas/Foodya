@@ -5,10 +5,10 @@ import { RowActions } from "./table-actions"
 import { ExtendedColumnDef } from "@/types/columns.data-table"
 import { Role } from "@/lib/definations"
 
-/* === Table Columns for Roles === */
+/* === Table Columns for Permissions === */
 export const columns = ({ refetchPermissions }: { refetchPermissions: () => void; }): ExtendedColumnDef<Role>[] => [
 
-  // === Id Column ===
+  // === Index / ID Column ===
   {
     accessorKey: "id",
     header: ({ column }) => (
@@ -24,7 +24,7 @@ export const columns = ({ refetchPermissions }: { refetchPermissions: () => void
     ),
   },
 
-  // === Role Column ===
+  // === Role Name Column ===
   {
     accessorKey: "role",
     header: ({ column }) => (

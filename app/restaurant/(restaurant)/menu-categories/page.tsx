@@ -8,25 +8,23 @@ import { columns } from './columns';
 import { CreateForm } from './table-actions';
 import { useModulePermission } from '@/hooks/useModulePermission';
 import AccessDenied from '@/app/errors/403/page';
-import { MenuCategories } from '@/lib/definations';
 import ServiceUnavailable from '@/app/errors/service-unavailable';
+import { MenuCategories } from '@/lib/definations';
+import { swrFetcher } from '@/lib/swr';
 
-/* === Fetcher Function === */
-const fetcher = (url: string) => fetch(url).then(res => res.json());
+
 
 const MenuCategoriesPage = () => {
-  // Use permission hook
+  // === Module Permission Hook ===
   const { canView, loading: permLoading } = useModulePermission();
 
-  // Fetch Menu Categories data from API
-  const {
-    data: roles,
-    error,
-    isLoading: rolesLoading,
-  } = useSWR<MenuCategories[]>('/api/menu-categories', fetcher);
+  // === Fetch Menu Categories Data ===
+  const { data, error, isLoading: dataLoading } = useSWR<MenuCategories[]>('/api/menu-categories', swrFetcher);
 
-  const isLoading = permLoading || rolesLoading;
+  // === Combined Loading State ===
+  const isLoading = permLoading || dataLoading;
 
+  // === Loading Fallback ===
   if (isLoading) {
     return (
       <div className="flex-1 h-full w-full bg-white flex justify-center items-center">
@@ -35,22 +33,36 @@ const MenuCategoriesPage = () => {
     );
   }
 
+  // === Access Denied Fallback ===
   if (!canView) {
     return <AccessDenied />;
   }
 
+  // === Error Fallback ===
   if (error) {
-    console.error(error);
-    return <ServiceUnavailable title='Service Unavailable' description='Please try again later or check your connection.' />;
+    console.error('SWR Error:', error);
+    return (
+      <ServiceUnavailable
+        title="Service Unavailable"
+        description="Please try again later or check your connection."
+      />
+    );
   }
 
   return (
     <div className="bg-white rounded-lg min-h-[50vh] flex flex-col">
-      <h3 className="text-3xl font-medium text-start px-4 pt-3 text-emerald-600">Menu Categories</h3>
 
+      {/* === Page Header === */}
+      <header className="px-4 pt-3">
+        <h3 className="text-3xl font-medium text-emerald-600 text-start">
+          Menu Categories
+        </h3>
+      </header>
+
+      {/* === Menu Categories Data Table === */}
       <DataTable
         columns={columns()}
-        data={roles ?? []}
+        data={data ?? []}
         filterColumns={['name']}
         createComponent={<CreateForm />}
         loading={isLoading}

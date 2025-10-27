@@ -9,7 +9,7 @@ import { truncateText } from "@/lib/utils"
 /* === Table Columns for Menu Categories === */
 export const columns = (): ExtendedColumnDef<MenuCategories>[] => [
 
-  // === Id Column ===
+  // === Index / ID Column ===
   {
     accessorKey: "id",
     header: ({ column }) => (
@@ -25,7 +25,7 @@ export const columns = (): ExtendedColumnDef<MenuCategories>[] => [
     ),
   },
 
-  // === Category Column ===
+  // === Category Name Column ===
   {
     accessorKey: "name",
     header: ({ column }) => (

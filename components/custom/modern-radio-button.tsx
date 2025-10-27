@@ -13,12 +13,46 @@ interface ModernRadioButtonProps {
   defaultFirst?: boolean;
 }
 
+
+
+/**
+ * === ModernRadioButton ===
+ * 
+ * A customizable radio button component that displays a list of options with labels and prices.
+ * Supports both controlled and uncontrolled modes, and allows toggling selection by clicking
+ * an already selected option to deselect it.
+ * 
+ * Features:
+ * - Optional automatic selection of the first option (`defaultFirst`).
+ * - Displays a price next to each label.
+ * - Works in controlled (via `value` prop) or uncontrolled mode (internal state).
+ * - Click-to-toggle behavior for the selected option.
+ *
+ * @param options - Array of option objects containing `value`, `label`, and `price`.
+ * @param value - Controlled selected value (optional).
+ * @param onValueChange - Callback fired when the selected value changes.
+ * @param defaultFirst - Automatically select the first option if true (default: false).
+ * @returns {JSX.Element} A styled list of selectable options with labels and prices.
+ *
+ * @example
+ * <ModernRadioButton
+ *   options={[
+ *     { value: 'small', label: 'Small', price: 5 },
+ *     { value: 'medium', label: 'Medium', price: 10 }
+ *   ]}
+ *   value={selectedValue}
+ *   onValueChange={(val) => setSelectedValue(val)}
+ *   defaultFirst={true}
+ * />
+ */
 const ModernRadioButton: React.FC<ModernRadioButtonProps> = ({
   options,
   value: controlledValue,
   onValueChange,
   defaultFirst = false,
 }) => {
+
+  // === Local States ===
   const isControlled = controlledValue !== undefined;
   const [internalValue, setInternalValue] = useState<string | undefined>(
     defaultFirst ? options[0]?.value : undefined

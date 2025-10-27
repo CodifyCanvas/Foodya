@@ -16,6 +16,13 @@
 # migrations
 /lib/db/migrations
 
+# vscode settings
+.vscode
+/.vscode/
+
+# others
+/public/uploads/**
+
 # next.js
 /.next/
 /out/

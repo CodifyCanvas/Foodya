@@ -9,7 +9,7 @@ import { truncateText } from "@/lib/utils"
 /* === Columns for Transaction Categories === */
 export const columns = (): ExtendedColumnDef<TransactionCategoriesTablesInterface>[] => [
 
-  // === Id Column ===
+  // === Index / ID Column ===
   {
     accessorKey: "id",
     header: ({ column }) => (

@@ -1,5 +1,5 @@
 import z from "zod";
-import { imageSchema } from "./index";
+import { imageSchema } from ".";
 
 
 
@@ -33,13 +33,7 @@ const numberFromString = z
  */
 export const menuItemFormSchema = z.object({
   id: z.union([z.number(), z.string().transform(String)]).optional(),
-  // image: imageSchema,
-  image: z.union([
-    z.instanceof(File),  // New upload
-    z.string(),          // Existing image URL/path
-    z.null(),            // Marked for deletion
-  ]).optional(),
-
+  image: imageSchema,
   item: z.string().min(1, "Please enter the item name."),
   category_id: z.string().min(1, { error: "Please select a category." }),
   description: z.string().optional(),

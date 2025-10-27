@@ -86,8 +86,27 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug
 
     const { name, fatherName, CNIC, email, phone } = parsed;
 
-    // === Upload Image (if provided) ===
-    let imagePath: string | null = null;
+    if (!Employeeid) {
+      return NextResponse.json(
+        { error: "Employee ID is missing. Cannot perform update." },
+        { status: 400 }
+      );
+    }
+
+    /* ====================================================
+    === Handle Image Cases ===
+    - Case 01: No image in formData → keep existing
+    - Case 02: Image removed → file is string ''
+    - Case 03: New image uploaded → file is File instance
+    ===================================================== */
+
+    // === Case 02 ===
+    if (typeof image === "string" && image !== null) {
+      await updateData("employeesTable", "id", Employeeid, { image: null })
+    }
+
+    // === Upload Profile Image (If Any) ===
+    let imagePath: string | undefined = undefined;
     if (image && image instanceof File) {
       try {
         imagePath = await uploadImage(image, "employees_profile_image"); // <- use helper

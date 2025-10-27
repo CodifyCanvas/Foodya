@@ -10,19 +10,21 @@ import { useModulePermission } from '@/hooks/useModulePermission';
 import AccessDenied from '@/app/errors/403/page';
 import { RestaurantTablesInterface } from '@/lib/definations';
 import ServiceUnavailable from '@/app/errors/service-unavailable';
+import { swrFetcher } from '@/lib/swr';
 
-/* === Data Fetcher === */
-const fetcher = (url: string) => fetch(url).then(res => res.json());
+
 
 const TablesPage = () => {
-  // Use the custom permission hook
+  // === Permission Hook ===
   const { canView, loading: permLoading } = useModulePermission();
 
-  // Fetch Restaurant Table data
-  const { data: modules, error, isLoading: dataLoading } = useSWR<RestaurantTablesInterface[]>('/api/restaurant-tables', fetcher);
+  // === Fetch Restaurant Tables ===
+  const { data: tables, error, isLoading: dataLoading } = useSWR<RestaurantTablesInterface[]>('/api/restaurant-tables', swrFetcher);
 
+  // === Combined Loading State ===
   const isLoading = permLoading || dataLoading;
 
+  // === Loading Fallback ===
   if (isLoading) {
     return (
       <div className="flex-1 h-full w-full bg-white flex justify-center items-center">
@@ -31,30 +33,37 @@ const TablesPage = () => {
     );
   }
 
+  // === Access Denied ===
   if (!canView) {
     return <AccessDenied />;
   }
 
+  // === Error Handling ===
   if (error) {
     console.error(error);
-    return <ServiceUnavailable title='Service Unavailable' description='Please try again later or check your connection.' />;
+    return (
+      <ServiceUnavailable
+        title="Service Unavailable"
+        description="Please try again later or check your connection."
+      />
+    );
   }
 
   return (
     <div className="bg-white rounded-lg min-h-[50vh] flex flex-col">
-      {/* Page Header */}
+      {/* === Page Header === */}
       <h3 className="text-3xl font-medium text-start px-4 pt-3 text-emerald-600">
         Restaurant Tables
       </h3>
 
+      {/* === Data Table === */}
       <DataTable
         columns={columns()}
-        data={modules ?? []}
+        data={tables ?? []}
         filterColumns={[]}
         createComponent={<CreateForm />}
         loading={isLoading}
       />
-
     </div>
   );
 };

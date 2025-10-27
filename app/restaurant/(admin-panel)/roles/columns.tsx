@@ -8,7 +8,7 @@ import { Role } from "@/lib/definations"
 /* === Table Columns for Roles === */
 export const columns = (): ExtendedColumnDef<Role>[] => [
 
-  // === Id Column ===
+  // === Index / ID Column ===
   {
     accessorKey: "id",
     header: ({ column }) => (
@@ -24,7 +24,7 @@ export const columns = (): ExtendedColumnDef<Role>[] => [
     ),
   },
 
-  // === Role Column ===
+  // === Role Name Column ===
   {
     accessorKey: "role",
     header: ({ column }) => (

@@ -86,7 +86,7 @@ export function EditEmployeeForm({ open, onOpenChange, data: dataProp }: FormDia
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="p-0 grid grid-cols-1 grid-rows-[minmax(auto,4rem)_auto_minmax(15rem,1fr)_auto] " variant="full-screen">
+      <DialogContent className="h-[calc(100vh-1rem)] grid grid-rows-[auto_1fr_auto] p-0" variant="full-screen">
 
         {/* === Dialog Header === */}
         <DialogHeader className="p-6 pb-0">
@@ -96,16 +96,15 @@ export function EditEmployeeForm({ open, onOpenChange, data: dataProp }: FormDia
           </DialogDescription>
         </DialogHeader>
 
-        {/* Stepper Navigation */}
-        <div className="w-full flex justify-center">
-          <Stepper currentStep={currentStep} steps={steps} />
-        </div>
-
-
         {/* === Scrollable Form Area === */}
         {employeeFetching ? <div className="h-full w-full bg-white flex justify-center items-center">
           <Loader className="animate-spin size-5 md:size-8 text-gray-500" />
-        </div> : <ScrollArea className="flex h-full flex-col justify-between overflow-hidden p-3">
+        </div> : <ScrollArea className="flex h-full my-2 min-h-[50vh] max-w-[100vw-2rem] flex-col justify-between p-3">
+
+          {/* Stepper Navigation */}
+          <div className="w-full flex justify-center">
+            <Stepper currentStep={currentStep} steps={steps} />
+          </div>
 
           {currentStep === 1 && <EmployeePersonalInfoForm data={data?.personalInfo ?? null} />}
           {currentStep === 2 && <EmployeeRecordsInfoForm data={{ employeeId: data?.personalInfo.id ?? null, designation: data?.employmentRecord[0]?.designation ?? null, joiningAt: data?.employmentRecord[0].joinedAt ?? null }} />}
@@ -114,30 +113,42 @@ export function EditEmployeeForm({ open, onOpenChange, data: dataProp }: FormDia
         </ScrollArea>}
 
         {/* === Dialog Footer Buttons === */}
-        <DialogFooter className="p-6 justify-between pt-0">
-          <DialogClose asChild>
-            <Button variant="outline">Close</Button>
-          </DialogClose>
-          <Button
-            type="button"
-            variant="outline"
-            disabled={currentStep === 1}
-            onClick={() => setCurrentStep((prev) => prev - 1)}
-          >
-            Back
-          </Button>
+        <DialogFooter className="p-6 pt-0">
+          <div className=" grid grid-cols-3 gap-2 sm:flex sm:justify-end sm:gap-2 " >
+            {/* Cancel */}
+            <DialogClose asChild>
+              <Button
+                variant="outline"
+                className="w-full sm:w-auto sm:min-w-32"
+              >
+                Cancel
+              </Button>
+            </DialogClose>
 
+            {/* Back */}
+            <Button
+              type="button"
+              variant="outline"
+              disabled={currentStep === 1}
+              onClick={() => setCurrentStep((prev) => prev - 1)}
+              className="w-full sm:w-auto sm:min-w-32"
+            >
+              Back
+            </Button>
 
-          <Button
-            type="button"
-            variant="outline"
-            disabled={currentStep === steps.length}
-            onClick={() => setCurrentStep((prev) => prev + 1)}
-          >
-            Next
-          </Button>
-
+            {/* Next */}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setCurrentStep((prev) => prev + 1)}
+              disabled={currentStep >= steps.length}
+              className="w-full sm:w-auto sm:min-w-32"
+            >
+              Next
+            </Button>
+          </div>
         </DialogFooter>
+
       </DialogContent>
     </Dialog>
   )

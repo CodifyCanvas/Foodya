@@ -13,9 +13,7 @@ export interface UsersWithRolesResponse {
   roles: RoleSelectInput[];
 }
 
-// ================================
-// Column Definitions
-// ================================
+/* === Table Columns for Users === */
 export const columns = (props: { roles: RoleSelectInput[] }): ExtendedColumnDef<User>[] => [
   // === Index Column ===
   {
@@ -28,7 +26,7 @@ export const columns = (props: { roles: RoleSelectInput[] }): ExtendedColumnDef<
     ),
   },
 
-  // === Name Column ===
+  // === Name Column with Avatar ===
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -51,7 +49,7 @@ export const columns = (props: { roles: RoleSelectInput[] }): ExtendedColumnDef<
     cell: ({ row }) => <div className="text-center">{row.original.email}</div>,
   },
 
-  // === Role Column ===
+  // === Role Column with Filter ===
   {
     accessorKey: "role_name",
     header: ({ column }) => (
@@ -60,7 +58,7 @@ export const columns = (props: { roles: RoleSelectInput[] }): ExtendedColumnDef<
     cell: ({ row }) => <div className="capitalize text-center">{row.original.role_name}</div>,
   },
 
-  // === Status Column (Active/Inactive) ===
+  // === Status Column (Active / Inactive) ===
   {
     accessorKey: "is_active",
     header: ({ column }) => (

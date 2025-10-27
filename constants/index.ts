@@ -15,6 +15,10 @@ export const logo = {
 
 
 
+/**
+ * === App Configuration ===
+ * Stores common URLs for navigation and redirects.
+ */
 export const appConfigurations = {
   loginURL: '/restaurant/dashboard',  // <- redirect here after successful login
   logoutURL: '/login',                  // <- redirect here after logout

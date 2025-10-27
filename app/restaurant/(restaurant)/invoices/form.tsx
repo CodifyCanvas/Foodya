@@ -722,17 +722,17 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
 
               <div className="w-full flex flex-row justify-center items-center gap-2 lg:w-auto">
                 <DialogClose asChild>
-                  <Button variant="outline" className="min-w-24 sm:w-auto">Cancel</Button>
+                  <Button variant="outline" className="sm:min-w-32 w-auto">Cancel</Button>
                 </DialogClose>
                 <Button
                   type="button"
                   variant="secondary"
                   onClick={() => ResetForm()}
-                  className="min-w-24 sm:w-auto"
+                  className="sm:min-w-32 w-auto"
                 >
                   Reset
                 </Button>
-                <Button type="submit" disabled={submitButtonLoading} variant="green" className="min-w-24 sm:w-auto">
+                <Button type="submit" disabled={submitButtonLoading} variant="green" className="sm:min-w-32 w-auto">
                   {dataProp ? "Update" : "Create"}
                 </Button>
               </div>

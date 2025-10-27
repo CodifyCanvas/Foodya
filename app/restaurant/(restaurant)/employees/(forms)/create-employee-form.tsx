@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Form } from "@/components/ui/form"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import Stepper from "@/components/custom/Stepper"
 import { useHookFormMask } from 'use-mask-input';
 
@@ -27,6 +27,7 @@ import { refreshData } from "@/lib/swr"
 import { EmployeePersonalInfo } from "./(form-fields)/employee-personal-info-fields"
 import { EmployeeRecords } from "./(form-fields)/employee-records-fields"
 import { EmployeeSalaryInfo } from "./(form-fields)/employee-salary-info-fields"
+import { Loader } from "lucide-react"
 
 
 /* === Props Interface === */
@@ -79,12 +80,6 @@ export function CreateEmployeeForm({ open, onOpenChange, data }: FormDialogProps
   })
 
   const registerWithMask = useHookFormMask(form.register);
-
-  // === Watch and Memoize Image File Preview ===
-  const selectedFile = form.watch("personalInfo.image")
-  const previewUrl = useMemo(() => {
-    return selectedFile instanceof File ? URL.createObjectURL(selectedFile) : null
-  }, [selectedFile])
 
   /* === Submit Handler === */
   const onSubmit: SubmitHandler<EmployeeFormValues> = async (formValues) => {
@@ -181,7 +176,7 @@ export function CreateEmployeeForm({ open, onOpenChange, data }: FormDialogProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="p-0" variant="full-screen">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 grid grid-cols-1 grid-rows-[minmax(auto,4rem)_auto_minmax(15rem,1fr)_auto]">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="h-[calc(100vh-1rem)] grid grid-rows-[auto_1fr_auto]">
 
             {/* === Dialog Header === */}
             <DialogHeader className="p-6 pb-0">
@@ -191,48 +186,88 @@ export function CreateEmployeeForm({ open, onOpenChange, data }: FormDialogProps
               </DialogDescription>
             </DialogHeader>
 
-            {/* Stepper Navigation */}
-            <div className="w-full flex justify-center">
-              <Stepper currentStep={currentStep} steps={steps} />
-            </div>
+
 
 
             {/* === Scrollable Form Area === */}
-            <ScrollArea className="flex flex-col justify-between overflow-hidden p-3">
+            <ScrollArea className="flex flex-col min-h-[50vh] max-w-[100vw-2rem] justify-between p-3">
 
-              {currentStep === 1 && <EmployeePersonalInfo control={form.control} image={undefined} previewUrl={previewUrl} registerWithMask={registerWithMask} mode="create" />}
+              {/* Stepper Navigation */}
+              <div className="w-full flex justify-center">
+                <Stepper currentStep={currentStep} steps={steps} />
+              </div>
+
+              {currentStep === 1 && <EmployeePersonalInfo control={form.control} image={undefined} registerWithMask={registerWithMask} mode="create" />}
               {currentStep === 2 && <EmployeeRecords control={form.control} mode="create" />}
               {currentStep === 3 && <EmployeeSalaryInfo control={form.control} mode="create" />}
 
+              <ScrollBar orientation="vertical" />
             </ScrollArea>
 
             {/* === Dialog Footer Buttons === */}
-            <DialogFooter className="p-6 justify-between pt-0">
+            <DialogFooter className="p-6 pt-0">
+              <div className=" grid grid-cols-2 gap-2  sm:flex sm:flex-wrap sm:justify-end sm:gap-2 " >
+                {/* Cancel */}
+                <DialogClose asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full sm:w-auto sm:min-w-32 order-4 sm:order-1"
+                  >
+                    Cancel
+                  </Button>
+                </DialogClose>
 
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-
-              <Button type="button" variant="secondary" onClick={() => ResetForm()} >
-                Reset
-              </Button>
-
-              <Button type="button" variant="outline" disabled={currentStep === 1} onClick={() => setCurrentStep((prev) => prev - 1)} >
-                Back
-              </Button>
-
-              {currentStep < steps.length && (
-                <Button type="button" variant="outline" onClick={() => setCurrentStep((prev) => prev + 1)} >
-                  Next
+                {/* Reset */}
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => ResetForm()}
+                  className="w-full sm:w-auto sm:min-w-32 order-3 sm:order-2"
+                >
+                  Reset
                 </Button>
-              )}
-              {currentStep === steps.length && (
-                <Button type="submit" variant="green" disabled={submitButtonLoading}>
-                  Create
-                </Button>
-              )}
 
+                {/* Back */}
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={currentStep === 1}
+                  onClick={() => setCurrentStep((prev) => prev - 1)}
+                  className="w-full sm:w-auto sm:min-w-32 order-1 sm:order-3"
+                >
+                  Back
+                </Button>
+
+                {/* Next / Submit */}
+                {currentStep < steps.length ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setCurrentStep((prev) => prev + 1)}
+                    className="w-full sm:w-auto sm:min-w-32 order-2 sm:order-4"
+                  >
+                    Next
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    disabled={submitButtonLoading}
+                    variant="green"
+                    className="w-full sm:w-auto sm:min-w-32 order-2 sm:order-4"
+                  >
+                    {submitButtonLoading ? (
+                      <p className="flex flex-row gap-2">
+                        <Loader className="animate-spin duration-300" />{" "}
+                        {data ? "Updating" : "Creating"}
+                      </p>
+                    ) : data ? "Update" : "Create"}
+                  </Button>
+                )}
+              </div>
             </DialogFooter>
+
+
+
           </form>
         </Form>
       </DialogContent>

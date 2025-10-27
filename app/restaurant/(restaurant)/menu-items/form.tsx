@@ -193,6 +193,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
             <ScrollArea className="flex flex-col min-h-[50vh] max-w-[100vw-2rem] justify-between p-3">
 
               <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr] items-center gap-2 grid-rows-1 w-full">
+
                 {/* === Item Image Field === */}
                 <div className="w-full justify-center flex py-2">
                   <FormField

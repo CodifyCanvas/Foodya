@@ -169,14 +169,26 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    /* ====================================================
+        === Handle Image Cases ===
+        - Case 01: No image in formData → keep existing
+        - Case 02: Image removed → file is string ''
+        - Case 03: New image uploaded → file is File instance
+        ===================================================== */
+
+    // === Case 02 ===
+    if (typeof image === "string" && image !== null) {
+      await updateData("users", "id", id, { image: null })
+    }
+
     // === Upload Profile Image (If Any) ===
-    let imagePath: string | null = null;
+    let imagePath: string | undefined = undefined;
     if (image && image instanceof File) {
       try {
         imagePath = await uploadImage(image, "users"); // <- use helper
       } catch (err) {
-        console.error(`[POST ${path}] Image upload failed:`, err);
-        return NextResponse.json({ error: "Image upload failed. Please try again." }, { status: 500 });
+        console.error(`[PUT ${path}] Image upload failed:`, err);
+        return NextResponse.json({ error: "We couldn't upload the image. Please try again." }, { status: 500 });
       }
     }
 

@@ -15,6 +15,9 @@ import { TransactionsReportResult } from "@/lib/definations";
 import { formatDateWithFns } from "@/lib/date-fns";
 import { toCapitalizedWords } from "@/lib/utils";
 import { swrFetcher } from "@/lib/swr";
+import { useSidebar } from "@/components/ui/sidebar";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 
 
@@ -35,6 +38,7 @@ const useDebouncedValue = (input: string, delay: number): string => {
 export function TransactionTable() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { open } = useSidebar();
 
     // === Get Initial States from URL ===
     const defaultSearch = searchParams.get("search") ?? "";
@@ -95,7 +99,7 @@ export function TransactionTable() {
     if (error) return <div className="text-red-500">Failed to load transactions.</div>;
 
     return (
-        <div className="space-y-4 pt-5">
+        <div className={`space-y-4 pt-5 ${open ? 'md:w-[calc(100vw-23rem)]' : 'md:w-[calc(100vw-8rem)]'}`}>
             {/* === Header === */}
             <div className="flex items-center justify-between">
                 <h2 className="text-3xl font-medium pt-3 text-emerald-600 text-start">Transactions</h2>
@@ -112,7 +116,7 @@ export function TransactionTable() {
                     className="max-w-sm"
                 />
                 <div className="flex items-center space-x-2">
-                    <span className="text-sm text-muted-foreground">Rows per page:</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">Rows per page:</span>
                     <Select value={rowsPerPage.toString()} onValueChange={handleLimitChange}>
                         <SelectTrigger className="w-20 h-8 rounded-lg font-rubik">
                             <SelectValue placeholder="Rows" />
@@ -131,7 +135,7 @@ export function TransactionTable() {
             {/* === Transaction Table === */}
             <div className="overflow-x-auto">
                 <Table className="min-w-full">
-                    <TableCaption>List of all transactions</TableCaption>
+                    <TableCaption>{searchText ? `Search Result of '${searchText}'` : `List of all transactions`}</TableCaption>
                     <TableHeader>
                         <TableRow className="uppercase text-xs">
                             <TableHead>TID</TableHead>
@@ -198,12 +202,16 @@ export function TransactionTable() {
             <div className="flex items-center justify-between pt-4">
                 <div className="text-sm text-muted-foreground">Page {currentPage} of {totalPages}</div>
                 <div className="flex space-x-2">
-                    <button onClick={handlePrevious} disabled={currentPage === 1} className="px-3 py-1 border rounded disabled:opacity-50" >
-                        Previous
-                    </button>
-                    <button onClick={handleNext} disabled={currentPage === totalPages} className="px-3 py-1 border rounded disabled:opacity-50">
-                        Next
-                    </button>
+
+                    <Button variant="outline" size="icon" title="Go to previous page" className="size-8" onClick={handlePrevious} disabled={currentPage === 1}  >
+                        <span className="sr-only">Go to previous page</span>
+                        <ChevronLeft />
+                    </Button>
+                    <Button variant="outline" size="icon" title="Go to next page" className="size-8" onClick={handleNext} disabled={currentPage === totalPages} >
+                        <span className="sr-only">Go to next page</span>
+                        <ChevronRight />
+                    </Button>
+
                 </div>
             </div>
         </div>

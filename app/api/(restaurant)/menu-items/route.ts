@@ -166,7 +166,7 @@ export async function PUT(req: NextRequest) {
     // === Parse Form Data ===
     const formData = await req.formData();
     const jsonData = formData.get("data");
-    const file = formData.get("image") as File | null;
+    const image = formData.get("image") as File | null;
 
     if (!jsonData || typeof jsonData !== "string") {
       return NextResponse.json({ error: "Invalid form submission. Please try again." }, { status: 400 });
@@ -197,15 +197,15 @@ export async function PUT(req: NextRequest) {
     ===================================================== */
 
     // === Case 02 ===
-    if (typeof file === "string" && file !== null) {
+    if (typeof image === "string" && image !== null) {
       await updateData("menuItems", "id", id, { image: null })
     }
 
     // === Upload Profile Image (If Any) ===
     let imagePath: string | undefined = undefined;
-    if (file && file instanceof File) {
+    if (image && image instanceof File) {
       try {
-        imagePath = await uploadImage(file, "menu_items"); // <- use helper
+        imagePath = await uploadImage(image, "menu_items"); // <- use helper
       } catch (err) {
         console.error(`[PUT ${path}] Image upload failed:`, err);
         return NextResponse.json({ error: "We couldn't upload the image. Please try again." }, { status: 500 });

@@ -1,14 +1,14 @@
-"use client"
+'use client';
 
-import { DataTableColumnHeader } from "@/components/DataTable/data-table-column-header"
-import { RowActions } from "./table-actions"
-import { ExtendedColumnDef } from "@/types/columns.data-table"
-import { ModuleInterface } from "@/lib/definations"
+import { DataTableColumnHeader } from "@/components/DataTable/data-table-column-header";
+import { RowActions } from "./table-actions";
+import { ExtendedColumnDef } from "@/types/columns.data-table";
+import { ModuleInterface } from "@/lib/definations";
 
-/* === Table Columns for Roles === */
+/* === Table Columns for Modules === */
 export const columns = (): ExtendedColumnDef<ModuleInterface>[] => [
 
-  // === Id Column ===
+  // === Index / ID Column ===
   {
     accessorKey: "id",
     header: ({ column }) => (
@@ -24,7 +24,7 @@ export const columns = (): ExtendedColumnDef<ModuleInterface>[] => [
     ),
   },
 
-  // === Role Column ===
+  // === Label Column ===
   {
     accessorKey: "label",
     header: ({ column }) => (
@@ -39,13 +39,13 @@ export const columns = (): ExtendedColumnDef<ModuleInterface>[] => [
     ),
   },
 
-  // === Role Column ===
+  // === Page / Name Column ===
   {
     accessorKey: "name",
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title="page"
+        title="Page"
         className="justify-center"
       />
     ),
@@ -69,4 +69,4 @@ export const columns = (): ExtendedColumnDef<ModuleInterface>[] => [
       />
     ),
   },
-]
+];

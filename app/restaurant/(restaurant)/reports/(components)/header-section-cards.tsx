@@ -34,7 +34,7 @@ export function HeaderSectionCards() {
 
             {metric.change && (
               <CardAction>
-                <Badge variant="outline">{metric.change}</Badge>
+                <Badge variant="outline" className="sm:text-xs md:text-[0.6rem] lg:text-sm">{metric.change}</Badge>
               </CardAction>
             )}
 

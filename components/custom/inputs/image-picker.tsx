@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Control, Controller } from "react-hook-form";
 import Dropzone from "react-dropzone";
 import Image from "next/image";
 import { XCircleIcon, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+
 
 interface ImagePickerProps {
     control: Control<any>;
@@ -18,6 +20,34 @@ interface ImagePickerProps {
     imageClassName?: string;
 }
 
+
+
+/**
+ * === Image picker with preview and React Hook Form integration. ===
+ * 
+ * Allows users to upload an image via drag-and-drop or file selection, 
+ * displays a preview of the selected or current image, and integrates with `react-hook-form`.
+ * Supports file type restrictions and clearing the selected image.
+ *
+ * @param control - React Hook Form control object for form management.
+ * @param name - Name of the form field.
+ * @param label - Optional label displayed above the picker.
+ * @param defaultValue - Optional initial File value (default: null).
+ * @param allowedTypes - Array of allowed file extensions (default: ["png","jpg","jpeg","webp"]).
+ * @param currentImageUrl - Optional URL of an existing image to display initially.
+ * @param className - Optional custom class names for the wrapper element.
+ * @param imageClassName - Optional custom class names for the preview image.
+ * @returns {JSX.Element} A controlled image upload component with preview and clear functionality.
+ *
+ * @example
+ * <ImagePicker
+ *   control={control}
+ *   name="profilePicture"
+ *   label="Upload your profile picture"
+ *   allowedTypes={["png","jpg"]}
+ *   currentImageUrl={user.avatarUrl}
+ * />
+ */
 export function ImagePicker({
     control,
     name,
@@ -27,7 +57,7 @@ export function ImagePicker({
     currentImageUrl,
     className,
     imageClassName
-}: ImagePickerProps) {
+}: ImagePickerProps): React.JSX.Element {
 
     // === State for selected file and preview URL ===
     const [file, setFile] = useState<File | null>(defaultValue);

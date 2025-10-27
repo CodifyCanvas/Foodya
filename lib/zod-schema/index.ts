@@ -7,14 +7,22 @@ import z from "zod";
  * Validates uploaded image file size & type.
  */
 export const imageSchema = z
-  .instanceof(File, { message: "Choose an image to upload" })
-  .refine((file) => file.size <= 2 * 1024 * 1024, {
-    message: "Image must be smaller than 2MB",
-  })
-  .refine(
-    (file) => ["image/jpeg", "image/png", "image/gif"].includes(file.type),
-    { message: "Unsupported format — try JPG, PNG, or GIF 🚀", }
-  )
+  .union([
+    // Validate if the input is a File instance
+    z
+      .instanceof(File, { message: "Choose an image to upload" })
+      .refine((file) => file.size <= 1 * 1024 * 1024, {
+        message: "Image must be smaller than 1MB",
+      })
+      .refine(
+        (file) => ["image/jpeg", "image/png", "image/gif"].includes(file.type),
+        { message: "Unsupported format — try JPG, PNG, or GIF 🚀" }
+      ),
+    // Allow string (e.g., URL or placeholder)
+    z.string(),
+    // Allow null
+    z.null(),
+  ])
   .optional();
 
 

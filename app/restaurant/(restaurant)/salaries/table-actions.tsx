@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ChevronDown, PencilLine, RefreshCcw, SquareMenu, TriangleAlert } from 'lucide-react';
+import { ChevronDown, PencilLine, RefreshCcw, TriangleAlert } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 import { cn } from '@/lib/utils';
@@ -44,18 +44,10 @@ const showPermissionToast = () =>
 export function RowActions({ data, props, className }: EditFormMultiProps) {
   const [openEdit, setOpenEdit] = useState(false);
 
-  const { canView, canEdit } = useModulePermission();
+  const { canEdit } = useModulePermission();
 
   const handleEditClick = () => {
     if (canEdit) {
-      setOpenEdit(true);
-    } else {
-      showPermissionToast();
-    }
-  };
-
-  const handleViewClick = () => {
-    if (canView) {
       setOpenEdit(true);
     } else {
       showPermissionToast();
@@ -73,10 +65,6 @@ export function RowActions({ data, props, className }: EditFormMultiProps) {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" className="font-rubik-400 text-xs">
-          <DropdownMenuItem onClick={handleViewClick}>
-            <SquareMenu className="mr-2 size-4" />
-            View
-          </DropdownMenuItem>
           <DropdownMenuItem onClick={handleEditClick}>
             <PencilLine className="mr-2 size-4" />
             Edit

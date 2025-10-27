@@ -7,10 +7,10 @@ import { TablesSelectInput, TransactionsTablesInterface } from "@/lib/defination
 import { formatDateWithFns } from "@/lib/date-fns"
 import TransactionTitleCell from "@/components/custom/dialogs/transaction-title-cell"
 
-/* === Columns for Income Transactions === */
+/* === Columns for Expense Transactions === */
 export const columns = (props: { categories: TablesSelectInput[] }): ExtendedColumnDef<TransactionsTablesInterface>[] => [
 
-  // === Id Column ===
+  // === Index / ID Column ===
   {
     accessorKey: "id",
     header: ({ column }) => (

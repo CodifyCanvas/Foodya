@@ -7,6 +7,7 @@ import { CategoriesSelectInput, ItemWithOptions } from "@/lib/definations"
 import { Badge } from "@/components/ui/badge"
 import { truncateText } from "@/lib/utils"
 
+// Api Response Structure
 export interface menuItemsFromRoute {
   menuItems: ItemWithOptions[]
   categories: CategoriesSelectInput[]
@@ -15,7 +16,7 @@ export interface menuItemsFromRoute {
 /* === Table Columns for Menu Items === */
 export const columns = (props: { categories: CategoriesSelectInput[] }): ExtendedColumnDef<ItemWithOptions>[] => [
 
-  // === Id Column ===
+  // === Index / Id Column ===
   {
     accessorKey: "id",
     header: ({ column }) => (

@@ -46,17 +46,6 @@ export function EmployeePersonalInfoForm({ data }: FormDialogProps) {
 
   const registerWithMask = useHookFormMask(form.register);
 
-  // === Watch Selected Image ===
-  const selectedFile = form.watch("image")
-
-  // === Generate Preview URL ===
-  const previewUrl = useMemo(() => {
-    if (selectedFile instanceof File) {
-      return URL.createObjectURL(selectedFile)
-    }
-    return null
-  }, [selectedFile])
-
   /* === Load Initial Values When Editing === */
   useEffect(() => {
     if (data) {
@@ -76,17 +65,18 @@ export function EmployeePersonalInfoForm({ data }: FormDialogProps) {
   async function onSubmit(formValues: z.infer<typeof EmployeePersonalInfoFormSchema>) {
     const API_URL = `/api/employees/${data?.id}`;
 
+    {/* === Prepare FormData === */ }
     const formData = new FormData();
-
-    // Destructure image out
     const { image, ...rest } = formValues;
 
-    // Append non-file data as JSON
+    {/* === Send Zod values (without image) as JSON string === */ }
     formData.append("data", JSON.stringify(rest));
 
-    // Add image file if available
+    {/* === Handle image === */ }
     if (image instanceof File) {
-      formData.append("image", image);
+      formData.append("image", image);  // <- New file uploaded
+    } else if (image === null) {
+      formData.append("image", ""); // <- Signal to remove existing image
     }
 
     const requestOptions = {
@@ -142,16 +132,16 @@ export function EmployeePersonalInfoForm({ data }: FormDialogProps) {
         {/* === Scrollable Form Area === */}
         <ScrollArea className="flex h-full flex-col justify-between overflow-hidden p-3">
 
-          <EmployeePersonalInfo control={form.control} image={data?.image} registerWithMask={registerWithMask} previewUrl={previewUrl} mode="edit" />
+          <EmployeePersonalInfo control={form.control} image={data?.image} registerWithMask={registerWithMask} mode="edit" />
 
         </ScrollArea>
 
         {/* === Action Buttons === */}
         <div className="w-full flex gap-2 justify-end">
-          <Button type="button" variant="secondary" onClick={() => ResetForm()} >
+          <Button type="button" className="min-w-32" variant="secondary" onClick={() => ResetForm()} >
             Reset
           </Button>
-          <Button type="submit" disabled={submitButtonLoading} variant="green">
+          <Button type="submit" className="min-w-32" disabled={submitButtonLoading} variant="green">
             Update
           </Button>
         </div>

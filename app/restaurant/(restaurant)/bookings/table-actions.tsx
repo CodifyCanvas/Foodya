@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { ChevronDown, PencilLine, Plus, Trash2, TriangleAlert, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 

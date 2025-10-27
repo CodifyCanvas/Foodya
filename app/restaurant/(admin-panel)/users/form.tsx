@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -26,22 +26,29 @@ import {
 import SwitchInput from "@/components/ui/switch-input"
 import { ComboboxInput } from "@/components/ui/combobox-input"
 import { User } from "@/lib/definations"
-import Image from "next/image"
+import { ImagePicker } from "@/components/custom/inputs/image-picker"
 
+
+
+// === Props ===
 interface FormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   data: User | null
   roles?: { label: string; value: string }[]
-  [key: string]: any
+  [key: string]: unknown
 }
 
+
+
 export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogProps) {
+
+  /* === Local State === */
   const [isVisible, setIsVisible] = useState(false)
   const [manualReset, setManualReset] = useState(false)
   const [submitButtonLoading, setSubmitButtonLoading] = useState<boolean>(false)
 
-  { /* === Initialize react-hook-form with Zod validation schema === */ }
+  /* === React Hook Form Setup === */
   const form = useForm<z.infer<typeof userFormSchema>>({
     resolver: zodResolver(userFormSchema),
     defaultValues: {
@@ -55,7 +62,7 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
     },
   })
 
-  {/* === Reset from values if data changes (for editing) === */ }
+  /* === Load Initial Values When Editing === */
   useEffect(() => {
     if (!manualReset && data) {
       form.reset({
@@ -69,37 +76,28 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
     }
   }, [data, manualReset, form])
 
-  const selectedFile = form.watch("image");
-
-  // 👇 File preview URL
-  const previewUrl = useMemo(() => {
-    if (selectedFile instanceof File) {
-      return URL.createObjectURL(selectedFile);
-    }
-    return null;
-  }, [selectedFile]);
-
-  {/* === Toggle Password Visibilty === */ }
+  /* === Toggle Password Visibility === */
   const togglePasswordVisibility = useCallback(() => {
     setIsVisible(prev => !prev)
   }, [])
 
-  {/* === Handle Form Submit === */ }
+  /* === Submit Handler === */
   async function onSubmit(formValues: z.infer<typeof userFormSchema>) {
     const API_URL = "/api/users"
     const isEditing = !!data?.id
 
+    {/* === Prepare FormData === */ }
     const formData = new FormData();
-
-    // Destructure image out
     const { image, ...rest } = formValues;
 
-    // Send Zod values (without image) as JSON string
+    {/* === Send Zod values (without image) as JSON string === */ }
     formData.append("data", JSON.stringify(rest));
 
-    // Add image file if available
+    {/* === Handle image === */ }
     if (image instanceof File) {
-      formData.append("image", image);
+      formData.append("image", image);  // <- New file uploaded
+    } else if (image === null) {
+      formData.append("image", ""); // <- Signal to remove existing image
     }
 
     const requestOptions = {
@@ -145,7 +143,7 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
     }
   }
 
-  {/* === Manual reset logic (with ID preserved if editing) === */ }
+  /* === Reset Handler === */
   const ResetForm = () => {
     setManualReset(true)
     form.reset({
@@ -164,6 +162,7 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
       <DialogContent className="p-0">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-rows-[auto_1fr_auto]">
+
             {/* === Dialog Header === */}
             <DialogHeader className="p-6 pb-0">
               <DialogTitle>{data ? "Edit User" : "Create New User"}</DialogTitle>
@@ -172,54 +171,33 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
               </DialogDescription>
             </DialogHeader>
 
-            {/* === Form Content === */}
+            {/* === Scrollable Form Area === */}
             <ScrollArea className="p-3 flex flex-col justify-between">
 
-              {/* === Image Input Field === */}
-              <div className="w-full flex flex-col items-center justify-center">
-                <div className="flex justify-start">
-                  {previewUrl ? (
-                    <div className="relative size-24 sm:size-40 rounded-lg outline outline-gray-300 dark:outline-gray-600 overflow-hidden">
-                      <Image src={previewUrl} alt="New preview" sizes="(min-width: 640px) 160px, 96px" fill style={{ objectFit: "cover" }} loading="lazy" />
-                    </div>
-                  ) : data?.image ? (
-                    <div className="relative size-24 sm:size-40 rounded-lg outline outline-gray-300 dark:outline-gray-600 overflow-hidden">
-                      <Image src={data.image} alt="Current profile" sizes="(min-width: 640px) 160px, 96px" fill style={{ objectFit: "cover" }} loading="lazy" />
-                    </div>
-                  ) : (
-                    <div className="size-24 sm:size-40 rounded-lg text-sm bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400 dark:text-gray-600">
-                      No Image
-                    </div>
+              {/* === Item Image Field === */}
+              <div className="w-full justify-center flex py-2">
+                <FormField
+                  control={form.control}
+                  name="image"
+                  render={() => (
+                    <FormItem className="group relative w-auto sm:max-w-sm m-1">
+                      <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                        Item Image
+                      </FormLabel>
+                      <FormControl>
+                        <ImagePicker
+                          control={form.control}
+                          name="image"
+                          allowedTypes={["png", "jpg", "jpeg", "webp"]}
+                          currentImageUrl={data?.image ?? undefined} // <- optional existing image
+                          className="rounded-lg size-30 sm:size-40"
+                          imageClassName="rounded-lg"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </div>
-
-                {/* === Item Image Field === */}
-                <div className="w-full py-2">
-                  <FormField
-                    control={form.control}
-                    name="image"
-                    render={({ field }) => (
-                      <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                        <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
-                          Image
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            id="image-select-field"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0] ?? null;
-                              field.onChange(file);
-                            }}
-                            className="h-10 text-xs"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                />
               </div>
 
               {/* === Name Input Field === */}
@@ -337,6 +315,7 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
                   />
                 </div>
               </div>
+
             </ScrollArea>
 
             {/* === Footer Buttons === */}
@@ -345,7 +324,8 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
               <Button type="submit" className="w-full" disabled={submitButtonLoading} variant="green" >
                 {submitButtonLoading ? (
                   <p className="flex flex-row gap-2">
-                    <Loader className="animate-spin duration-300" /> {data ? "Updating" : "Creating"}
+                    <Loader className="animate-spin duration-300" />
+                    {data ? "Updating" : "Creating"}
                   </p>
                 ) : data ? "Update" : "Create"}
               </Button>

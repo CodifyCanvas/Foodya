@@ -16,7 +16,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import { useModulePermission } from '@/hooks/useModulePermission';
-import { InvoiceDetail } from '@/lib/definations';
 import GenerateInvoiceDialog from '../orders/generate-invoice-dialog';
 
 /* === Types === */

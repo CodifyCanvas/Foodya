@@ -54,7 +54,7 @@ export const columns = (): ExtendedColumnDef<EmployeeWithLatestRecord>[] => [
       return (
         <div className="flex flex-row gap-2 items-center">
           <Avatar>
-            <AvatarImage src={image ?? undefined} />
+            <AvatarImage src={image ?? undefined} alt={name} />
             <AvatarFallback className="bg-indigo-500/35 text-indigo-600">
               {name?.charAt(0)?.toUpperCase()}
             </AvatarFallback>
@@ -92,13 +92,8 @@ export const columns = (): ExtendedColumnDef<EmployeeWithLatestRecord>[] => [
 
       return (
         <div className="w-full flex justify-center">
-          <Badge
-            className={`rounded-full capitalize font-rubik-400 border-none min-w-16 focus-visible:outline-none focus-visible:ring-2 flex items-center justify-center focus-visible:ring-opacity-20 ${statusStyles[status]}`}
-          >
-            <span
-              className={`size-1.5 rounded-full inline-block ${dotColors[status]}`}
-              aria-hidden="true"
-            />
+          <Badge className={`rounded-full capitalize font-rubik-400 border-none min-w-16 focus-visible:outline-none focus-visible:ring-2 flex items-center justify-center focus-visible:ring-opacity-20 ${statusStyles[status]}`}>
+            <span className={`size-1.5 rounded-full inline-block ${dotColors[status]}`} aria-hidden="true" />
             {status}
           </Badge>
         </div>

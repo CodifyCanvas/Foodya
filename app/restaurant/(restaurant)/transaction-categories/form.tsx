@@ -31,6 +31,7 @@ import toast from 'react-hot-toast'
 import { refreshData } from "@/lib/swr"
 import { TransactionCategoriesTablesInterface } from "@/lib/definations"
 import { Textarea } from "@/components/ui/textarea"
+import { Loader } from "lucide-react"
 
 /* === Props Interface === */
 interface FormDialogProps {
@@ -184,7 +185,7 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
                           value={field.value ?? ''}
                           placeholder="Lorem ipsum dolor sit amet consectetur adipisicing elit"
                           rows={3}
-                          className="resize-none max-h-[160px] overflow-y-auto"
+                          className="resize-none max-h-[160px] overflow-y-auto text-sm sm:text-base"
                         />
                       </FormControl>
                       <FormMessage />
@@ -195,16 +196,28 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
             </ScrollArea>
 
             {/* === Dialog Footer Buttons === */}
-            <DialogFooter className="p-6 justify-between pt-0">
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button type="button" variant="secondary" onClick={() => ResetForm()} >
-                Reset
+            <DialogFooter className="p-6 pt-0 flex flex-col sm:flex-col gap-3 w-full">
+              {/* === Submit Button === */}
+              <Button type="submit" className="w-full" disabled={submitButtonLoading} variant="green" >
+                {submitButtonLoading ? (
+                  <p className="flex flex-row gap-2">
+                    <Loader className="animate-spin duration-300" /> {data ? "Updating" : "Creating"}
+                  </p>
+                ) : data ? "Update" : "Create"}
               </Button>
-              <Button type="submit" disabled={submitButtonLoading} variant="green">
-                {data ? "Update" : "Create"}
-              </Button>
+
+              {/* === Reset + Cancel Buttons === */}
+              <div className="flex w-full  gap-2">
+                <Button type="button" className="flex-1" variant="secondary" onClick={ResetForm} >
+                  Reset
+                </Button>
+
+                <DialogClose asChild>
+                  <Button className="flex-1" variant="outline">
+                    Cancel
+                  </Button>
+                </DialogClose>
+              </div>
             </DialogFooter>
           </form>
         </Form>

@@ -201,7 +201,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp }: FormDialogProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="p-0" variant="full-screen">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="h-[calc(100vh-1rem)] grid grid-rows-[minmax(3rem,4rem)_1fr_minmax(5rem,auto)]">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="h-[calc(100vh-1rem)] grid grid-rows-[auto_1fr_auto]">
 
             {/* === Dialog Header === */}
             <DialogHeader className="p-6 pb-0">
@@ -259,13 +259,11 @@ export function RoleForm({ open, onOpenChange, data: dataProp }: FormDialogProps
                 </ScrollArea>)}
 
             {/* === Footer === */}
-            <DialogFooter className="p-6 justify-between pt-0">
-
+            <DialogFooter className="p-3 sm:p-6 grid gap-4grid-cols-1 md:grid-cols-[auto_1fr_auto] items-center justify-between pt-0">
               {/* === Footer Totals === */}
-              <div className="grid grid-cols-3 sm:grid-cols-[minmax(6rem,15rem)_minmax(6rem,15rem)_minmax(6rem,15rem)_minmax(6rem,15rem)_minmax(6rem,15rem)] justify-start items-center gap-2">
-
+              <div className="grid grid-cols-2 gap-2 items-center">
                 {/* === Total Unpaid Salaries === */}
-                <div className="w-full relative group h-10 p-2 m-1 border rounded-lg text-center">
+                <div className="w-full min-w-32 relative group h-10 p-2 m-1 border rounded-lg text-center">
                   <Label className="absolute left-2 top-0 z-10 -translate-y-1/2 bg-background px-1 text-xs text-foreground">
                     Total Unpaid Salaries
                   </Label>
@@ -275,16 +273,17 @@ export function RoleForm({ open, onOpenChange, data: dataProp }: FormDialogProps
                         {footerDetails.totalBalance?.toFixed(2) ?? "—"}
                       </div>
                     </TooltipTrigger>
-                    {footerDetails.totalBalance !== null && footerDetails.totalBalance !== undefined && (
-                      <TooltipContent className="text-sm max-w-xs text-center">
-                        <p>{toCapitalizedWords(footerDetails.totalBalance ?? 0)}</p>
-                      </TooltipContent>
-                    )}
+                    {footerDetails.totalBalance !== null &&
+                      footerDetails.totalBalance !== undefined && (
+                        <TooltipContent className="text-sm max-w-xs text-center">
+                          <p>{toCapitalizedWords(footerDetails.totalBalance ?? 0)}</p>
+                        </TooltipContent>
+                      )}
                   </Tooltip>
                 </div>
 
                 {/* === Selected Salaries To Pay === */}
-                <div className="w-full relative group h-10 p-2 m-1 border rounded-lg text-center">
+                <div className="w-full min-w-40 relative group h-10 p-2 m-1 border rounded-lg text-center">
                   <Label className="absolute left-2 top-0 z-10 -translate-y-1/2 bg-background px-1 text-xs text-foreground">
                     Selected Salaries To Pay
                   </Label>
@@ -294,27 +293,52 @@ export function RoleForm({ open, onOpenChange, data: dataProp }: FormDialogProps
                         {footerDetails.selectedSalariesToPay?.toFixed(2) ?? "—"}
                       </div>
                     </TooltipTrigger>
-                    {footerDetails.selectedSalariesToPay !== null && footerDetails.selectedSalariesToPay !== undefined && (
-                      <TooltipContent className="text-sm max-w-xs text-center">
-                        <p>{toCapitalizedWords(footerDetails.selectedSalariesToPay)}</p>
-                      </TooltipContent>
-                    )}
+                    {footerDetails.selectedSalariesToPay !== null &&
+                      footerDetails.selectedSalariesToPay !== undefined && (
+                        <TooltipContent className="text-sm max-w-xs text-center">
+                          <p>{toCapitalizedWords(footerDetails.selectedSalariesToPay)}</p>
+                        </TooltipContent>
+                      )}
                   </Tooltip>
                 </div>
-
               </div>
 
+              {/* Spacer for large screens (pushes buttons to the right) */}
+              <div className="hidden md:block"></div>
+
               {/* === Footer Buttons === */}
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button type="button" variant="secondary" onClick={handleResetForm} >
-                Reset
-              </Button>
-              <Button type="submit" disabled={isSubmitting} variant="green">
-                Update
-              </Button>
+              <div className="grid gap-2 grid-cols-2 sm:grid-cols-3 md:auto-cols-max md:grid-flow-col w-full md:w-auto" >
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  className="col-span-2 sm:col-span-1 order-1 sm:order-3 md:order-3 min-w-32"
+                  disabled={isSubmitting}
+                  variant="green">
+                  Update
+                </Button>
+
+                {/* Reset Button */}
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="min-w-32 order-2 sm:order-1 md:order-1"
+                  onClick={handleResetForm}
+                >
+                  Reset
+                </Button>
+
+                {/* Cancel Button */}
+                <DialogClose asChild>
+                  <Button
+                    variant="outline"
+                    className="min-w-32 order-3 sm:order-2 md:order-2"
+                  >
+                    Cancel
+                  </Button>
+                </DialogClose>
+              </div>
             </DialogFooter>
+
           </form>
         </Form>
       </DialogContent>

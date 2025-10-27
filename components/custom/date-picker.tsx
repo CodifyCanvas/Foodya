@@ -19,7 +19,29 @@ type DateInputProps = {
 } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'value' | 'onChange'>
 
 
-export const DateInput = React.forwardRef<HTMLButtonElement, DateInputProps>(({ value, onChange, className, return: returnType = "date", now, ...props }, ref) => {
+
+/**
+ * === Controlled date picker button with popover calendar. ===
+ * 
+ * Renders a button that opens a calendar popover for selecting a single date. 
+ * Supports both Date objects and ISO strings, with optional automatic selection of the current date.
+ *
+ * @param value - Current selected date (Date object or string).
+ * @param onChange - Callback fired when a date is selected. Supports standard or RHF-style event objects.
+ * @param className - Optional additional class names for styling.
+ * @param return - Determines the type returned in onChange: "date" (Date object) or "string" (ISO string). Default: "date".
+ * @param now - If true, auto-selects the current date when no value is provided.
+ * @returns {JSX.Element} A button that opens a popover calendar for date selection.
+ * 
+ * @example
+ * <DateInput 
+ *    value={selectedDate} 
+ *    onChange={(date) => setSelectedDate(date)} 
+ *    return="string"
+ *    now={true} 
+ * />
+ */
+export const DateInput = React.forwardRef<HTMLButtonElement, DateInputProps>(({ value, onChange, className, return: returnType = "date", now, ...props }, ref): React.JSX.Element => {
 
   const [open, setOpen] = React.useState(false);  // <- Popover open state
 

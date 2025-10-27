@@ -8,10 +8,10 @@ import { Badge } from "@/components/ui/badge"
 import { formatDateWithFns } from "@/lib/date-fns"
 import { truncateText } from "@/lib/utils"
 
-/* === Table Columns for Tables === */
+/* === Table Columns for Bookings === */
 export const columns = (props: { tables: TablesSelectInput[] }): ExtendedColumnDef<BookingsTablesInterface>[] => [
 
-  // === Id Column ===
+  // === Index / ID Column ===
   {
     accessorKey: "id",
     header: ({ column }) => (
@@ -48,7 +48,7 @@ export const columns = (props: { tables: TablesSelectInput[] }): ExtendedColumnD
     }
   },
 
-  // === Table Name Column ===
+  // === Table Name / Number Column ===
   {
     accessorKey: "tableName",
     header: ({ column }) => (

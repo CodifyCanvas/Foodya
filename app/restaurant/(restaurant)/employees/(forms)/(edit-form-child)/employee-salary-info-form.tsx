@@ -107,10 +107,10 @@ export function EmployeeSalaryInfoForm({ data }: FormDialogProps) {
 
         {/* === Action Buttons === */}
         <div className="w-full flex gap-2 justify-end">
-          <Button type="button" variant="secondary" onClick={() => ResetForm()} >
+          <Button type="button" className="min-w-32" variant="secondary" onClick={() => ResetForm()} >
             Reset
           </Button>
-          <Button type="submit" disabled={submitButtonLoading} variant="green">
+          <Button type="submit" className="min-w-32" disabled={submitButtonLoading} variant="green">
             Update
           </Button>
         </div>

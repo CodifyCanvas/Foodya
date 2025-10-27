@@ -6,10 +6,10 @@ import { ExtendedColumnDef } from "@/types/columns.data-table"
 import { RestaurantTablesInterface } from "@/lib/definations"
 import { Badge } from "@/components/ui/badge"
 
-/* === Table Columns for Tables === */
+/* === Table Columns for Restaurant Tables === */
 export const columns = (): ExtendedColumnDef<RestaurantTablesInterface>[] => [
 
-  // === Id Column ===
+  // === Index / ID Column ===
   {
     accessorKey: "id",
     header: ({ column }) => (
@@ -25,7 +25,7 @@ export const columns = (): ExtendedColumnDef<RestaurantTablesInterface>[] => [
     ),
   },
 
-  // === Table Label Column ===
+  // === Table Name / Number Column ===
   {
     accessorKey: "table_number",
     header: ({ column }) => (

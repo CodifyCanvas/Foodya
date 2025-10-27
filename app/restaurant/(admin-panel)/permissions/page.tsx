@@ -1,67 +1,79 @@
-'use client';
+'use client'
 
-import useSWR from 'swr';
-import { Loader } from 'lucide-react';
+import useSWR from 'swr'
+import { Loader } from 'lucide-react'
 
-import { DataTable } from '@/components/DataTable/data-table';
-import { columns } from './columns';
-import { useModulePermission } from '@/hooks/useModulePermission';
-import AccessDenied from '@/app/errors/403/page';
-import { Role } from '@/lib/definations';
-import { useUserContext } from '@/hooks/context/useUserContext';
-import ServiceUnavailable from '@/app/errors/service-unavailable';
+import { DataTable } from '@/components/DataTable/data-table'
+import { columns } from './columns'
+import { useModulePermission } from '@/hooks/useModulePermission'
+import { useUserContext } from '@/hooks/context/useUserContext'
+import AccessDenied from '@/app/errors/403/page'
+import ServiceUnavailable from '@/app/errors/service-unavailable'
+import { Role } from '@/lib/definations'
+import { swrFetcher } from '@/lib/swr'
 
-/* === Data Fetcher === */
-const fetcher = (url: string) => fetch(url).then(res => res.json());
+
 
 const PermissionsPage = () => {
-  // Use the permission hook
-  const { canView, loading: permLoading } = useModulePermission();
-  const { refetchPermissions } = useUserContext();
+  // === Module Permission Hook ===
+  const { canView, loading: permLoading } = useModulePermission()
 
+  // === User Context (for refetching permissions after edits) ===
+  const { refetchPermissions } = useUserContext()
 
-  // Fetch permissions data
-  const {
-    data: permissions,
-    error,
-    isLoading: dataLoading,
-  } = useSWR<Role[]>('/api/permission', fetcher);
+  // === Fetch permissions data via SWR ===
+  const { data: permissions, error, isLoading: dataLoading } = useSWR<Role[]>(
+    '/api/permission',
+    swrFetcher
+  )
 
-  const isLoading = permLoading || dataLoading;
+  // === Combined loading state ===
+  const isLoading = permLoading || dataLoading
 
+  // === Loading Fallback ===
   if (isLoading) {
     return (
       <div className="flex-1 h-full w-full bg-white flex justify-center items-center">
         <Loader className="animate-spin size-7 text-gray-500" />
       </div>
-    );
+    )
   }
 
+  // === Access Denied Fallback ===
   if (!canView) {
-    return <AccessDenied />;
+    return <AccessDenied />
   }
 
+  // === Error Fallback ===
   if (error) {
-    console.error(error);
-    return <ServiceUnavailable title='Service Unavailable' description='Please try again later or check your connection.' />;
+    console.error('SWR Error:', error)
+    return (
+      <ServiceUnavailable
+        title="Service Unavailable"
+        description="Please try again later or check your connection."
+      />
+    )
   }
 
   return (
     <div className="bg-white rounded-lg min-h-[50vh] flex flex-col">
-      {/* Page Header */}
-      <h3 className="text-3xl font-medium text-start px-4 pt-3 text-emerald-600">
-        Permissions
-      </h3>
 
+      {/* === Page Header === */}
+      <header className="px-4 pt-3">
+        <h3 className="text-3xl font-medium text-emerald-600 text-start">
+          Permissions
+        </h3>
+      </header>
+
+      {/* === Permissions Data Table === */}
       <DataTable
         columns={columns({ refetchPermissions })}
         data={permissions ?? []}
         filterColumns={['role']}
         loading={isLoading}
       />
-
     </div>
-  );
-};
+  )
+}
 
-export default PermissionsPage;
+export default PermissionsPage

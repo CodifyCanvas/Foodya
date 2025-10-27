@@ -10,7 +10,7 @@ import TransactionTitleCell from "@/components/custom/dialogs/transaction-title-
 /* === Columns for Income Transactions === */
 export const columns = (props: { categories: TablesSelectInput[] }): ExtendedColumnDef<TransactionsTablesInterface>[] => [
 
-  // === Id Column ===
+  // === Index / ID Column ===
   {
     accessorKey: "id",
     header: ({ column }) => (

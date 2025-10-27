@@ -8,25 +8,26 @@ import { columns } from './columns';
 import { CreateForm } from './table-actions';
 import { useModulePermission } from '@/hooks/useModulePermission';
 import AccessDenied from '@/app/errors/403/page';
-import { InvoiceWithMenuItemsAndTablesInterface } from '@/lib/definations';
 import ServiceUnavailable from '@/app/errors/service-unavailable';
+import { InvoiceWithMenuItemsAndTablesInterface } from '@/lib/definations';
+import { swrFetcher } from '@/lib/swr';
 
-/* === Fetcher Function === */
-const fetcher = (url: string) => fetch(url).then(res => res.json());
+
 
 const InvoicePage = () => {
-  // Use permission hook
+  // === Module Permission Hook ===
   const { canView, loading: permLoading } = useModulePermission();
 
-  // Fetch Menu Categories data from API
-  const {
-    data: invoices,
-    error,
-    isLoading: rolesLoading,
-  } = useSWR<InvoiceWithMenuItemsAndTablesInterface>('/api/invoices', fetcher);
+  // === Fetch Invoices Data ===
+  const { data, error, isLoading: dataLoading } = useSWR<InvoiceWithMenuItemsAndTablesInterface>(
+    '/api/invoices',
+    swrFetcher
+  );
 
-  const isLoading = permLoading || rolesLoading;
+  // === Combined Loading State ===
+  const isLoading = permLoading || dataLoading;
 
+  // === Loading Fallback ===
   if (isLoading) {
     return (
       <div className="flex-1 h-full w-full bg-white flex justify-center items-center">
@@ -35,23 +36,39 @@ const InvoicePage = () => {
     );
   }
 
+  // === Access Denied Fallback ===
   if (!canView) {
     return <AccessDenied />;
   }
 
+  // === Error Fallback ===
   if (error) {
-    console.error(error);
-    return <ServiceUnavailable title='Service Unavailable' description='Please try again later or check your connection.' />;
+    console.error('SWR Error:', error);
+    return (
+      <ServiceUnavailable
+        title="Service Unavailable"
+        description="Please try again later or check your connection."
+      />
+    );
   }
 
   return (
     <div className="bg-white rounded-lg min-h-[50vh] flex flex-col">
-      <h3 className="text-3xl font-medium text-start px-4 pt-3 text-emerald-600">Manage Invoices</h3>
 
+      {/* === Page Header === */}
+      <header className="px-4 pt-3">
+        <h3 className="text-3xl font-medium text-emerald-600 text-start">
+          Manage Invoices
+        </h3>
+      </header>
+
+      {/* === Invoices Data Table === */}
       <DataTable
-        columns={columns({ menuItems: invoices?.menuItems ?? [], tables: invoices?.tables ?? [] })}
-        data={invoices?.invoices ?? []}
-        createComponent={<CreateForm props={{ menuItems: invoices?.menuItems ?? [], tables: invoices?.tables ?? [] }} />}
+        columns={columns({ menuItems: data?.menuItems ?? [], tables: data?.tables ?? [] })}
+        data={data?.invoices ?? []}
+        createComponent={
+          <CreateForm props={{ menuItems: data?.menuItems ?? [], tables: data?.tables ?? [] }} />
+        }
         loading={isLoading}
       />
 

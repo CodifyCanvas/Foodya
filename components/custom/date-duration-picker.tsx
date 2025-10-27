@@ -16,6 +16,8 @@ import {
 
 import { formatDateWithFns } from "@/lib/date-fns"
 
+
+
 type Props = {
   nameStart: string
   nameEnd: string
@@ -23,12 +25,37 @@ type Props = {
   secondLabel?: string
 }
 
+
+
+/**
+ * === Controlled date and time range picker integrated with React Hook Form. ===
+ * 
+ * Provides a UI to select a start and end date/time, with a calendar popover for dates 
+ * and time inputs for precise hours and minutes. Automatically updates the end time 
+ * to one hour after the selected start time when a new date is chosen.
+ *
+ * @param nameStart - Form field name for the start date/time.
+ * @param nameEnd - Form field name for the end date/time.
+ * @param firstLabel - Optional label for the start time input (default: "Start Time").
+ * @param secondLabel - Optional label for the end time input (default: "End Time").
+ * @returns {JSX.Element} A date-time range picker with popover calendar and controlled time inputs.
+ * 
+ * @example
+ * <FormProvider {...methods}>
+ *   <DateTimeRangePicker
+ *     nameStart="eventStart"
+ *     nameEnd="eventEnd"
+ *     firstLabel="Start"
+ *     secondLabel="End"
+ *   />
+ * </FormProvider>
+ */
 export function DateTimeRangePicker({
   nameStart,
   nameEnd,
   firstLabel,
   secondLabel,
-}: Props) {
+}: Props): React.JSX.Element {
   const { control, setValue } = useFormContext()
 
   const getTimeValue = (date: Date | string | null | undefined) => {
@@ -38,6 +65,7 @@ export function DateTimeRangePicker({
 
   return (
     <div className="flex-col gap-4 w-full">
+
       {/* === Date Picker === */}
       <div className="flex flex-col gap-3 w-full">
         <Controller
@@ -84,7 +112,7 @@ export function DateTimeRangePicker({
       {/* === Time Inputs === */}
       <div className="flex flex-row gap-2 mt-5 w-full">
 
-        {/* Start Time */}
+        {/* === Start Time === */}
         <div className="flex flex-col group relative w-full gap-3">
           <Label htmlFor="time-from" className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs" >
             {firstLabel || "Start Time"}
@@ -119,7 +147,7 @@ export function DateTimeRangePicker({
           />
         </div>
 
-        {/* End Time */}
+        {/* === End Time === */}
         <div className="flex flex-col group relative w-full gap-3">
           <Label htmlFor="time-to" className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs" >
             {secondLabel || "End Time"}

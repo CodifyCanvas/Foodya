@@ -2,8 +2,14 @@
 
 import { Card, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../ui/table"
+import { TableRow, TableCell } from "../ui/table"
 
+
+
+/**
+ * === ReportsHeaderCardSkeleton ===
+ * Displays a grid of skeleton cards representing report headers while loading.
+ */
 export function ReportsHeaderCardSkeleton() {
   const skeletons = new Array(4).fill(null)
 
@@ -33,6 +39,16 @@ export function ReportsHeaderCardSkeleton() {
   )
 }
 
+
+
+/**
+ * === DataTableSkeleton ===
+ * Displays a skeleton table with configurable number of columns and rows.
+ * 
+ * @param columnCount - Number of columns (default: 5)
+ * @param rowCount - Number of rows (default: 8)
+ * @param className - Optional additional CSS classes
+ */
 export function DataTableSkeleton({
   columnCount = 5,
   rowCount = 8,
@@ -43,15 +59,15 @@ export function DataTableSkeleton({
 
   return (
     <div className={cn("w-full overflow-hidden  border-t border-b my-5", className)}>
-          {rows.map((_, rowIndex) => (
-            <TableRow key={`row-${rowIndex}`}>
-              {columns.map((_, colIndex) => (
-                <TableCell key={`cell-${rowIndex}-${colIndex}`}>
-                  <div className="h-4 w-full max-w-[150px] rounded bg-gray-100 animate-pulse" />
-                </TableCell>
-              ))}
-            </TableRow>
+      {rows.map((_, rowIndex) => (
+        <TableRow key={`row-${rowIndex}`}>
+          {columns.map((_, colIndex) => (
+            <TableCell key={`cell-${rowIndex}-${colIndex}`}>
+              <div className="h-4 w-full max-w-[150px] rounded bg-gray-100 animate-pulse" />
+            </TableCell>
           ))}
+        </TableRow>
+      ))}
     </div>
   )
 }

@@ -32,6 +32,7 @@ import { refreshData } from "@/lib/swr"
 import { TransactionsTablesInterface } from "@/lib/definations"
 import { Textarea } from "@/components/ui/textarea"
 import SelectInput from "@/components/ui/select-input"
+import { Loader } from "lucide-react"
 
 /* === Props Interface === */
 interface FormDialogProps {
@@ -157,7 +158,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
                   control={form.control}
                   name="title"
                   render={({ field }) => (
-                    <FormItem className="group relative w-full m-1">
+                    <FormItem className="group relative w-auto sm:max-w-sm m-1">
                       <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                         Title
                       </FormLabel>
@@ -205,7 +206,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
                   control={form.control}
                   name="amount"
                   render={({ field }) => (
-                    <FormItem className="group relative w-full m-1">
+                    <FormItem className="group relative w-auto sm:max-w-sm m-1">
                       <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                         Amount
                       </FormLabel>
@@ -249,16 +250,28 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
             </ScrollArea>
 
             {/* === Dialog Footer Buttons === */}
-            <DialogFooter className="p-6 justify-between pt-0">
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button type="button" variant="secondary" onClick={() => ResetForm()} >
-                Reset
+            <DialogFooter className="p-6 pt-0 flex flex-col sm:flex-col gap-3 w-full">
+              {/* === Submit Button === */}
+              <Button type="submit" className="w-full" disabled={submitButtonLoading} variant="green" >
+                {submitButtonLoading ? (
+                  <p className="flex flex-row gap-2">
+                    <Loader className="animate-spin duration-300" /> {data ? "Updating" : "Creating"}
+                  </p>
+                ) : data ? "Update" : "Create"}
               </Button>
-              <Button type="submit" disabled={submitButtonLoading} variant="green">
-                {data ? "Update" : "Create"}
-              </Button>
+
+              {/* === Reset + Cancel Buttons === */}
+              <div className="flex w-full  gap-2">
+                <Button type="button" className="flex-1" variant="secondary" onClick={ResetForm} >
+                  Reset
+                </Button>
+
+                <DialogClose asChild>
+                  <Button className="flex-1" variant="outline">
+                    Cancel
+                  </Button>
+                </DialogClose>
+              </div>
             </DialogFooter>
           </form>
         </Form>

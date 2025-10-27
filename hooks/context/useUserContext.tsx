@@ -4,6 +4,7 @@ import React, { createContext, useContext, useCallback, useEffect, useState, use
 import useSWR from 'swr';
 import { User, Permissions, ModulePermission } from '@/lib/definations';
 import toast from 'react-hot-toast';
+import { swrFetcher } from '@/lib/swr';
 
 
 
@@ -32,11 +33,6 @@ interface UserProviderProps {
 
 
 
-// === Fetch function for SWR ===
-const fetchUser = (url: string) => fetch(url).then((res) => res.json());
-
-
-
 // === Context ===
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
@@ -46,7 +42,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
   // Fetch user data using SWR
-  const { data: user, error, isLoading, mutate } = useSWR<User>('/api/user', fetchUser);
+  const { data: user, error, isLoading, mutate } = useSWR<User>('/api/user', swrFetcher);
 
   // Local state to manage permissions and related errors/loading
   const [permissions, setPermissions] = useState<Permissions[] | null>(null);
