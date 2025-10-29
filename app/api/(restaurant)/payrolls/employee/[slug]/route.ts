@@ -76,7 +76,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     const { salaries } = EmployeeSalaryPostingFormSchema.parse(body);
 
     // === Mark Payrolls as Paid ===
-    const update = await markUnpaidPayrollsAsPaid(salaries);
+    const update = await markUnpaidPayrollsAsPaid(salaries, slug);
 
     // === Return success response ===
     return NextResponse.json(

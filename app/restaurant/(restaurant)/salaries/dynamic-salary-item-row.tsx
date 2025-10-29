@@ -33,7 +33,7 @@ export function DynamicSalaryItemRow({
   return (
     <>
       {/* === Basic Pay Input Field === */}
-      <div className="w-full py-2">
+      <div className="w-full">
         <FormField
           control={control}
           name={`salaries.${index}.basicPay`}
@@ -58,7 +58,7 @@ export function DynamicSalaryItemRow({
       </div>
 
       {/* === Bonus Input Field === */}
-      <div className="w-full py-2">
+      <div className="w-full">
         <FormField
           control={control}
           name={`salaries.${index}.bonus`}
@@ -82,7 +82,7 @@ export function DynamicSalaryItemRow({
       </div>
 
       {/* === Penalty Input Field === */}
-      <div className="w-full py-2">
+      <div className="w-full">
         <FormField
           control={control}
           name={`salaries.${index}.penalty`}
@@ -106,7 +106,7 @@ export function DynamicSalaryItemRow({
       </div>
 
       {/* === Decription Input Field === */}
-      <div className="w-full py-2">
+      <div className="w-full">
         <FormField
           control={control}
           name={`salaries.${index}.description`}
@@ -132,7 +132,7 @@ export function DynamicSalaryItemRow({
       </div>
 
       {/* === Total Pay Input Field === */}
-      <div className="w-full py-2">
+      <div className="w-full">
         <FormField
           control={control}
           name={`salaries.${index}.totalPay`}

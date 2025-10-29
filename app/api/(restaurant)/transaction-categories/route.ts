@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { checkDuplicate, deleteData, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions";
+import { checkDuplicate, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions";
 import { deleteTheTransactionCategory } from "@/lib/crud-actions/transaction-categories";
 import { TransactionCategoriesFormSchema } from "@/lib/zod-schema/restaurant.zod";
 import { NextRequest, NextResponse } from "next/server";

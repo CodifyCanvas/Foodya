@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth"
 import { getAllBookingsTables, syncBookingAndTableStatuses } from "@/lib/crud-actions/bookings-tables"
-import { deleteData, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions"
+import { deleteData, insertData, updateData } from "@/lib/crud-actions/general-actions"
 import { getAllActiveTable } from "@/lib/crud-actions/restaurant-tables";
 import { mapToLabelValue } from "@/lib/utils"
 import { bookingsTablesFormSchema } from "@/lib/zod-schema/restaurant.zod"

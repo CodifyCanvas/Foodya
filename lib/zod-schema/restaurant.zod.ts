@@ -266,7 +266,6 @@ export const EmployeeSalaryPostingFormSchema = z.object({
     z.object({
       id: z.union([z.number(), z.string().transform(String)]),
 
-      employeeId: z.union([z.number(), z.string().transform(String)]),
       description: z.string().nullable(),
 
       basicPay: z.string(),

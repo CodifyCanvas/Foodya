@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { syncBookingAndTableStatuses } from "@/lib/crud-actions/bookings-tables";
-import { checkDuplicate, deleteData, getAllData, getSpecificColumns, insertData, updateData } from "@/lib/crud-actions/general-actions";
+import { checkDuplicate, insertData, updateData } from "@/lib/crud-actions/general-actions";
 import { deleteRestaurantTable, getAllActiveTable } from "@/lib/crud-actions/restaurant-tables";
 import { restaurantTablesFormSchema } from "@/lib/zod-schema/restaurant.zod";
 import { NextRequest, NextResponse } from "next/server";

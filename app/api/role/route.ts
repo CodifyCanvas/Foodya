@@ -1,6 +1,5 @@
 import { auth } from "@/auth";
 import { checkDuplicate, deleteData, getAllData, insertData, updateData } from "@/lib/crud-actions/general-actions";
-import { deleteRoleById } from "@/lib/crud-actions/roles";
 import { roleFormSchema } from "@/lib/zod-schema";
 import { NextRequest, NextResponse } from "next/server";
 

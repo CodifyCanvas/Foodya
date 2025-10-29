@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { getHeaderCardMetrics } from "@/lib/crud-actions/reports";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 
 
@@ -11,7 +11,7 @@ const path = '/api/reports/header-cards';
 /* ===============================================
 === [GET] Fetch Dashboard header cards Reports ===
 =============================================== */
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
         // === Authenticate the user session === 
         const session = await auth();

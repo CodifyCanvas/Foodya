@@ -478,11 +478,10 @@ export interface PayrollWithEmployeeDetails {
  */
 export interface PayrollDialogSalaryRow {
   id: number | string;
-  employeeId: number | null;
   description: string | null;
   basicPay: string;
-  bonus: string | null;
-  penalty: string | null;
+  bonus: string;
+  penalty: string;
   totalPay: string;
   month: string;
   paidAt?: string | null;

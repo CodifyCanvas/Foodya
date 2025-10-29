@@ -250,7 +250,6 @@ export async function fetchEmployeeUnpaidPayrolls(employeeId: number, status: 'p
   const payrolls = await db
     .select({
       id: payrollsTable.id,
-      employeeId: payrollsTable.employeeId,
       description: payrollsTable.description,
       basicPay: payrollsTable.basicPay,
       bonus: payrollsTable.bonus,
@@ -267,6 +266,8 @@ export async function fetchEmployeeUnpaidPayrolls(employeeId: number, status: 'p
   // === Convert 'paidAt' dates to ISO string or null if missing ===
   return payrolls.map((p) => ({
     ...p,
+    bonus: p.bonus ?? '0.00',
+    penalty: p.penalty ?? '0.00',
     paidAt: p.paidAt ? p.paidAt.toISOString() : null,
   }));
 }
@@ -326,9 +327,11 @@ export async function getEmployeePayrollSummary(employeeId: number): Promise<Pay
  * === Marks specified unpaid payroll records as paid and logs corresponding transaction entries. ===
  * 
  * @param {PayrollDialogSalaryRow[]} salaries - Array of salary payroll rows to mark as paid.
+ * @param {number} employeeId - The ID of the employee to mark the payroll of the months.
+ * 
  * @returns {Promise<boolean>} Returns true if operation completes successfully, false if no salaries provided.
  */
-export async function markUnpaidPayrollsAsPaid(salaries: PayrollDialogSalaryRow[]): Promise<boolean> {
+export async function markUnpaidPayrollsAsPaid(salaries: PayrollDialogSalaryRow[], employeeId: number): Promise<boolean> {
   if (!salaries || salaries.length === 0) return false;
 
   // === Perform all updates within a transaction for atomicity ===
@@ -349,7 +352,7 @@ export async function markUnpaidPayrollsAsPaid(salaries: PayrollDialogSalaryRow[
         .where(
           and(
             eq(payrollsTable.id, Number(salary.id)),
-            eq(payrollsTable.employeeId, Number(salary.employeeId)),
+            eq(payrollsTable.employeeId, employeeId),
             eq(payrollsTable.month, salary.month)
           )
         );

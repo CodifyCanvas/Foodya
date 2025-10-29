@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -71,30 +71,28 @@ export function RoleForm({ open, onOpenChange, data: dataProp }: FormDialogProps
   });
 
   /* === Fetch Salaries Data === */
-  const fetchPayrolls = useCallback(async () => {
-    if (!dataProp?.employeeId) return;
-
-    setIsLoading(true);
-    toast.loading("Fetching Employee Payrolls...", { id: 'fetching-payrolls-toast' });
-
-    try {
-      const response = await fetch(`/api/payrolls/employee/${dataProp.employeeId}`);
-      const result = await response.json();
-
-      setSalariesData(result);
-    } catch (error) {
-      console.error("Payroll fetch error:", error);
-      toast.error(`Failed to fetch Payrolls for Employee #${dataProp.employeeId}`);
-    } finally {
-      setIsLoading(false);
-      toast.dismiss("fetching-payrolls-toast");
-    }
-  }, [dataProp]);
-
-  /* === Load Data on Open === */
   useEffect(() => {
-    if (open) fetchPayrolls();
-  }, [fetchPayrolls, open]);
+    if (!open || !dataProp?.employeeId) return;
+
+    const fetchPayrolls = async () => {
+      setIsLoading(true);
+      toast.loading("Fetching Employee Payrolls...", { id: 'fetching-payrolls-toast' });
+
+      try {
+        const response = await fetch(`/api/payrolls/employee/${dataProp.employeeId}`);
+        const result = await response.json();
+        setSalariesData(result);
+      } catch (error) {
+        console.error("Payroll fetch error:", error);
+        toast.error(`Failed to fetch Payrolls for Employee #${dataProp.employeeId}`);
+      } finally {
+        setIsLoading(false);
+        toast.dismiss("fetching-payrolls-toast");
+      }
+    };
+
+    fetchPayrolls();
+  }, [open, dataProp?.employeeId]);
 
   /* === Set Form Values When Salaries Fetched === */
   useEffect(() => {
@@ -246,7 +244,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp }: FormDialogProps
                           </AccordionTrigger>
 
                         </div>
-                        <AccordionContent className="space-y-4 py-4 grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-2 ">
+                        <AccordionContent className="py-1 sm:py-4 grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-2 ">
 
                           {/* === Input Fields === */}
                           <DynamicSalaryItemRow key={field.id} index={index} control={control} watch={watch} setValue={setValue} />
@@ -259,11 +257,11 @@ export function RoleForm({ open, onOpenChange, data: dataProp }: FormDialogProps
                 </ScrollArea>)}
 
             {/* === Footer === */}
-            <DialogFooter className="p-3 sm:p-6 grid gap-4grid-cols-1 md:grid-cols-[auto_1fr_auto] items-center justify-between pt-0">
+            <DialogFooter className="p-3 sm:p-6 grid gap-4 grid-cols-1 md:grid-cols-[auto_1fr_auto] items-center justify-between pt-0">
               {/* === Footer Totals === */}
-              <div className="grid grid-cols-2 gap-2 items-center">
-                {/* === Total Unpaid Salaries === */}
-                <div className="w-full min-w-32 relative group h-10 p-2 m-1 border rounded-lg text-center">
+              <div className="grid grid-cols-2 gap-2 items-center mb-2 md:mb-0">
+                {/* Total Unpaid Salaries */}
+                <div className="w-full min-w-32 relative group h-10 p-2 border rounded-lg text-center">
                   <Label className="absolute left-2 top-0 z-10 -translate-y-1/2 bg-background px-1 text-xs text-foreground">
                     Total Unpaid Salaries
                   </Label>
@@ -282,8 +280,8 @@ export function RoleForm({ open, onOpenChange, data: dataProp }: FormDialogProps
                   </Tooltip>
                 </div>
 
-                {/* === Selected Salaries To Pay === */}
-                <div className="w-full min-w-40 relative group h-10 p-2 m-1 border rounded-lg text-center">
+                {/* Selected Salaries To Pay */}
+                <div className="w-full min-w-40 relative group h-10 p-2 border rounded-lg text-center">
                   <Label className="absolute left-2 top-0 z-10 -translate-y-1/2 bg-background px-1 text-xs text-foreground">
                     Selected Salaries To Pay
                   </Label>
@@ -303,20 +301,8 @@ export function RoleForm({ open, onOpenChange, data: dataProp }: FormDialogProps
                 </div>
               </div>
 
-              {/* Spacer for large screens (pushes buttons to the right) */}
-              <div className="hidden md:block"></div>
-
               {/* === Footer Buttons === */}
-              <div className="grid gap-2 grid-cols-2 sm:grid-cols-3 md:auto-cols-max md:grid-flow-col w-full md:w-auto" >
-                {/* Submit Button */}
-                <Button
-                  type="submit"
-                  className="col-span-2 sm:col-span-1 order-1 sm:order-3 md:order-3 min-w-32"
-                  disabled={isSubmitting}
-                  variant="green">
-                  Update
-                </Button>
-
+              <div className="grid gap-2 grid-cols-2 sm:grid-cols-3 md:grid-flow-col md:auto-cols-max w-full md:w-auto">
                 {/* Reset Button */}
                 <Button
                   type="button"
@@ -336,8 +322,19 @@ export function RoleForm({ open, onOpenChange, data: dataProp }: FormDialogProps
                     Cancel
                   </Button>
                 </DialogClose>
+
+                {/* Update Button */}
+                <Button
+                  type="submit"
+                  className="col-span-2 sm:col-span-1 order-1 sm:order-3 md:order-3 min-w-32"
+                  disabled={isSubmitting}
+                  variant="green"
+                >
+                  Update
+                </Button>
               </div>
             </DialogFooter>
+
 
           </form>
         </Form>
