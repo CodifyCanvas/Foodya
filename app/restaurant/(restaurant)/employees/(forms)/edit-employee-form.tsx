@@ -16,11 +16,11 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 
 import toast from 'react-hot-toast'
 import Stepper from "@/components/custom/Stepper"
-import { Loader } from "lucide-react"
 import { EmployeePersonalInfoForm } from "./(edit-form-child)/employee-personal-info-form"
 import { EmployeeWithFullDetails } from "@/lib/definations"
 import { EmployeeRecordsInfoForm } from "./(edit-form-child)/employee-records-info-form"
 import { EmployeeSalaryInfoForm } from "./(edit-form-child)/employee-salary-info-form"
+import { FormsLoadingScreen } from "@/components/fallbacks/loadings"
 
 /* === Props Interface === */
 interface FormDialogProps {
@@ -97,20 +97,20 @@ export function EditEmployeeForm({ open, onOpenChange, data: dataProp }: FormDia
         </DialogHeader>
 
         {/* === Scrollable Form Area === */}
-        {employeeFetching ? <div className="h-full w-full bg-white flex justify-center items-center">
-          <Loader className="animate-spin size-5 md:size-8 text-gray-500" />
-        </div> : <ScrollArea className="flex h-full my-2 min-h-[50vh] max-w-[100vw-2rem] flex-col justify-between p-3">
+        {employeeFetching
+          ? <FormsLoadingScreen />
+          : <ScrollArea className="flex h-full my-2 min-h-[50vh] max-w-[100vw-2rem] flex-col justify-between p-3">
 
-          {/* Stepper Navigation */}
-          <div className="w-full flex justify-center">
-            <Stepper currentStep={currentStep} steps={steps} />
-          </div>
+            {/* Stepper Navigation */}
+            <div className="w-full flex justify-center">
+              <Stepper currentStep={currentStep} steps={steps} />
+            </div>
 
-          {currentStep === 1 && <EmployeePersonalInfoForm data={data?.personalInfo ?? null} />}
-          {currentStep === 2 && <EmployeeRecordsInfoForm data={{ employeeId: data?.personalInfo.id ?? null, designation: data?.employmentRecord[0]?.designation ?? null, joiningAt: data?.employmentRecord[0].joinedAt ?? null }} />}
-          {currentStep === 3 && <EmployeeSalaryInfoForm data={{ employeeId: data?.personalInfo.id ?? null, currentSalary: data?.personalInfo.salary ?? null }} />}
+            {currentStep === 1 && <EmployeePersonalInfoForm data={data?.personalInfo ?? null} />}
+            {currentStep === 2 && <EmployeeRecordsInfoForm data={{ employeeId: data?.personalInfo.id ?? null, designation: data?.employmentRecord[0]?.designation ?? null, joiningAt: data?.employmentRecord[0].joinedAt ?? null }} />}
+            {currentStep === 3 && <EmployeeSalaryInfoForm data={{ employeeId: data?.personalInfo.id ?? null, currentSalary: data?.personalInfo.salary ?? null }} />}
 
-        </ScrollArea>}
+          </ScrollArea>}
 
         {/* === Dialog Footer Buttons === */}
         <DialogFooter className="p-6 pt-0">
@@ -141,7 +141,7 @@ export function EditEmployeeForm({ open, onOpenChange, data: dataProp }: FormDia
               type="button"
               variant="outline"
               onClick={() => setCurrentStep((prev) => prev + 1)}
-              disabled={currentStep >= steps.length}
+              disabled={currentStep >= steps.length || employeeFetching}
               className="w-full sm:w-auto sm:min-w-32"
             >
               Next

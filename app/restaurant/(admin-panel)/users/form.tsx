@@ -181,7 +181,7 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
                   name="image"
                   render={() => (
                     <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                      <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                      <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                         Item Image
                       </FormLabel>
                       <FormControl>
@@ -207,7 +207,7 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
                   name="name"
                   render={({ field }) => (
                     <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                      <FormLabel className="absolute start-2 top-0 z-10 bg-background text-foreground -translate-y-1/2 px-1 text-xs">
+                      <FormLabel className="absolute start-2 top-0 z-10 bg-card text-muted-foreground  -translate-y-1/2 px-1 text-xs">
                         Full Name
                       </FormLabel>
                       <FormControl>
@@ -226,7 +226,7 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
                   name="email"
                   render={({ field }) => (
                     <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                      <FormLabel className="absolute start-2 top-0 z-10 bg-background text-foreground -translate-y-1/2 px-1 text-xs">
+                      <FormLabel className="absolute start-2 top-0 z-10 bg-card text-muted-foreground  -translate-y-1/2 px-1 text-xs">
                         Email
                       </FormLabel>
                       <FormControl>
@@ -245,7 +245,7 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
                   name="password"
                   render={({ field }) => (
                     <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                      <FormLabel className="absolute start-2 top-0 z-10 bg-background text-foreground -translate-y-1/2 px-1 text-xs">
+                      <FormLabel className="absolute start-2 top-0 z-10 bg-card text-muted-foreground  -translate-y-1/2 px-1 text-xs">
                         Password
                       </FormLabel>
                       <FormControl>
@@ -296,7 +296,7 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
                     name="role_id"
                     render={({ field }) => (
                       <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                        <FormLabel className="absolute start-2 top-0 z-10 bg-background text-foreground -translate-y-1/2 px-1 text-xs">
+                        <FormLabel className="absolute start-2 top-0 z-10 bg-card text-muted-foreground  -translate-y-1/2 px-1 text-xs">
                           Role
                         </FormLabel>
                         <FormControl>

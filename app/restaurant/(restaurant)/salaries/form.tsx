@@ -34,6 +34,7 @@ import { Label } from "@/components/ui/label"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Loader } from "lucide-react"
 import { PayrollDialogSalaryRow } from "@/lib/definations"
+import { FormsLoadingScreen } from "@/components/fallbacks/loadings"
 
 /* === Props Interface === */
 interface FormDialogProps {
@@ -211,58 +212,59 @@ export function RoleForm({ open, onOpenChange, data: dataProp }: FormDialogProps
 
             {/* === Scrollable Form Area === */}
             {isLoading
-              ? (
-                <div className="h-full w-full bg-white flex justify-center items-center">
-                  <Loader className="animate-spin size-5 md:size-8 text-gray-500" />
-                </div>
-              ) : (
-                <ScrollArea className="flex flex-col min-h-[50vh] max-w-[100vw-2rem] justify-between overflow-hidden py-3 px-6">
+              ? <FormsLoadingScreen />
+              : (<ScrollArea className="flex border-b border-dashed mb-3 flex-col min-h-[50vh] max-w-[100vw-2rem] justify-between overflow-hidden py-3 px-6">
 
-                  <Accordion type="single" collapsible>
-                    {fields.map((field, index) => (
-                      <AccordionItem key={field.id} value={field.month}>
-                        <div className="w-full flex items-center gap-2 py-1">
-                          <FormField
-                            control={form.control}
-                            name={`salaries.${index}.selected`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormControl>
-                                  <Checkbox
-                                    id={`select-salary-${index}-accordion`}
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                    className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
-                                  />
-                                </FormControl>
-                              </FormItem>
-                            )}
-                          />
+                <Accordion type="single" collapsible>
+                  {fields.length > 0 ? fields.map((field, index) => (
+                    <AccordionItem key={field.id} value={field.month}>
+                      <div className="w-full flex items-center gap-2 py-1">
+                        <FormField
+                          control={form.control}
+                          name={`salaries.${index}.selected`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Checkbox
+                                  id={`select-salary-${index}-accordion`}
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                  className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
 
-                          <AccordionTrigger className="w-full justify-between">
-                            <span>{formatMonthYear(field.month)}</span>
-                          </AccordionTrigger>
+                        <AccordionTrigger className="w-full justify-between">
+                          <span>{formatMonthYear(field.month)}</span>
+                        </AccordionTrigger>
 
-                        </div>
-                        <AccordionContent className="py-1 sm:py-4 grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-2 ">
+                      </div>
+                      <AccordionContent className="py-1 sm:py-4 grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-2 ">
 
-                          {/* === Input Fields === */}
-                          <DynamicSalaryItemRow key={field.id} index={index} control={control} watch={watch} setValue={setValue} />
+                        {/* === Input Fields === */}
+                        <DynamicSalaryItemRow key={field.id} index={index} control={control} watch={watch} setValue={setValue} />
 
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
+                      </AccordionContent>
+                    </AccordionItem>
+                  )) : <div className="h-full w-full bg-card flex flex-col justify-center items-center text-center gap-2 p-4">
+                    <p className="text-sm md:text-base font-medium text-muted-foreground">Oops! Nothing to show here</p>
+                    <p className="text-sm md:text-base font-medium text-muted-foreground">Try refreshing or check back later</p>
+                  </div>
 
-                </ScrollArea>)}
+                  }
+                </Accordion>
+
+              </ScrollArea>)}
 
             {/* === Footer === */}
-            <DialogFooter className="p-3 sm:p-6 grid gap-4 grid-cols-1 md:grid-cols-[auto_1fr_auto] items-center justify-between pt-0">
+            <DialogFooter className="p-3 sm:p-6 grid gap-4 grid-cols-1 lg:grid-cols-[auto_1fr_auto] items-center justify-between pt-0">
               {/* === Footer Totals === */}
               <div className="grid grid-cols-2 gap-2 items-center mb-2 md:mb-0">
                 {/* Total Unpaid Salaries */}
                 <div className="w-full min-w-32 relative group h-10 p-2 border rounded-lg text-center">
-                  <Label className="absolute left-2 top-0 z-10 -translate-y-1/2 bg-background px-1 text-xs text-foreground">
+                  <Label className="absolute left-2 top-0 z-10 -translate-y-1/2 bg-card px-1 text-xs text-muted-foreground">
                     Total Unpaid Salaries
                   </Label>
                   <Tooltip>
@@ -282,7 +284,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp }: FormDialogProps
 
                 {/* Selected Salaries To Pay */}
                 <div className="w-full min-w-40 relative group h-10 p-2 border rounded-lg text-center">
-                  <Label className="absolute left-2 top-0 z-10 -translate-y-1/2 bg-background px-1 text-xs text-foreground">
+                  <Label className="absolute left-2 top-0 z-10 -translate-y-1/2 bg-card px-1 text-xs text-muted-foreground">
                     Selected Salaries To Pay
                   </Label>
                   <Tooltip>
@@ -300,6 +302,8 @@ export function RoleForm({ open, onOpenChange, data: dataProp }: FormDialogProps
                   </Tooltip>
                 </div>
               </div>
+
+              <div className="lg:block hidden" />
 
               {/* === Footer Buttons === */}
               <div className="grid gap-2 grid-cols-2 sm:grid-cols-3 md:grid-flow-col md:auto-cols-max w-full md:w-auto">

@@ -18,6 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Loader } from "lucide-react";
 import { formatDateWithFns } from "@/lib/date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 // --- Props Type ---
 type GenerateInvoiceProps = {
@@ -295,241 +296,245 @@ const GenerateInvoiceDialog = ({ mode, data, isOpen, setIsOpen }: GenerateInvoic
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:min-w-6/7 md:min-w-2.5/3 max-h-[calc(100vh-2rem)] min-w-1/2 min-h-1/2 lg:min-w-fit font-rubik-400">
+      <DialogContent className="p-0 max-h-[calc(100vh-1rem)] min-w-[calc(100vw-2rem)] lg:min-w-2/3 font-rubik-400">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="max-h-[calc(100vh-5rem)] grid grid-rows-[auto_1fr_auto]">
 
-        <DialogHeader>
-          <DialogTitle className="text-lg font-medium">
-            {mode === 'create'
-              ? "Generate Invoice"
-              : <>Invoice <span className="text-orange-500">#{invoiceDetail?.invoice.id}</span></>
-            }
-          </DialogTitle>
-          <DialogDescription className="sr-only">
-            Click on &apos;Confirm & Print&apos; to generate the invoice for the order.
-          </DialogDescription>
-        </DialogHeader>
-
-        {invoicefetching ? (
-          // Show loader while invoice is fetching
-          <div className="flex h-full w-full justify-center items-center">
-            <Loader className="animate-spin size-7 text-gray-500" />
-          </div>
-        ) : (
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-
-              <div className={`w-full grid gap-4 text-sm items-start ${mode === 'view' ? 'grid-cols-2' : 'grid-cols-1'}`}>
-
-                {/* --- Customer Input Field --- */}
-                <div className="w-full">
-                  <FormField
-                    control={form.control}
-                    name="customerName"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row">
-                        <FormLabel className="font-normal">
-                          Customer Name:
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="text"
-                            placeholder="Random"
-                            {...field}
-                            className="w-fit h-10 border-b text-neutral-500"
-                            variant="minimal"
-                            readOnly={isViewMode}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* --- Order Type Select Field --- */}
-                <div className="w-full">
-                  <FormField
-                    control={form.control}
-                    name="orderType"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row">
-                        <FormLabel className="font-normal">
-                          Order Type:
-                        </FormLabel>
-                        <FormControl>
-                          <SelectInput options={[
-                            { label: 'Drive Thru', value: 'drive_thru' },
-                            { label: 'Take Away', value: 'takeaway' },
-                            { label: 'Dine In', value: 'dine_in', optDisabled: !isDineInHidden, optHide: !isDineInHidden }
-                          ]}
-                            value={field.value ?? ""}
-                            className="w-fit border-0 border-b border-gray-300 rounded-none shadow-none focus:ring-0 focus:border-neutral-500"
-                            onChange={field.onChange}
-                            placeholder="Drive Thru, ..."
-                            disabled={!!order?.orderType || isViewMode}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-
-                {/* --- Payment Select Field --- */}
-                <div className="w-full">
-                  <FormField
-                    control={form.control}
-                    name="paymentMethod"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row">
-                        <FormLabel className="font-normal">
-                          Payment:
-                        </FormLabel>
-                        <FormControl>
-                          <SelectInput options={[
-                            { label: 'Cash', value: 'cash' },
-                            { label: 'Card', value: 'card' },
-                            { label: 'Online', value: 'online' }
-                          ]}
-                            value={field.value ?? ""}
-                            className="w-fit border-0 border-b border-gray-300 rounded-none shadow-none focus:ring-0 focus:border-neutral-500"
-                            onChange={field.onChange}
-                            placeholder="Cash, Cred..."
-                            disabled={isViewMode}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* --- Paid Status --- */}
-                {invoiceDetail?.invoice && <div className="flex w-full flex-row text-neutral-500 justify-start">
-                  <p className="text-black mr-2">Paid: </p>
-                  <p>{invoiceDetail?.invoice.isPaid ? 'Paid' : 'Unpaid'}</p>
-                </div>
+            <DialogHeader className="p-4">
+              <DialogTitle className="text-lg font-medium">
+                {mode === 'create'
+                  ? "Generate Invoice"
+                  : <>Invoice <span className="text-orange-500">#{invoiceDetail?.invoice.id}</span></>
                 }
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                Click on &apos;Confirm & Print&apos; to generate the invoice for the order.
+              </DialogDescription>
+            </DialogHeader>
 
-                {/* --- Order Create Date --- */}
-                {invoiceDetail?.order.createdAt && <div className="flex w-full flex-row text-neutral-500 justify-start">
-                  <p className="text-black mr-2">Order Date: </p>
-                  <p>{formatDateWithFns(invoiceDetail?.order.createdAt, { showTime: true })}</p>
-                </div>
-                }
-
-                {/* --- Invoice Create Date --- */}
-                {invoiceDetail?.invoice.createdAt && <div className="flex w-full flex-row text-neutral-500 justify-start">
-                  <p className="text-black mr-2">Invoice Date: </p>
-                  <p>{formatDateWithFns(invoiceDetail?.invoice.createdAt, { showTime: true })}</p>
-                </div>
-                }
-
-                {/* --- Invoice Create By User --- */}
-                {invoiceDetail?.invoice?.generatedByUserId && <div className="flex flex-row w-full col-span-2 text-neutral-500 justify-start">
-                  <p className="text-black mr-2">Invoiced by: </p>
-                  <p>{invoiceDetail?.generatedBy?.name}</p>
-                </div>
-                }
-
+            {invoicefetching ? (
+              // Show loader while invoice is fetching
+              <div className="flex bg-transparent justify-center items-start">
+                <Loader className="animate-spin size-7 text-gray-500" />
               </div>
+            ) : (
+              <ScrollArea className="flex p-4 flex-col min-h-[50vh] min-w-[calc(100vw-5rem)] lg:min-w-2/3 max-w-[100vw-2rem] justify-between">
 
-              {/* --- Items Table --- */}
-              <div className="grid w-full [&>div]:max-h-[40vh] border-b [&>div]:rounded">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="[&>*]:whitespace-nowrap  bg-white hover:bg-white sticky top-0 uppercase text-xs after:content-[''] after:inset-x-0 after:h-px after:absolute after:bottom-0">
-                      <TableHead className="pl-4 min-w-auto sm:min-w-20 text-neutral-500">S.No</TableHead>
-                      <TableHead className="min-w-auto sm:min-w-56 text-neutral-500">Item Name</TableHead>
-                      <TableHead className="min-w-auto sm:min-w-20 text-neutral-500">Qty</TableHead>
-                      <TableHead className="min-w-auto sm:min-w-20 text-neutral-500">Price (PKR)</TableHead>
-                      <TableHead className="min-w-auto sm:min-w-20 text-neutral-500">Total</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody className="overflow-hidden">
-                    {menuItems.map((product: OrderItem, index: number) => (
-                      <TableRow
-                        key={index}
-                        className="[&>*]:whitespace-nowrap h-10 font-rubik-400"
-                      >
-                        <TableCell className="pl-4">{index + 1}</TableCell>
-                        <TableCell>{product.menuItemName} <span className="text-xs">{product.menuItemOptionName && `(${product.menuItemOptionName})`}</span></TableCell>
-                        <TableCell>{product.quantity}</TableCell>
-                        <TableCell>{product.price}</TableCell>
-                        <TableCell>{(parseFloat(product.price) * product.quantity).toFixed(2)}</TableCell>
+                <div
+                  className={`w-full grid gap-4 text-sm items-start ${mode === 'view' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 mb-5'
+                    }`}
+                >
+                  {/* --- Customer Input Field --- */}
+                  <div className="w-full">
+                    <FormField
+                      control={form.control}
+                      name="customerName"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row">
+                          <FormLabel className="min-w-fit font-normal">
+                            Customer Name:
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="text"
+                              placeholder="Random"
+                              {...field}
+                              className="w-fit min-w-32 h-10 border-b text-neutral-500"
+                              variant="minimal"
+                              readOnly={isViewMode}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* --- Order Type Select Field --- */}
+                  <div className="w-full">
+                    <FormField
+                      control={form.control}
+                      name="orderType"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row">
+                          <FormLabel className="font-normal">
+                            Order Type:
+                          </FormLabel>
+                          <FormControl>
+                            <SelectInput options={[
+                              { label: 'Drive Thru', value: 'drive_thru' },
+                              { label: 'Take Away', value: 'takeaway' },
+                              { label: 'Dine In', value: 'dine_in', optDisabled: !isDineInHidden, optHide: !isDineInHidden }
+                            ]}
+                              value={field.value ?? ""}
+                              className="w-fit min-w-32 border-0 border-b border-gray-300 rounded-none shadow-none focus:ring-0 focus:border-neutral-500"
+                              onChange={field.onChange}
+                              placeholder="Drive Thru, ..."
+                              disabled={!!order?.orderType || isViewMode}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+
+                  {/* --- Payment Select Field --- */}
+                  <div className="w-full">
+                    <FormField
+                      control={form.control}
+                      name="paymentMethod"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row">
+                          <FormLabel className="font-normal">
+                            Payment:
+                          </FormLabel>
+                          <FormControl>
+                            <SelectInput options={[
+                              { label: 'Cash', value: 'cash' },
+                              { label: 'Card', value: 'card' },
+                              { label: 'Online', value: 'online' }
+                            ]}
+                              value={field.value ?? ""}
+                              className="w-fit min-w-32 border-0 border-b border-gray-300 rounded-none shadow-none focus:ring-0 focus:border-neutral-500"
+                              onChange={field.onChange}
+                              placeholder="Cash, Cred..."
+                              disabled={isViewMode}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* --- Paid Status --- */}
+                  {invoiceDetail?.invoice && <div className="flex w-full  h-10 flex-row text-muted-foreground justify-start">
+                    <p className="text-foreground mr-2">Paid: </p>
+                    <p>{invoiceDetail?.invoice.isPaid ? 'Paid' : 'Unpaid'}</p>
+                  </div>
+                  }
+
+                  {/* --- Order Create Date --- */}
+                  {invoiceDetail?.order.createdAt && <div className="flex h-10 w-full flex-row text-muted-foreground justify-start">
+                    <p className="text-foreground mr-2">Order Date: </p>
+                    <p>{formatDateWithFns(invoiceDetail?.order.createdAt, { showTime: true })}</p>
+                  </div>
+                  }
+
+                  {/* --- Invoice Create Date --- */}
+                  {invoiceDetail?.invoice.createdAt && <div className="flex h-10 w-full flex-row text-muted-foreground justify-start">
+                    <p className="text-foreground mr-2">Invoice Date: </p>
+                    <p>{formatDateWithFns(invoiceDetail?.invoice.createdAt, { showTime: true })}</p>
+                  </div>
+                  }
+
+                  {/* --- Invoice Create By User --- */}
+                  {invoiceDetail?.invoice?.generatedByUserId && <div className="flex h-10 flex-row w-full text-muted-foreground justify-start">
+                    <p className="text-foreground mr-2">Invoiced by: </p>
+                    <p>{invoiceDetail?.generatedBy?.name}</p>
+                  </div>
+                  }
+
+                </div>
+
+                {/* --- Items Table --- */}
+                <div className="grid w-full [&>div]:max-h-[40vh] border-b [&>div]:rounded scroll-bar">
+                  <Table className="scroll-bar">
+                    <TableHeader>
+                      <TableRow className="[&>*]:whitespace-nowrap bg-secondary hover:bg-secondary/75 sticky top-0 uppercase text-xs after:content-[''] after:inset-x-0 after:h-px after:absolute after:bottom-0">
+                        <TableHead className="pl-4 min-w-auto sm:min-w-20 text-muted-foreground">S.No</TableHead>
+                        <TableHead className="min-w-auto sm:min-w-56 text-muted-foreground">Item Name</TableHead>
+                        <TableHead className="min-w-auto sm:min-w-20 text-muted-foreground">Qty</TableHead>
+                        <TableHead className="min-w-auto sm:min-w-20 text-muted-foreground">Price (PKR)</TableHead>
+                        <TableHead className="min-w-auto sm:min-w-20 text-muted-foreground">Total</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody className="overflow-hidden">
+                      {menuItems.map((product: OrderItem, index: number) => (
+                        <TableRow
+                          key={index}
+                          className="[&>*]:whitespace-nowrap h-10 font-rubik-400"
+                        >
+                          <TableCell className="pl-4">{index + 1}</TableCell>
+                          <TableCell>{product.menuItemName} <span className="text-xs">{product.menuItemOptionName && `(${product.menuItemOptionName})`}</span></TableCell>
+                          <TableCell>{product.quantity}</TableCell>
+                          <TableCell>{product.price}</TableCell>
+                          <TableCell>{(parseFloat(product.price) * product.quantity).toFixed(2)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* --- Invoice Totals Summary --- */}
+                <div className="flex my-5 flex-col gap-2 text-sm">
+                  <div className="flex flex-row text-muted-foreground justify-between">
+                    <p>Subtotal</p>
+                    <p>{invoiceFooter.subtotal.toFixed(2)}</p>
+                  </div>
+                  <div className="flex flex-row text-muted-foreground justify-between">
+                    <p>Discount %</p>
+                    <p>{invoiceFooter.discount}%</p>
+                  </div>
+                  <div className="flex flex-row text-muted-foreground justify-between">
+                    <p>Total</p>
+                    <p>{invoiceFooter.total.toFixed(2)}</p>
+                  </div>
+                  {booking && <div className="flex flex-row text-muted-foreground justify-between">
+                    <p>Arrears</p>
+                    <p>{booking.advancePaid}</p>
+                  </div>
+                  }
+                  <div className="flex flex-row justify-between">
+                    <p>Grand Total</p>
+                    <p className="text-orange-600 dark:text-orange-400">
+                      {Math.max(Math.round(invoiceFooter.grandTotal.toFixed(2)), 0)} PKR
+                    </p>
+                  </div>
+
+                  {/* --- Overpayment Notice --- */}
+                  {booking && invoiceFooter?.grandTotal < 0 && (
+                    <p className="text-orange-500 dark:text-orange-400 text-sm">
+                      You&apos;ve overpaid by <strong>{Math.abs(invoiceFooter.grandTotal).toFixed(2)} PKR</strong>. We&apos;ll refund the extra.
+                    </p>
+                  )}
+
+                </div>
+
+              </ScrollArea>
+            )}
+
+            {/* --- Dialog Actions --- */}
+            <DialogFooter className='flex p-4 flex-col sm:flex-row sm:justify-between sm:items-center gap-2'>
+              {!isViewMode && <div hidden={isViewMode} className="flex items-center space-x-2">
+                <Checkbox
+                  id="enableAutoPrint"
+                  checked={enablePrintOnSubmit}
+                  disabled={isViewMode}
+                  onCheckedChange={(checked) => {
+                    if (checked === "indeterminate") {
+                      setEnablePrintOnSubmit(false);
+                    } else {
+                      setEnablePrintOnSubmit(checked);
+                    }
+                  }}
+                  className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600 cursor-pointer dark:text-foreground"
+                />
+                <label htmlFor="enableAutoPrint" className="select-none cursor-pointer text-sm">
+                  Auto print on submit
+                </label>
+              </div>}
+              <div className="flex w-full ml-auto sm:w-auto gap-2">
+                <DialogClose asChild>
+                  <Button variant="outline" onClick={() => setIsOpen(false)} className="w-1/2 min-w-32 sm:w-auto">Cancel</Button>
+                </DialogClose>
+                <Button type="submit" className="w-1/2 min-w-32 sm:w-auto" variant={'green'}>{isViewMode ? 'Print' : 'Confirm & Print'}</Button>
               </div>
-
-              {/* --- Invoice Totals Summary --- */}
-              <div className="flex flex-col gap-2 text-sm">
-                <div className="flex flex-row text-neutral-500 justify-between">
-                  <p>Subtotal</p>
-                  <p>{invoiceFooter.subtotal.toFixed(2)}</p>
-                </div>
-                <div className="flex flex-row text-neutral-500 justify-between">
-                  <p>Discount %</p>
-                  <p>{invoiceFooter.discount}%</p>
-                </div>
-                <div className="flex flex-row text-neutral-500 justify-between">
-                  <p>Total</p>
-                  <p>{invoiceFooter.total.toFixed(2)}</p>
-                </div>
-                {booking && <div className="flex flex-row text-neutral-500 justify-between">
-                  <p>Arrears</p>
-                  <p>{booking.advancePaid}</p>
-                </div>
-                }
-                <div className="flex flex-row justify-between">
-                  <p>Grand Total</p>
-                  <p className="text-orange-500">
-                    {Math.max(Math.round(invoiceFooter.grandTotal.toFixed(2)), 0)} PKR
-                  </p>
-                </div>
-
-                {/* --- Overpayment Notice --- */}
-                {booking && invoiceFooter?.grandTotal < 0 && (
-                  <p className="text-orange-500 text-sm">
-                    You&apos;ve overpaid by <strong>{Math.abs(invoiceFooter.grandTotal).toFixed(2)} PKR</strong>. We&apos;ll refund the extra.
-                  </p>
-                )}
-
-              </div>
-
-              {/* --- Dialog Actions --- */}
-              <DialogFooter className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2'>
-                {!isViewMode && <div hidden={isViewMode} className="flex items-center space-x-2">
-                  <Checkbox
-                    id="enableAutoPrint"
-                    checked={enablePrintOnSubmit}
-                    disabled={isViewMode}
-                    onCheckedChange={(checked) => {
-                      if (checked === "indeterminate") {
-                        setEnablePrintOnSubmit(false);
-                      } else {
-                        setEnablePrintOnSubmit(checked);
-                      }
-                    }}
-                    className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600 dark:text-foreground"
-                  />
-                  <label htmlFor="enableAutoPrint" className="select-none text-sm">
-                    Auto print on submit
-                  </label>
-                </div>}
-                <div className="flex w-full ml-auto sm:w-auto gap-2">
-                  <DialogClose asChild>
-                    <Button variant="outline" onClick={() => setIsOpen(false)} className="w-1/2 sm:w-auto">Cancel</Button>
-                  </DialogClose>
-                  <Button type="submit" className="w-1/2 min-w-20 sm:w-auto" variant={'green'}>{isViewMode ? 'Print' : 'Confirm & Print'}</Button>
-                </div>
-              </DialogFooter>
-
-            </form>
-          </Form>
-        )}
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   )

@@ -1,4 +1,4 @@
-import { MoveRight } from "lucide-react";
+import { Check, MoveRight } from "lucide-react";
 import React from "react";
 
 interface StepperProps {
@@ -26,7 +26,7 @@ interface StepperProps {
  */
 export default function Stepper({ currentStep, steps }: StepperProps): React.JSX.Element {
   return (
-    <div className="flex items-center space-x-4">
+    <div className="flex  items-center space-x-4">
       {steps.map((stepLabel, index) => {
         const stepNumber = index + 1;
         const isActive = stepNumber === currentStep;
@@ -37,20 +37,20 @@ export default function Stepper({ currentStep, steps }: StepperProps): React.JSX
             <div className="flex flex-col px-2 items-center">
               <div
                 className={`
-                  w-8 h-8 flex items-center border-2 justify-center font-semibold rounded-full
-                  ${isActive ? "border-black text-black" : isCompleted ? "bg-black border-black text-white" : " border-neutral-500/75 text-neutral-500"}
+                  w-8 h-8 flex text-shadow-2xs items-center font-mono border-2 justify-center font-semibold rounded-full
+                  ${isActive ? "bg-primary border-primary text-white" : isCompleted ? "bg-primary border-primary text-white" : " border-ring text-muted-foreground"}
                 `}
               >
-                {stepNumber < 10 ? `0${stepNumber}` : stepNumber}
+                {isCompleted ? <Check /> : `${stepNumber < 10 ? `0${stepNumber}` : stepNumber}`}
               </div>
-              <p className={`mt-2 w-full text-center text-xs font-semibold ${isActive ? "text-black" : "text-neutral-500"}`}>
+              <p className={`mt-2 w-full text-center text-xs font-semibold text-shadow-2xs ${isActive ? "text-primary" : "text-muted-foreground"}`}>
                 {stepLabel}
               </p>
             </div>
 
             {/* Render arrow except after the last step */}
             {stepNumber !== steps.length && (
-              <div className="text-gray-400 font-bold select-none"><MoveRight /></div>
+              <div className={`font-bold select-none ${isCompleted ? "text-primary" : "text-muted-foreground/75"} `}><MoveRight /></div>
             )}
           </React.Fragment>
         );

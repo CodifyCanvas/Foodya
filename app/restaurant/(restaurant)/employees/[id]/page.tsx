@@ -10,6 +10,7 @@ import { EmployeeCompleteDetailsInterface } from '@/lib/definations';
 import { isValidMonthYear } from '@/lib/utils';
 import { fetchEmployee } from '@/lib/crud-actions/employees';
 import { notFound } from 'next/navigation';
+import { PageLoadingScreen } from '@/components/fallbacks/loadings';
 
 // === Props Interface ===
 interface PageProps {
@@ -54,15 +55,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
       name: 'Info',
       value: 'info',
       content: (
-        <Suspense
-          fallback={
-            <div className="flex-1 h-full w-full bg-white flex justify-center items-center">
-              <Loader className="animate-spin size-7 text-gray-500" />
-            </div>
-          }
-        >
-          <Info data={employee} showSalary={showSalary} />
-        </Suspense>
+        <Info data={employee} showSalary={showSalary} />
       ),
     },
     {
@@ -71,9 +64,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
       content: (
         <Suspense
           fallback={
-            <div className="flex-1 h-full w-full bg-white flex justify-center items-center">
-              <Loader className="animate-spin size-7 text-gray-500" />
-            </div>
+            <PageLoadingScreen />
           }
         >
           <SalaryHistory data={employee} from={from} to={to} status={status} />
@@ -83,12 +74,12 @@ const Page = async ({ params, searchParams }: PageProps) => {
   ];
 
   return (
-    <div className="bg-white rounded-lg font-rubik h-full flex flex-1 flex-col p-4">
+    <div className="bg-card rounded-lg font-rubik h-full flex flex-1 flex-col p-4">
       {/* Back Button & Header */}
       <div className="flex flex-col gap-2">
         <Link
           href="/restaurant/employees"
-          className="flex flex-row gap-2 items-center py-1 px-2 bg-neutral-100 text-black shadow-xs rounded-full w-fit hover:bg-neutral-200/75"
+          className="flex flex-row gap-2 items-center py-1 px-2 bg-muted text-foreground shadow-xs rounded-full w-fit hover:bg-foreground/20"
           aria-label="Back to Employees List"
         >
           <CornerUpLeft size={18} />
@@ -100,12 +91,12 @@ const Page = async ({ params, searchParams }: PageProps) => {
       {/* Tabs Section */}
       <div className="w-full">
         <Tabs defaultValue="info" className="gap-4">
-          <TabsList className="bg-background rounded-none border-b p-0">
+          <TabsList className="bg-primary/20 rounded border-b p-0">
             {tabs.map((tab) => (
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
-                className="bg-background data-[state=active]:text-emerald-600 text-neutral-500 data-[state=active]:border-emerald-600 h-full rounded-none border-0 border-b-2 border-transparent data-[state=active]:shadow-none"
+                className="bg-card data-[state=active]:text-primary data-[state=active]:dark:text-primary text-muted-foreground data-[state=active]:border-primary data-[state=active]:dark:border-primary h-full rounded-none border-0 border-b-2 border-transparent data-[state=active]:shadow-none"
               >
                 {tab.name}
               </TabsTrigger>

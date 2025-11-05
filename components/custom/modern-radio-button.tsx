@@ -85,7 +85,7 @@ const ModernRadioButton: React.FC<ModernRadioButtonProps> = ({
           >
             {option.label}
             &nbsp;
-            <span className="text-orange-600">{option.price}</span>
+            <span className="text-orange-600 dark:text-orange-400">{option.price}</span>
           </div>
         );
       })}

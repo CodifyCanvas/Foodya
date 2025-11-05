@@ -162,7 +162,7 @@ export function RoleForm({ open, onOpenChange, data, tables = [] }: FormDialogPr
                   name="customerName"
                   render={({ field }) => (
                     <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                      <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                      <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                         Customer Name
                       </FormLabel>
                       <FormControl>
@@ -186,7 +186,7 @@ export function RoleForm({ open, onOpenChange, data, tables = [] }: FormDialogPr
                   name="tableId"
                   render={({ field }) => (
                     <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                      <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                      <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                         Table
                       </FormLabel>
                       <FormControl>
@@ -208,7 +208,7 @@ export function RoleForm({ open, onOpenChange, data, tables = [] }: FormDialogPr
               {/* === Reservation Date & Time Range === */}
               <div className="w-full py-2">
                 <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                  <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                  <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                     Reservation Date
                   </FormLabel>
                   <FormControl>
@@ -228,7 +228,7 @@ export function RoleForm({ open, onOpenChange, data, tables = [] }: FormDialogPr
                   name="advancePaid"
                   render={({ field }) => (
                     <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                      <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                      <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                         Advanced Payment
                       </FormLabel>
                       <FormControl>

@@ -1,60 +1,46 @@
-'use client'
+'use client';
 
-import useSWR from 'swr'
-import { Loader } from 'lucide-react'
-
-import { DataTable } from '@/components/DataTable/data-table'
-import { columns, UsersWithRolesResponse } from './columns'
-import { CreateForm } from './table-actions'
-import { useModulePermission } from '@/hooks/useModulePermission'
-import AccessDenied from '@/app/errors/403/page'
-import ServiceUnavailable from '@/app/errors/service-unavailable'
-import { swrFetcher } from '@/lib/swr'
+import useSWR from 'swr';
+import { DataTable } from '@/components/DataTable/data-table';
+import { columns, UsersWithRolesResponse } from './columns';
+import { CreateForm } from './table-actions';
+import { useModulePermission } from '@/hooks/useModulePermission';
+import AccessDenied from '@/app/errors/403/page';
+import ServiceUnavailable from '@/app/errors/service-unavailable';
+import { swrFetcher } from '@/lib/swr';
+import { PageLoadingScreen, PageLoadingTableScreen } from '@/components/fallbacks/loadings';
 
 
 
 const UsersPage = () => {
 
-  // === Permission check for this module ===
-  const { canView, loading: permLoading } = useModulePermission()
+  /** === Module Permission Hook === */
+  const { canView, loading: permLoading } = useModulePermission();
 
-  // === Fetch users data using SWR ===
+  /** === Conditional SWR Fetching === */
+  const shouldFetch = !permLoading && canView;
   const { data, error, isLoading: dataLoading } = useSWR<UsersWithRolesResponse>(
-    '/api/users',
+    shouldFetch ? '/api/users' : null,
     swrFetcher
-  )
+  );
 
-  // === Overall loading state ===
-  const isLoading = permLoading || dataLoading
+  /** === Loading & Permission Fallbacks === */
+  if (permLoading) return <PageLoadingScreen />;
+  if (!canView) return <AccessDenied />;
 
-  // === Loading fallback ===
-  if (isLoading) {
-    return (
-      <div className="flex-1 h-full w-full bg-white flex justify-center items-center">
-        <Loader className="animate-spin size-7 text-gray-500" />
-      </div>
-    )
-  }
-
-  // === Access denied fallback ===
-  if (!canView) {
-    return <AccessDenied />
-  }
-
-  // === Error fallback ===
+  /** === Error Fallback === */
   if (error) {
-    console.error('SWR Error:', error)
+    console.error('[UsersPage] SWR Error:', error);
     return (
       <ServiceUnavailable
         title="Service Unavailable"
         description="Please try again later or check your connection."
       />
-    )
+    );
   }
 
   return (
-    <div className="bg-white rounded-lg min-h-[50vh] flex flex-col">
-
+    <div className="bg-card outline outline-accent rounded-lg min-h-[50vh] flex flex-col">
       {/* === Page Header === */}
       <header className="px-4 pt-3">
         <h3 className="text-3xl font-medium text-emerald-600 text-start">
@@ -63,15 +49,18 @@ const UsersPage = () => {
       </header>
 
       {/* === Users Data Table === */}
-      <DataTable
-        columns={columns({ roles: data?.roles ?? [] })}
-        data={data?.users ?? []}
-        filterColumns={['email', 'name']}
-        createComponent={<CreateForm props={{ roles: data?.roles ?? [] }} />}
-        loading={isLoading}
-      />
-    </div>
-  )
-}
+      {dataLoading
+        ? <PageLoadingTableScreen buttonCount={3} columns={6} />
+        : <DataTable
+          columns={columns({ roles: data?.roles ?? [] })}
+          data={data?.users ?? []}
+          filterColumns={['email', 'name']}
+          createComponent={<CreateForm props={{ roles: data?.roles ?? [] }} />}
+        />
+      }
 
-export default UsersPage
+    </div>
+  );
+};
+
+export default UsersPage;

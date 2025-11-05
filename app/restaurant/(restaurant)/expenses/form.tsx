@@ -159,7 +159,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
                   name="title"
                   render={({ field }) => (
                     <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                      <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                      <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                         Title
                       </FormLabel>
                       <FormControl>
@@ -182,7 +182,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
                   name="category"
                   render={({ field }) => (
                     <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                      <FormLabel htmlFor="select_category_expense_form" className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                      <FormLabel htmlFor="select_category_expense_form" className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                         Select Category
                       </FormLabel>
                       <FormControl>
@@ -207,7 +207,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
                   name="amount"
                   render={({ field }) => (
                     <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                      <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                      <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                         Amount
                       </FormLabel>
                       <FormControl>
@@ -230,7 +230,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
                   name="description"
                   render={({ field }) => (
                     <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                      <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                      <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                         Description (optional)
                       </FormLabel>
                       <FormControl>

@@ -27,7 +27,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <UserProvider>
       {/* === Sidebar + Global Context Provider === */}
-      <SidebarProvider className="bg-blue-100 font-rubik">
+      <SidebarProvider className="bg-background font-rubik">
 
         {/* === Global Hooks & Utilities === */}
         <ShortcutsHook />
@@ -40,8 +40,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <SidebarInset className="flex flex-col gap-4 pl-2 md:pl-0 pr-2">
 
           {/* === Header Section === */}
-          <header className="flex h-16 pt-4 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-16">
-            <div className="bg-white p-3 px-4 rounded-lg w-full flex items-center gap-2 shadow-sm">
+          <header className="flex h-16  pt-4 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-16">
+            <div className="bg-sidebar outline outline-accent p-3 px-4 rounded-lg w-full flex items-center gap-2 shadow-sm">
               {/* Sidebar Toggle Button */}
               <SidebarTrigger className="-ml-1" />
               <Separator orientation="vertical" className="mr-2 h-4" />
@@ -54,7 +54,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </header>
 
           {/* === Page Content Section === */}
-          <main className="bg-transparent flex-1 mb-2 font-rubik-400">
+          <main className="bg-transparent rounded-lg flex-1 mb-2 font-rubik-400">
             {children}
           </main>
 

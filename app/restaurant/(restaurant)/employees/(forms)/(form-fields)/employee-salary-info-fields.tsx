@@ -24,7 +24,7 @@ export function EmployeeSalaryInfo({ control, mode = 'edit' }: EmployeeSalaryInf
           name={`${fieldPrefix}previousSalary`}
           render={({ field }) => (
             <FormItem className="group relative w-full m-1">
-              <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+              <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                 Current Salary
               </FormLabel>
               <FormControl>
@@ -50,7 +50,7 @@ export function EmployeeSalaryInfo({ control, mode = 'edit' }: EmployeeSalaryInf
           name={`${fieldPrefix}newSalary`}
           render={({ field }) => (
             <FormItem className="group relative w-full m-1">
-              <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+              <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                 New Salary
               </FormLabel>
               <FormControl>
@@ -74,7 +74,7 @@ export function EmployeeSalaryInfo({ control, mode = 'edit' }: EmployeeSalaryInf
           name={`${fieldPrefix}reason`}
           render={({ field }) => (
             <FormItem className="group relative w-full m-1">
-              <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+              <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                 Reason
               </FormLabel>
               <FormControl>
@@ -98,7 +98,7 @@ export function EmployeeSalaryInfo({ control, mode = 'edit' }: EmployeeSalaryInf
           name={`${fieldPrefix}changeType`}
           render={({ field }) => (
             <FormItem className="group relative w-full m-1">
-              <FormLabel htmlFor="select_changeType_empolyee_salary_info_form" className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+              <FormLabel htmlFor="select_changeType_empolyee_salary_info_form" className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                 Change Type
               </FormLabel>
               <FormControl>

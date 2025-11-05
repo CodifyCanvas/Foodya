@@ -118,7 +118,7 @@ export function NavMain() {
                   )
                 }
                 tooltip={item.title}
-                className="hover:bg-emerald-200 focus:bg-emerald-200 focus:hover:bg-emerald-300"
+                className="focus:dark:bg-emerald-500/75 focus:bg-emerald-300"
               >
                 {item.icon && <item.icon className="mr-2 size-4" />}
                 <span className="text-sm font-rubik-400">{item.title}</span>
@@ -152,7 +152,7 @@ export function NavMain() {
                           }
                           asChild
                           className={cn(
-                            "hover:bg-emerald-100",
+                            "hover:bg-emerald-200 dark:hover:bg-emerald-500/75",
                             isActivePath &&
                             "bg-emerald-600 text-white hover:bg-emerald-500 hover:text-white"
                           )}
@@ -188,7 +188,7 @@ function ShortcutHint({ shortcuts, active = false }: { shortcuts?: string[], act
     <KbdGroup >
       {shortcuts.map((key, index) => (
         <React.Fragment key={index}>
-          <Kbd className={`text-[0.70rem] ${active ? 'bg-emerald-200 text-black' : ''}`}>{key}</Kbd>
+          <Kbd className={`text-[0.70rem] text-mono ${active ? 'bg-emerald-200 text-black' : 'text-foreground'}`}>{key}</Kbd>
           {index < shortcuts.length - 1 && (
             <span className={`px-0.5 text-xs text-black ${active ? 'text-white' : ''} `}>+</span>
           )}

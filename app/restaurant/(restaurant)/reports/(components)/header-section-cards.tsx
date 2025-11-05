@@ -1,5 +1,5 @@
 "use client";
-import { ReportsHeaderCardSkeleton } from "@/components/skeletons";
+import { ReportsHeaderCardSkeleton } from "@/components/fallbacks/skeletons";
 import { Badge } from "@/components/ui/badge"
 import {
   Card,

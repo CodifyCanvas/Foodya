@@ -1,60 +1,48 @@
-'use client'
+'use client';
 
-import useSWR from 'swr'
-import { Loader } from 'lucide-react'
+import useSWR from 'swr';
 
-import { DataTable } from '@/components/DataTable/data-table'
-import { columns } from './columns'
-import { CreateForm } from './table-actions'
-import { useModulePermission } from '@/hooks/useModulePermission'
-import AccessDenied from '@/app/errors/403/page'
-import ServiceUnavailable from '@/app/errors/service-unavailable'
-import { ModuleInterface } from '@/lib/definations'
-import { swrFetcher } from '@/lib/swr'
+import { DataTable } from '@/components/DataTable/data-table';
+import { columns } from './columns';
+import { CreateForm } from './table-actions';
+import { useModulePermission } from '@/hooks/useModulePermission';
+import AccessDenied from '@/app/errors/403/page';
+import ServiceUnavailable from '@/app/errors/service-unavailable';
+import { ModuleInterface } from '@/lib/definations';
+import { swrFetcher } from '@/lib/swr';
+import { PageLoadingScreen, PageLoadingTableScreen } from '@/components/fallbacks/loadings';
 
 
 
 const ModulesPage = () => {
-  // === Module Permission Hook ===
-  const { canView, loading: permLoading } = useModulePermission()
 
-  // === Fetch modules data ===
-  const { data: modules, error, isLoading: dataLoading } = useSWR<ModuleInterface[]>(
-    '/api/module',
+  /** === Module Permission Hook === */
+  const { canView, loading: permLoading } = useModulePermission();
+
+  /** === Conditional SWR Fetching === */
+  const shouldFetch = !permLoading && canView;
+  const { data, error, isLoading: dataLoading } = useSWR<ModuleInterface[]>(
+    shouldFetch ? '/api/module' : null,
     swrFetcher
-  )
+  );
 
-  // === Combined loading state ===
-  const isLoading = permLoading || dataLoading
+  /** === Loading & Permission Fallbacks === */
+  if (permLoading) return <PageLoadingScreen />;
+  if (!canView) return <AccessDenied />;
 
-  // === Loading Fallback ===
-  if (isLoading) {
-    return (
-      <div className="flex-1 h-full w-full bg-white flex justify-center items-center">
-        <Loader className="animate-spin size-7 text-gray-500" />
-      </div>
-    )
-  }
-
-  // === Access Denied Fallback ===
-  if (!canView) {
-    return <AccessDenied />
-  }
-
-  // === Error Fallback ===
+  /** === Error Fallback === */
   if (error) {
-    console.error('SWR Error:', error)
+    console.error('[ModulesPage] SWR Error:', error);
     return (
       <ServiceUnavailable
         title="Service Unavailable"
         description="Please try again later or check your connection."
       />
-    )
+    );
   }
 
   return (
-    <div className="bg-white rounded-lg min-h-[50vh] flex flex-col">
-
+    <div className="bg-card outline outline-accent rounded-lg min-h-[50vh] flex flex-col">
       {/* === Page Header === */}
       <header className="px-4 pt-3">
         <h3 className="text-3xl font-medium text-emerald-600 text-start">
@@ -63,15 +51,17 @@ const ModulesPage = () => {
       </header>
 
       {/* === Modules Data Table === */}
-      <DataTable
-        columns={columns()}
-        data={modules ?? []}
-        filterColumns={['name']}
-        createComponent={<CreateForm />}
-        loading={isLoading}
-      />
+      {dataLoading
+        ? <PageLoadingTableScreen buttonCount={3} columns={4} />
+        : <DataTable
+          columns={columns()}
+          data={data ?? []}
+          filterColumns={['name']}
+          createComponent={<CreateForm />}
+        />
+      }
     </div>
-  )
-}
+  );
+};
 
-export default ModulesPage
+export default ModulesPage;

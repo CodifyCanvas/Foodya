@@ -38,7 +38,7 @@ export function HeaderMenuDesktop({ handleNavigation }: { handleNavigation: (url
       <NavigationMenuList>
 
         <NavigationMenuItem>
-          <NavigationMenuTrigger>Dashboard</NavigationMenuTrigger>
+          <NavigationMenuTrigger className="bg-transparent">Dashboard</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[400px] gap-2 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
               {cards.map((component) => (
@@ -57,14 +57,14 @@ export function HeaderMenuDesktop({ handleNavigation }: { handleNavigation: (url
         </NavigationMenuItem>
 
         <NavigationMenuItem>
-          <NavigationMenuTrigger>Developer</NavigationMenuTrigger>
+          <NavigationMenuTrigger className="bg-transparent">Developer</NavigationMenuTrigger>
           <NavigationMenuContent>
             <DeveloperInfo />
           </NavigationMenuContent>
         </NavigationMenuItem>
 
         <NavigationMenuItem>
-          <NavigationMenuTrigger>Help</NavigationMenuTrigger>
+          <NavigationMenuTrigger className="bg-transparent">Help</NavigationMenuTrigger>
           <NavigationMenuContent>
             <HelpLinks device="desktop" />
           </NavigationMenuContent>
@@ -93,7 +93,7 @@ export function HeaderMenuMobile({ handleNavigation }: { handleNavigation: (url:
           <SheetDescription>Displays the mobile sidebar.</SheetDescription>
         </SheetHeader>
 
-        <SheetContent side="right" className="w-[300px] p-3 pt-6 overflow-y-auto">
+        <SheetContent side="right" className="w-[300px] p-3 pt-6 bg-sidebar overflow-y-auto">
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="item-1">
               <AccordionTrigger>Dashboard</AccordionTrigger>
@@ -136,7 +136,7 @@ function ListItem({
       <NavigationMenuLink asChild>
         <Button variant='ghost' onClick={() => handleNavigation(href)} className="flex py-7 cursor-pointer w-full flex-row items-center justify-start gap-3">
           {icon && (
-            <div className="min-w-10 min-h-10 flex items-center justify-center relative overflow-hidden rounded-sm bg-black/5 transition-colors duration-200">
+            <div className="min-w-10 min-h-10 flex items-center justify-center relative overflow-hidden rounded-sm bg-accent transition-colors duration-200">
               <Image src={icon} alt="icon" width={48} height={48} className="object-contain absolute w-7 h-7" />
             </div>
           )}
@@ -163,7 +163,7 @@ function DashboardLinks({ handleNavigation }: { handleNavigation: (url: string) 
           onClick={() => handleNavigation(c.href)}
           className="flex items-center justify-start gap-2 h-12 p-2 hover:bg-accent rounded"
         >
-          <div className="bg-black/5 w-8 h-8 items-center justify-center flex rounded-sm">
+          <div className="bg-accent w-8 h-8 items-center justify-center flex rounded-sm">
             <Image src={c.icon} width={24} height={24} alt="icon" />
           </div>
           <span className="font-rubik-500">{c.title}</span>
@@ -195,7 +195,7 @@ export function HelpLinks({
               >
                 <Link href={href}>
                   {icon && (
-                    <div className="min-w-10 min-h-10 flex items-center justify-center relative overflow-hidden rounded-sm bg-black/5 transition-colors duration-200">
+                    <div className="min-w-10 min-h-10 flex items-center justify-center relative overflow-hidden rounded-sm bg-accent transition-colors duration-200">
                       <Image
                         src={icon}
                         alt={`${title} icon`}
@@ -228,7 +228,7 @@ export function HelpLinks({
           href={href}
           className="flex items-center justify-start gap-2 h-12 p-2 hover:bg-accent rounded"
         >
-          <div className="bg-black/5 w-8 h-8 items-center justify-center flex rounded-sm">
+          <div className="bg-accent w-8 h-8 items-center justify-center flex rounded-sm">
             <Image src={icon} width={24} height={24} alt={`${title} icon`} />
           </div>
           <span className="font-rubik-500">{title}</span>

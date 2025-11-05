@@ -23,7 +23,6 @@ interface FormDialogProps {
     designation: string | null;
     joiningAt?: string | null;
   };
-  [key: string]: any;
 }
 
 /* === Employee Records Info Form === */

@@ -1,46 +1,38 @@
 'use client';
 
 import useSWR from 'swr';
-import { Loader } from 'lucide-react';
 
 import { DataTable } from '@/components/DataTable/data-table';
 import { columns } from './columns';
 import { CreateForm } from './table-actions';
 import { useModulePermission } from '@/hooks/useModulePermission';
 import AccessDenied from '@/app/errors/403/page';
-import { TransactionCategoriesTablesInterface } from '@/lib/definations';
 import ServiceUnavailable from '@/app/errors/service-unavailable';
+import { TransactionCategoriesTablesInterface } from '@/lib/definations';
 import { swrFetcher } from '@/lib/swr';
+import { PageLoadingScreen, PageLoadingTableScreen } from '@/components/fallbacks/loadings';
 
 
 
 const TransactionsCategoriesPage = () => {
-  // === Permission Hook ===
+
+  /** === Module Permission Hook === */
   const { canView, loading: permLoading } = useModulePermission();
 
-  // === Fetch Transaction Categories ===
-  const { data: categories, error, isLoading: dataLoading } = useSWR<TransactionCategoriesTablesInterface[]>('/api/transaction-categories', swrFetcher);
+  /** === Conditional SWR Fetching === */
+  const shouldFetch = !permLoading && canView;
+  const { data, error, isLoading: dataLoading } = useSWR<TransactionCategoriesTablesInterface[]>(
+    shouldFetch ? '/api/transaction-categories' : null,
+    swrFetcher
+  );
 
-  // === Combined Loading State ===
-  const isLoading = permLoading || dataLoading;
+  /** === Loading & Permission Fallbacks === */
+  if (permLoading) return <PageLoadingScreen />;
+  if (!canView) return <AccessDenied />;
 
-  // === Loading Fallback ===
-  if (isLoading) {
-    return (
-      <div className="flex-1 h-full w-full bg-white flex justify-center items-center">
-        <Loader className="animate-spin size-7 text-gray-500" />
-      </div>
-    );
-  }
-
-  // === Access Denied ===
-  if (!canView) {
-    return <AccessDenied />;
-  }
-
-  // === Error Handling ===
+  /** === Error Fallback === */
   if (error) {
-    console.error(error);
+    console.error('[TransactionsCategoriesPage] SWR Error:', error);
     return (
       <ServiceUnavailable
         title="Service Unavailable"
@@ -50,20 +42,24 @@ const TransactionsCategoriesPage = () => {
   }
 
   return (
-    <div className="bg-white rounded-lg min-h-[50vh] flex flex-col">
+    <div className="bg-card outline outline-accent rounded-lg min-h-[50vh] flex flex-col">
       {/* === Page Header === */}
-      <h3 className="text-3xl font-medium text-start px-4 pt-3 text-emerald-600">
-        Transaction Categories
-      </h3>
+      <header className="px-4 pt-3">
+        <h3 className="text-3xl font-medium text-emerald-600 text-start">
+          Transaction Categories
+        </h3>
+      </header>
 
-      {/* === Data Table === */}
-      <DataTable
-        columns={columns()}
-        data={categories ?? []}
-        filterColumns={['category', 'description']}
-        createComponent={<CreateForm />}
-        loading={isLoading}
-      />
+      {/* === Transaction Categories Data Table === */}
+      {dataLoading
+        ? <PageLoadingTableScreen buttonCount={2} columns={4} />
+        : <DataTable
+          columns={columns()}
+          data={data ?? []}
+          filterColumns={['category', 'description']}
+          createComponent={<CreateForm />}
+        />
+      }
     </div>
   );
 };

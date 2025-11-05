@@ -79,7 +79,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="bg-white font-rubik-400">
+      <Card className="bg-card font-rubik-400">
 
         {/* === Header Section === */}
         <CardHeader className="text-center">
@@ -127,7 +127,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                         <Label htmlFor="password">Password</Label>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="text-sm font-normal text-black underline-offset-4 hover:underline cursor-text">
+                            <span className="text-sm font-normal text-foreground underline-offset-4 hover:underline cursor-text">
                               Forgot password?
                             </span>
                           </TooltipTrigger>
@@ -167,12 +167,12 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
               </Button>
 
               {/* === Separator === */}
-              <div className="text-center text-sm text-gray-500">Or</div>
+              <div className="text-center text-sm text-muted-foreground">Or</div>
 
               {/* === Social / Help Links === */}
               <div className="flex justify-center gap-3">
                 {HelpLinks.map(({ href, icon, title }) => (
-                  <Link key={title} href={href} target="_blank" rel="noopener noreferrer" aria-label={title} className="rounded-sm bg-black/5 hover:bg-black/10 transition-all duration-300 scale-80 hover:scale-100 flex items-center justify-center w-10 h-10 overflow-hidden">
+                  <Link key={title} href={href} target="_blank" rel="noopener noreferrer" aria-label={title} className={`rounded-sm bg-accent transition-all duration-300 scale-80 hover:scale-100 flex items-center justify-center w-10 h-10 overflow-hidden`}>
                     <Image src={icon} alt={title} width={28} height={28} className="object-contain" />
                   </Link>
                 ))}

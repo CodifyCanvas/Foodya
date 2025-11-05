@@ -97,8 +97,8 @@ const Info = ({ data, showSalary }: InfoProps) => {
 
 const ProfileImage = ({ imageUrl }: { imageUrl: string | null }) => {
   return imageUrl ? (
-    <div className="relative w-full max-w-[13rem] aspect-square rounded-lg outline outline-gray-300 dark:outline-gray-600 shadow-md overflow-hidden">
-      <Image src={imageUrl} alt="Employee profile picture" fill style={{ objectFit: 'cover' }} priority />
+    <div className="relative w-full max-w-[13rem] aspect-square rounded-lg outline outline-border shadow-md overflow-hidden">
+      <Image src={imageUrl} alt="Employee profile picture" fill style={{ objectFit: 'cover' }} sizes="(max-width: 768px) 100vw, 13rem" priority />
     </div>
   ) : (
     <div className="w-full max-w-[13rem] aspect-square rounded-lg bg-neutral-200/75 shadow-md flex items-center justify-center text-neutral-400/80 p-12">
@@ -115,7 +115,7 @@ const EmployeeDetails = ({
   showSalary: boolean;
 }) => {
   return (
-    <div className="flex flex-col items-center md:items-start gap-2 text-gray-800 text-lg w-full">
+    <div className="flex flex-col items-center md:items-start gap-2 text-foreground text-lg w-full">
       <Detail label="Name" value={data.name} />
       <Detail label="CNIC" value={data.CNIC} />
       <Detail label="Father Name" value={data.fatherName} />
@@ -138,7 +138,7 @@ const EmployeeDetails = ({
 
 const Detail = ({ label, value }: { label: string; value?: string | number | null }) => (
   <p>
-    {label}: <span className="text-orange-500 font-normal">{value || 'N/A'}</span>
+    {label}: <span className="text-orange-600 dark:text-orange-400 font-normal">{value || 'N/A'}</span>
   </p>
 );
 
@@ -176,7 +176,7 @@ const DataTable: React.FC<TableRoundedCornerDemoProps> = ({ columns, value }) =>
 
 // === Value Formatter ===
 const getDisplayValue = (value: any): string => {
-  if ( value === null || value === undefined || value === '' || (typeof value === 'number' && isNaN(value))) { 
+  if (value === null || value === undefined || value === '' || (typeof value === 'number' && isNaN(value))) {
     return '—';
   }
 

@@ -25,7 +25,7 @@ export function EmployeeRecords({ control, mode = 'edit' }: EmployeeRecordsInfoP
           name={`${fieldPrefix}designation`}
           render={({ field }) => (
             <FormItem className="group relative w-full m-1">
-              <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+              <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                 Employee Designation
               </FormLabel>
               <FormControl>
@@ -49,7 +49,7 @@ export function EmployeeRecords({ control, mode = 'edit' }: EmployeeRecordsInfoP
           name={`${fieldPrefix}shift`}
           render={({ field }) => (
             <FormItem className="group relative w-full m-1">
-              <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+              <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                 Employee Shift
               </FormLabel>
               <FormControl>
@@ -73,7 +73,7 @@ export function EmployeeRecords({ control, mode = 'edit' }: EmployeeRecordsInfoP
           name={`${fieldPrefix}joinedAt`}
           render={({ field }) => (
             <FormItem className="group relative w-full m-1">
-              <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+              <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                 Joined Date
               </FormLabel>
               <FormControl>
@@ -92,7 +92,7 @@ export function EmployeeRecords({ control, mode = 'edit' }: EmployeeRecordsInfoP
           name={`${fieldPrefix}resignedAt`}
           render={({ field }) => (
             <FormItem className="group relative w-full m-1">
-              <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+              <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                 Resigned Date (if any)
               </FormLabel>
               <FormControl>
@@ -111,22 +111,22 @@ export function EmployeeRecords({ control, mode = 'edit' }: EmployeeRecordsInfoP
           name={`${fieldPrefix}status`}
           render={({ field }) => (
             <FormItem className="group relative w-full m-1">
-              <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+              <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                 Employeement Status
               </FormLabel>
               <FormControl>
                 <SelectInput options={[
-                              { label: 'Active', value: 'active' },
-                              { label: 'Resigned', value: 'resigned' },
-                              { label: 'Terminated', value: 'terminated' },
-                              { label: 'Rejoined', value: 'rejoined' },
-                            ]}
-                              value={field.value}
-                              className="w-full rounded-lg"
-                              onChange={field.onChange}
-                              placeholder="Active, Resigned, Terminated..."
-                              id="select_changeType_empolyee_salary_info_form"
-                            />
+                  { label: 'Active', value: 'active' },
+                  { label: 'Resigned', value: 'resigned' },
+                  { label: 'Terminated', value: 'terminated' },
+                  { label: 'Rejoined', value: 'rejoined' },
+                ]}
+                  value={field.value}
+                  className="w-full rounded-lg"
+                  onChange={field.onChange}
+                  placeholder="Active, Resigned, Terminated..."
+                  id="select_changeType_empolyee_salary_info_form"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -141,20 +141,20 @@ export function EmployeeRecords({ control, mode = 'edit' }: EmployeeRecordsInfoP
           name={`${fieldPrefix}changeType`}
           render={({ field }) => (
             <FormItem className="group relative w-full m-1">
-              <FormLabel htmlFor="select_changeType_empolyee_records_form" className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+              <FormLabel htmlFor="select_changeType_empolyee_records_form" className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                 Change Type
               </FormLabel>
               <FormControl>
                 <SelectInput options={[
-                              { label: 'Valid', value: 'valid' },
-                              { label: 'Correction', value: 'correction', optDisabled: mode === 'create' },
-                            ]}
-                              value={field.value}
-                              className="w-full rounded-lg"
-                              onChange={field.onChange}
-                              placeholder="Valid, Correction..."
-                              id="select_changeType_empolyee_records_form"
-                            />
+                  { label: 'Valid', value: 'valid' },
+                  { label: 'Correction', value: 'correction', optDisabled: mode === 'create' },
+                ]}
+                  value={field.value}
+                  className="w-full rounded-lg"
+                  onChange={field.onChange}
+                  placeholder="Valid, Correction..."
+                  id="select_changeType_empolyee_records_form"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

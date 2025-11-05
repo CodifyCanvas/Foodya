@@ -27,7 +27,7 @@ export async function GET() {
     }
 
     // === Fetch invoices and related data ===
-    const rawInvoices = await getAllData("InvoicesTable");
+    const rawInvoices = await getAllData("InvoicesTable", 'desc');
     const menuItems = await getAllMenuItems();
     const rawTables = await getAllActiveTable();
 

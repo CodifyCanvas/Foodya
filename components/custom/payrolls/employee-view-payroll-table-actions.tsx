@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { Printer, RotateCcw } from 'lucide-react';
+import { FunnelPlus, FunnelX, Printer } from 'lucide-react';
 
 import { Input } from '@/components/ui/input';
 import SelectInput from '@/components/ui/select-input';
@@ -49,22 +49,22 @@ const EmployeePayrollTableActions = ({ data }: PayrollTableActionsProps) => {
 
     const params = new URLSearchParams(searchParams.toString());
 
-    if (startDate) { 
-      params.set('from', startDate); 
-    } else { 
-      params.delete('from'); 
-    } 
-    
-    if (endDate) { 
-      params.set('to', endDate); 
-    } else { 
-      params.delete('to'); 
+    if (startDate) {
+      params.set('from', startDate);
+    } else {
+      params.delete('from');
     }
 
-    if(status && status !== 'all') { 
-      params.set('status', status) 
-    } else{ 
-      params.delete('status'); 
+    if (endDate) {
+      params.set('to', endDate);
+    } else {
+      params.delete('to');
+    }
+
+    if (status && status !== 'all') {
+      params.set('status', status)
+    } else {
+      params.delete('status');
     }
 
     router.replace(`?${params.toString()}`);
@@ -90,7 +90,7 @@ const EmployeePayrollTableActions = ({ data }: PayrollTableActionsProps) => {
 
       {/* === Filter: Start Month === */}
       <div className="flex flex-col">
-        <label htmlFor="from" className="text-xs text-neutral-600">From</label>
+        <label htmlFor="from" className="text-xs text-muted-foreground">From</label>
         <Input
           id="from"
           type="month"
@@ -101,7 +101,7 @@ const EmployeePayrollTableActions = ({ data }: PayrollTableActionsProps) => {
 
       {/* === Filter: End Month === */}
       <div className="flex flex-col">
-        <label htmlFor="to" className="text-xs text-neutral-600">To</label>
+        <label htmlFor="to" className="text-xs text-muted-foreground">To</label>
         <Input
           id="to"
           type="month"
@@ -112,7 +112,7 @@ const EmployeePayrollTableActions = ({ data }: PayrollTableActionsProps) => {
 
       {/* === Filter: Payment Status === */}
       <div className="flex flex-col">
-        <label htmlFor="status" className="text-xs text-neutral-600">Status</label>
+        <label htmlFor="status" className="text-xs text-muted-foreground">Status</label>
         <SelectInput
           id="status"
           value={status}
@@ -129,7 +129,8 @@ const EmployeePayrollTableActions = ({ data }: PayrollTableActionsProps) => {
 
       {/* === Button: Apply Filters === */}
       <Button onClick={handleApplyFilters} variant="green">
-        Apply
+        <FunnelPlus />
+        <span className="md:block hidden">Filter</span>
       </Button>
 
       {/* === Button: Reset Filters === */}
@@ -137,18 +138,17 @@ const EmployeePayrollTableActions = ({ data }: PayrollTableActionsProps) => {
         <Button
           onClick={handleResetFilters}
           variant="destructive"
-          size="icon"
           title="Clear all filters"
-          className="bg-red-100 hover:bg-red-500 text-red-600 hover:text-white"
+          size='icon'
         >
-          <RotateCcw />
+          <FunnelX />
         </Button>
       )}
 
       {/* === Button: Print Payroll Statement === */}
-      <Button onClick={() => handlePrintPayrollStatement(data)} variant="outline">
-        <Printer className="mr-2 h-4 w-4" />
-        Print Statement
+      <Button title="Print Payroll Statement" onClick={() => handlePrintPayrollStatement(data)} variant="outline">
+        <Printer className="h-4 w-4" />
+        <span className="md:block hidden">Print Statement</span>
       </Button>
     </div>
   );

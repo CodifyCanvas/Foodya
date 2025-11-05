@@ -46,6 +46,7 @@ const InputWithPlusMinusButtons = ({
       }}
       minValue={0}
       className={cn('w-full max-w-xs space-y-2', className)}
+      aria-label="Quantity"
     >
       <Group className='dark:bg-input/30 border-input data-focus-within:border-ring 
                         data-focus-within:ring-ring/50 
@@ -61,6 +62,7 @@ const InputWithPlusMinusButtons = ({
 
         {/* Decrement Button */}
         <Button
+          aria-label="Decrement-Qty"
           slot='decrement'
           className='border-none bg-orange-500 text-white hover:bg-orange-600 
                      cursor-pointer ms-2 flex aspect-square h-5 items-center justify-center 
@@ -76,6 +78,7 @@ const InputWithPlusMinusButtons = ({
 
         {/* Increment Button */}
         <Button
+          aria-label="Increment-Qty"
           slot='increment'
           className='border-none bg-orange-500 text-white hover:bg-orange-600 
                      cursor-pointer me-2 flex aspect-square h-5 items-center justify-center

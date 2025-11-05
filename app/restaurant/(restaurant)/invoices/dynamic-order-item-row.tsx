@@ -43,27 +43,27 @@ export function DynamicOrderItemRow({
     }
 
     // Set menuItemName when menuItem is selected
-  if (selectedMenuItem) {
-    setValue(`orderItems.${index}.menuItemName`, selectedMenuItem.item);
-  }
-    
-  // Set Menu item image when menuItem is selected
-  if (selectedMenuItem) {
-    setValue(`orderItems.${index}.menuItemImage`, selectedMenuItem.image);
-  }
+    if (selectedMenuItem) {
+      setValue(`orderItems.${index}.menuItemName`, selectedMenuItem.item);
+    }
 
-  // Set optionName if selectedOption exists, otherwise set to empty string
-  setValue(
-    `orderItems.${index}.menuItemOptionName`,
-   selectedOption?.option_name?.trim() ? selectedOption.option_name : null
-    // selectedOption?.option_name || null
-  );
+    // Set Menu item image when menuItem is selected
+    if (selectedMenuItem) {
+      setValue(`orderItems.${index}.menuItemImage`, selectedMenuItem.image);
+    }
+
+    // Set optionName if selectedOption exists, otherwise set to empty string
+    setValue(
+      `orderItems.${index}.menuItemOptionName`,
+      selectedOption?.option_name?.trim() ? selectedOption.option_name : null
+      // selectedOption?.option_name || null
+    );
 
   }, [menuItemId, optionId]);
 
   return (
     <div className="grid grid-cols-[minmax(13rem,18rem)_minmax(8rem,15rem)_6rem_6rem_6rem_auto] items-center gap-2 py-2">
-      
+
       {/* === Menu Item Input Field === */}
       <div className="w-full">
         <FormField
@@ -71,13 +71,13 @@ export function DynamicOrderItemRow({
           name={`orderItems.${index}.menuItemId`}
           render={({ field }) => (
             <FormItem className="group relative w-full m-1">
-              <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+              <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                 <span className="hidden sm:block">Select Menu Item</span>
                 <span className="block sm:hidden">Item</span>
               </FormLabel>
               <FormControl>
                 <ComboboxInput
-                  options={menuItems.map((item : ItemWithOptions) => ({
+                  options={menuItems.map((item: ItemWithOptions) => ({
                     value: String(item.id),
                     label: item.item,
                   }))}
@@ -100,9 +100,9 @@ export function DynamicOrderItemRow({
           name={`orderItems.${index}.menuItemOptionId`}
           render={({ field }) => (
             <FormItem className="group relative w-full m-1">
-              <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+              <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                 <span className="hidden sm:block">Select Item Option</span>
-  <span className="block sm:hidden">Option</span>
+                <span className="block sm:hidden">Option</span>
               </FormLabel>
               <FormControl>
                 <SelectInput
@@ -130,9 +130,9 @@ export function DynamicOrderItemRow({
           name={`orderItems.${index}.quantity`}
           render={({ field }) => (
             <FormItem className="group relative w-full m-1">
-              <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+              <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                 <span className="hidden sm:block">Quantity</span>
-  <span className="block sm:hidden">Qty</span>
+                <span className="block sm:hidden">Qty</span>
               </FormLabel>
               <FormControl>
                 <Input
@@ -155,7 +155,7 @@ export function DynamicOrderItemRow({
           name={`orderItems.${index}.price`}
           render={({ field }) => (
             <FormItem className="group relative w-full m-1">
-              <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+              <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                 Price
               </FormLabel>
               <FormControl>
@@ -175,7 +175,7 @@ export function DynamicOrderItemRow({
 
       {/* === Total (Qty * Price) - Temporary Display === */}
       <div className="w-full group relative h-10 p-2 m-1 border rounded-lg text-center">
-        <Label className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+        <Label className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
           Total
         </Label>
         <div className="px-2 text-sm font-rubik-400 text-end h-10">{lineTotal.toFixed(2)}</div>

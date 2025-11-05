@@ -15,7 +15,7 @@ export function TeamSwitcher() {
           <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent cursor-pointer data-[state=open]:text-sidebar-accent-foreground">
             <div className=" text-sidebar-primary-foreground flex aspect-square size-8
               data-[state=open]:size-12 items-center justify-center rounded-lg">
-              <Image src={logo.main} alt="logo" width={120} height={120} loading="lazy" className="object-contain rounded-md" />
+              <Image src={logo.main} alt="logo" width={120} height={120} priority className="object-contain rounded-md" />
             </div>
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium font-rubik-500 text-xl">Foodya</span>

@@ -152,7 +152,7 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
                   name="category"
                   render={({ field }) => (
                     <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                      <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                      <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                         Name
                       </FormLabel>
                       <FormControl>
@@ -176,7 +176,7 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
                   name="description"
                   render={({ field }) => (
                     <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                      <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                      <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                         Description
                       </FormLabel>
                       <FormControl>

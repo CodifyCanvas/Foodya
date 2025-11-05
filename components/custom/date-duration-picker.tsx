@@ -114,7 +114,7 @@ export function DateTimeRangePicker({
 
         {/* === Start Time === */}
         <div className="flex flex-col group relative w-full gap-3">
-          <Label htmlFor="time-from" className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs" >
+          <Label htmlFor="time-from" className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs" >
             {firstLabel || "Start Time"}
           </Label>
           <Controller
@@ -149,7 +149,7 @@ export function DateTimeRangePicker({
 
         {/* === End Time === */}
         <div className="flex flex-col group relative w-full gap-3">
-          <Label htmlFor="time-to" className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs" >
+          <Label htmlFor="time-to" className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs" >
             {secondLabel || "End Time"}
           </Label>
           <Controller

@@ -22,7 +22,6 @@ interface FormDialogProps {
     employeeId: number | null;
     currentSalary: string | null;
   };
-  [key: string]: any;
 }
 
 /* === Employee Salary Changes Form === */

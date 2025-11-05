@@ -229,7 +229,7 @@ function Sidebar({
       <div
         data-slot="sidebar-container"
         className={cn(
-          "fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex",
+          "fixed inset-y-0  z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex",
           side === "left"
             ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
             : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
@@ -246,7 +246,7 @@ function Sidebar({
           data-slot="sidebar-inner"
           className={cn(
             "bg-sidebar flex h-full w-full flex-col",
-            "group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:shadow-sm",
+            "group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-accent group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:shadow-sm",
             "group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:text-center"
           )}
         >
@@ -556,6 +556,7 @@ function SidebarMenuButton({
       <TooltipContent
         side="right"
         align="center"
+        className="text-card"
         hidden={state !== "collapsed" || isMobile}
         {...tooltip}
       />

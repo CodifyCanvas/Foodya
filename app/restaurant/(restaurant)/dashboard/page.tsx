@@ -30,7 +30,7 @@ const DashboardPage = async () => {
   };
 
   return (
-    <main className="w-full h-full py-5 px-3 flex flex-1 transition-all duration-300 bg-white rounded-lg justify-center items-center font-rubik-400">
+    <div className="w-full h-full py-5 px-3 outline outline-accent flex flex-1 transition-all duration-300 bg-card rounded-lg justify-center items-center  font-sans">
       <div className="mx-auto">
 
         {/* === Hero Welcome Section === */}
@@ -48,7 +48,7 @@ const DashboardPage = async () => {
           <div className="space-y-3">
             <Badge
               variant="secondary"
-              className="text-xs py-1.5 sm:text-sm sm:py-1 px-2 rounded-full gap-2 bg-emerald-100/75 transition-all duration-300 text-emerald-600 hover:bg-emerald-100"
+              className="text-xs py-1.5 sm:text-sm sm:py-1 px-2 rounded-full gap-2 bg-emerald-100/75 dark:bg-emerald-600/30 transition-all duration-300 text-emerald-600 dark:text-emerald-400"
             >
               <div className="relative flex justify-center items-center p-2">
                 <div className="w-3 h-3 absolute z-20 bg-green-500 rounded-full duration-500 animate-ping"></div>
@@ -57,18 +57,18 @@ const DashboardPage = async () => {
               {getGreeting()}
             </Badge>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl transition-all duration-300 font-rubik-500 text-gray-900 tracking-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl transition-all font-medium duration-300 text-foreground tracking-tight">
               Welcome to{' '}
               <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
                 Foodya
               </span>
             </h1>
 
-            <p className="text-2xl font-rubik-400 text-gray-600 font-medium">
-              Hello, <span className="text-emerald-600">{currentUser.name}</span>!
+            <p className="text-2xl  text-gray-600 dark:text-gray-500 font-medium">
+              Hello, <span className="text-emerald-600 capitalize">{currentUser.name}</span>!
             </p>
 
-            <p className="text-sm sm:text-base md:text-lg transition-all duration-300 font-rubik-400 text-gray-500 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base md:text-lg transition-all duration-300  text-gray-500 max-w-2xl mx-auto">
               Your all-in-one platform for managing your food business with excellence
             </p>
           </div>
@@ -79,7 +79,7 @@ const DashboardPage = async () => {
 
         {/* === Status Footer === */}
         <div className="mt-12 text-center space-y-4">
-          <p className="text-xs sm:text-sm transition-all duration-300 text-gray-400">
+          <p className="text-xs sm:text-sm transition-all duration-300 text-gray-500">
             Logged in as{' '}
             <span className="capitalize hover:underline">{currentUser.role_name}</span> • Foodya Dashboard v1.0
           </p>
@@ -87,9 +87,11 @@ const DashboardPage = async () => {
           <div className="flex items-center justify-center gap-2 text-sm sm:text-base transition-all duration-300 text-gray-500">
             <span>© {year} Foodya - All Rights Reserved</span>
           </div>
+
         </div>
       </div>
-    </main>
+
+    </div>
   );
 };
 

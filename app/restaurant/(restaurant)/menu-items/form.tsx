@@ -201,7 +201,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
                     name="image"
                     render={() => (
                       <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                        <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                        <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                           Item Image
                         </FormLabel>
                         <FormControl>
@@ -220,8 +220,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
                   />
                 </div>
 
-                <div className=" w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3  items-end ">
-
+                <div className=" w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[minmax(10rem,25rem)_minmax(10rem,25rem)_auto]  items-end ">
 
                   {/* === Item Name Field === */}
                   <div className="w-full py-2">
@@ -230,7 +229,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
                       name="item"
                       render={({ field }) => (
                         <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                          <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                          <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                             Item Name
                           </FormLabel>
                           <FormControl>
@@ -254,7 +253,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
                       name="category_id"
                       render={({ field }) => (
                         <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                          <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                          <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                             Category
                           </FormLabel>
                           <FormControl>
@@ -280,7 +279,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
                       name="price"
                       render={({ field }) => (
                         <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                          <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                          <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                             Price
                           </FormLabel>
                           <FormControl>
@@ -303,7 +302,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
                       name="description"
                       render={({ field }) => (
                         <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                          <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                          <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                             Description
                           </FormLabel>
                           <FormControl>
@@ -345,19 +344,21 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
                 </div>
               </div>
 
+              <hr className="border border-dashed border-muted-foreground/35" />
+
               {/* === Repeater Fields === */}
               <div>
                 {fields.map((field, index) => (
-                  <div key={field.id} className="flex gap-2 sm:flex-row flex-col">
+                  <div key={field.id} className="grid grid-cols-[1fr_auto] grid-rows-2 sm:grid-rows-1 sm:grid-cols-[minmax(10rem,25rem)_minmax(10rem,25rem)_auto] items-end gap-2">
 
                     {/* === Reapeater Option Name Field === */}
-                    <div className="w-full sm:w-1/2 py-2">
+                    <div className="w-full py-2 col-span-2 sm:col-span-1">
                       <FormField
                         control={form.control}
                         name={`options.${index}.option_name`}
                         render={({ field }) => (
                           <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                            <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                            <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                               Item Name
                             </FormLabel>
                             <FormControl>
@@ -373,35 +374,33 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
                         )}
                       />
                     </div>
-                    <div className="flex w-full flex-row items-end gap-2">
 
-                      {/* === Repeater Option Price Field === */}
-                      <div className="w-full sm:w-1/2 py-2">
-                        <FormField
-                          control={form.control}
-                          name={`options.${index}.price`}
-                          render={({ field }) => (
-                            <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                              <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
-                                Item Price
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  placeholder="Enter Category"
-                                  {...field}
-                                  className="h-10 hide-spinner"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      {/* === Remove Repeater Fields Button === */}
-                      <Button type="button" className="mb-3 size-10" variant={"destructive"} onClick={() => remove(index)} size={"icon"}><Trash2 /></Button>
+                    {/* === Repeater Option Price Field === */}
+                    <div className="w-full py-2">
+                      <FormField
+                        control={form.control}
+                        name={`options.${index}.price`}
+                        render={({ field }) => (
+                          <FormItem className="group relative w-auto sm:max-w-sm m-1">
+                            <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                              Item Price
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                placeholder="Enter Category"
+                                {...field}
+                                className="h-10 hide-spinner"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
+
+                    {/* === Remove Repeater Fields Button === */}
+                    <Button type="button" className="mb-3 size-10" variant={"destructive"} onClick={() => remove(index)} size={"icon"}><Trash2 /></Button>
                   </div>
                 ))}
                 {/* === Add Repeater Option & Price Fields Button === */}
@@ -411,29 +410,45 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
             </ScrollArea>
 
             {/* === Dialog Footer Buttons === */}
-            <DialogFooter className="p-6 pt-0 flex flex-col gap-3 w-full">
-              {/* === Submit Button === */}
-              <Button type="submit" className="w-full sm:w-32" disabled={submitButtonLoading} variant="green" >
-                {submitButtonLoading ? (
-                  <p className="flex flex-row gap-2">
-                    <Loader className="animate-spin duration-300" /> {data ? "Updating" : "Creating"}
-                  </p>
-                ) : data ? "Update" : "Create"}
-              </Button>
-
-              {/* === Reset + Cancel Buttons === */}
-              <div className="flex w-full gap-2">
-                <Button type="button" className="flex-1 sm:flex-none sm:w-32" variant="secondary" onClick={ResetForm} >
-                  Reset
-                </Button>
-
-                <DialogClose asChild>
-                  <Button className="flex-1 sm:flex-none sm:w-32" variant="outline">
-                    Cancel
+            <DialogFooter className="p-6 pt-0 w-full">
+              <div className="grid gap-3 sm:flex sm:justify-end sm:items-center">
+                {/* === Mobile Submit Button === */}
+                <div className="order-1 sm:order-3 w-full sm:w-auto">
+                  <Button
+                    type="submit"
+                    className="w-full sm:w-32"
+                    disabled={submitButtonLoading}
+                    variant="green"
+                  >
+                    {submitButtonLoading ? (
+                      <p className="flex flex-row items-center gap-2">
+                        <Loader className="animate-spin duration-300" />
+                        {data ? "Updating" : "Creating"}
+                      </p>
+                    ) : data ? "Update" : "Create"}
                   </Button>
-                </DialogClose>
+                </div>
+
+                {/* === Reset + Cancel Buttons === */}
+                <div className="grid grid-cols-2 gap-2 order-2 sm:order-1 sm:flex sm:w-auto">
+                  <Button
+                    type="button"
+                    className="w-full sm:w-32"
+                    variant="secondary"
+                    onClick={ResetForm}
+                  >
+                    Reset
+                  </Button>
+
+                  <DialogClose asChild>
+                    <Button className="w-full sm:w-32" variant="outline">
+                      Cancel
+                    </Button>
+                  </DialogClose>
+                </div>
               </div>
             </DialogFooter>
+
           </form>
         </Form>
       </DialogContent>

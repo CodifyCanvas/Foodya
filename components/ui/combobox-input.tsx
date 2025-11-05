@@ -91,8 +91,8 @@ export function ComboboxInput({
                     role="combobox"
                     aria-expanded={open}
                     className={cn(
-                        "w-full justify-between capitalize font-rubik-400",
-                        value ? "text-black" : "text-neutral-500"
+                        "w-full justify-between font-rubik-400",
+                        value ? "text-foreground" : "text-neutral-500"
                     )}
                 >
                     {/* === Show selected label or placeholder === */}

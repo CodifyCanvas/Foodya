@@ -17,8 +17,8 @@ const Tag = React.memo(({ label, isActive, onClick }: TagProps) => {
       onClick={onClick}
       className={`border cursor-pointer px-5 py-1.5 rounded-full text-sm font-rubik-400 transition-colors
         ${isActive
-          ? 'bg-orange-100 text-orange-600 border-orange-400'
-          : 'bg-white text-neutral-800 border-neutral-300'}
+          ? 'bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400 border-orange-400'
+          : 'bg-white dark:bg-transparent text-foreground border-neutral-300 dark:border-white/25'}
       `}
       aria-pressed={isActive}
     >

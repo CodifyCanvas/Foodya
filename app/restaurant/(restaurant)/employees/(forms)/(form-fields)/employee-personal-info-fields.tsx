@@ -27,7 +27,7 @@ export function EmployeePersonalInfo({ image, control, registerWithMask, mode = 
           name={`${fieldPrefix}image`}
           render={() => (
             <FormItem className="group relative w-auto sm:max-w-sm m-1">
-              <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+              <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                 Item Image
               </FormLabel>
               <FormControl>
@@ -55,7 +55,7 @@ export function EmployeePersonalInfo({ image, control, registerWithMask, mode = 
             name={`${fieldPrefix}name`}
             render={({ field }) => (
               <FormItem className="group relative w-full m-1">
-                <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                   Employee Name
                 </FormLabel>
                 <FormControl>
@@ -79,7 +79,7 @@ export function EmployeePersonalInfo({ image, control, registerWithMask, mode = 
             name={`${fieldPrefix}CNIC`}
             render={() => (
               <FormItem className="group relative w-full m-1">
-                <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                   Employee CNIC
                 </FormLabel>
                 <FormControl>
@@ -103,7 +103,7 @@ export function EmployeePersonalInfo({ image, control, registerWithMask, mode = 
             name={`${fieldPrefix}fatherName`}
             render={({ field }) => (
               <FormItem className="group relative w-full m-1">
-                <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                   Father Name
                 </FormLabel>
                 <FormControl>
@@ -127,7 +127,7 @@ export function EmployeePersonalInfo({ image, control, registerWithMask, mode = 
             name={`${fieldPrefix}email`}
             render={({ field }) => (
               <FormItem className="group relative w-full m-1">
-                <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                   Employee Email
                 </FormLabel>
                 <FormControl>
@@ -151,7 +151,7 @@ export function EmployeePersonalInfo({ image, control, registerWithMask, mode = 
             name={`${fieldPrefix}phone`}
             render={() => (
               <FormItem className="group relative w-full m-1">
-                <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                   Employee Phone
                 </FormLabel>
                 <FormControl>

@@ -95,7 +95,7 @@ export const DateInput = React.forwardRef<HTMLButtonElement, DateInputProps>(({ 
           <ChevronDownIcon className="ml-2 h-4 w-4 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+      <PopoverContent className="w-auto bg-card overflow-hidden p-0" align="start">
 
         {/* Calendar component for date selection */}
         <Calendar

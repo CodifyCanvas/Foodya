@@ -35,7 +35,8 @@ import { DateInput } from "@/components/custom/date-picker"
 import SwitchInput from "@/components/ui/switch-input"
 import { Loader, Plus } from "lucide-react"
 import { DynamicOrderItemRow } from './dynamic-order-item-row'
-import { GeneratedBy, InvoiceDetail, InvoiceResponse } from "@/lib/definations"
+import { InvoiceResponse } from "@/lib/definations"
+import { FormsLoadingScreen } from "@/components/fallbacks/loadings"
 
 /* === Props Interface === */
 interface FormDialogProps {
@@ -44,34 +45,6 @@ interface FormDialogProps {
   data: { invoiceId: string | number } | null
   [key: string]: any
 }
-
-// interface Order {
-//   id: number;
-//   tableId: string;
-//   orderType: "dine_in" | "drive_thru" | "takeaway";
-//   status: string;
-//   description: string | null;
-//   createdAt: string; // ISO date string
-// }
-
-// interface Item {
-//   id: number;
-//   menuItemImage: string | null;
-//   orderId: number;
-//   menuItemId: string;
-//   menuItemName: string;
-//   menuItemOptionId: string | null;
-//   menuItemOptionName: string | null;
-//   quantity: number;
-//   price: string;
-// }
-
-// export interface InvoiceOrderItem {
-//   invoice: InvoiceDetail;
-//   order: Order;
-//   items: Item[];
-//   generatedBy: GeneratedBy;
-// }
 
 export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], tables = [] }: FormDialogProps) {
   /* === Local State === */
@@ -331,9 +304,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
 
             {/* === Scrollable Form Area === */}
             {invoiceFetching
-              ? <div className="h-1/2 w-full bg-white flex justify-center items-center">
-                <Loader className="animate-spin size-5 md:size-8 text-gray-500" />
-              </div>
+              ? <FormsLoadingScreen />
               : <ScrollArea className="flex p-2 flex-col min-h-[50vh] max-w-[100vw-2rem] justify-between">
 
                 <h1 className="font-semibold pt-4 text-xs uppercase pl-2 pb-2 text-neutral-500">Invoice info</h1>
@@ -348,7 +319,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
                       name="customerName"
                       render={({ field }) => (
                         <FormItem className="group relative w-full m-1">
-                          <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                          <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                             Customer Name
                           </FormLabel>
                           <FormControl>
@@ -371,7 +342,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
                       name="paymentMethod"
                       render={({ field }) => (
                         <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                          <FormLabel htmlFor="select_payment_invoice_form" className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                          <FormLabel htmlFor="select_payment_invoice_form" className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                             <span className="hidden sm:block">Payment Method</span>
                             <span className="block sm:hidden">Pay via:</span>
                           </FormLabel>
@@ -402,7 +373,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
                       name="invoiceCreatedAt"
                       render={({ field }) => (
                         <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                          <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                          <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                             Invoice Date
                           </FormLabel>
                           <FormControl>
@@ -450,7 +421,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
                       name="orderId"
                       render={({ field }) => (
                         <FormItem className="group relative w-full m-1">
-                          <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                          <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                             Order ID
                           </FormLabel>
                           <FormControl>
@@ -475,7 +446,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
                       name="tableId"
                       render={({ field }) => (
                         <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                          <FormLabel htmlFor="select_table_invoice_form" className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                          <FormLabel htmlFor="select_table_invoice_form" className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                             Select Table
                           </FormLabel>
                           <FormControl>
@@ -501,7 +472,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
                       name="orderType"
                       render={({ field }) => (
                         <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                          <FormLabel htmlFor="select_orderType_invoice_form" className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                          <FormLabel htmlFor="select_orderType_invoice_form" className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                             Order Type
                           </FormLabel>
                           <FormControl>
@@ -530,7 +501,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
                       name="orderCreatedAt"
                       render={({ field }) => (
                         <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                          <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                          <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                             Order Date
                           </FormLabel>
                           <FormControl>
@@ -571,7 +542,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
                     <ScrollBar orientation="horizontal" />
                   </ScrollArea>
 
-                  <Button type="button" variant="green" size='icon' className="ml-2 mb-2" onClick={() => append({
+                  <Button type="button" variant="green" size='icon' className="bg-blue-500 size-10 ml-2 mb-2 hover:bg-blue-600" onClick={() => append({
                     menuItemImage: null,
                     menuItemId: "",
                     menuItemName: "",
@@ -602,7 +573,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
                     name="subTotalAmount"
                     render={({ field }) => (
                       <FormItem className="group relative w-full m-1">
-                        <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                        <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                           Subtotal
                         </FormLabel>
                         <FormControl>
@@ -626,7 +597,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
                     name="discount"
                     render={({ field }) => (
                       <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                        <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                        <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                           <span className="block sm:hidden">Disc %</span>
                           <span className="hidden sm:block">Discount %</span>
                         </FormLabel>
@@ -653,7 +624,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
                     name="totalAmount"
                     render={({ field }) => (
                       <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                        <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                        <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                           Total
                         </FormLabel>
                         <FormControl>
@@ -676,7 +647,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
                     name="advancePaid"
                     render={({ field }) => (
                       <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                        <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                        <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                           <span className="hidden sm:block">Advance Paid</span>
                           <span className="block sm:hidden">Adv.</span>
                         </FormLabel>
@@ -700,7 +671,7 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
                     name="grandTotal"
                     render={({ field }) => (
                       <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                        <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                        <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                           Grand Total
                         </FormLabel>
                         <FormControl>
@@ -732,8 +703,13 @@ export function RoleForm({ open, onOpenChange, data: dataProp, menuItems = [], t
                 >
                   Reset
                 </Button>
-                <Button type="submit" disabled={submitButtonLoading} variant="green" className="sm:min-w-32 w-auto">
-                  {dataProp ? "Update" : "Create"}
+                <Button type="submit" disabled={submitButtonLoading} variant="green" className="min-w-32 w-auto">
+                  {submitButtonLoading ? (
+                    <p className="flex flex-row items-center gap-2">
+                      <Loader className="animate-spin duration-300" />
+                      {data ? "Updating" : "Creating"}
+                    </p>
+                  ) : data ? "Update" : "Create"}
                 </Button>
               </div>
             </DialogFooter>

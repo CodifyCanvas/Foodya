@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, LogOut } from "lucide-react";
+import { ChevronRight, LogOut, SunMoon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
@@ -8,11 +8,13 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/c
 import { useUserContext } from "@/hooks/context/useUserContext";
 import { useState } from "react";
 import LogoutConfirmationDialog from "./custom/dialogs/logout-dialog";
+import { ThemeSwitchDialog } from "./ui/theme-toggler";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
   const { user } = useUserContext();
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
+  const [openThemeDialog, setOpenThemeDialog] = useState(false);
 
   return (
     <SidebarMenu>
@@ -21,7 +23,7 @@ export function NavUser() {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground" >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user?.image ?? undefined} alt={user?.name} />
+                <AvatarImage src={user?.image ?? undefined} alt={user?.name ?? 'User Avatar'} />
                 <AvatarFallback className="rounded-lg">
                   {user?.name ? user.name.charAt(0).toUpperCase() : "-"}
                 </AvatarFallback>
@@ -38,7 +40,7 @@ export function NavUser() {
             <DropdownMenuLabel className="p-0 font-normal font-rubik-400">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user?.image ?? undefined} alt={user?.name} />
+                  <AvatarImage src={user?.image ?? undefined} alt={user?.name ?? 'User Avatar'} />
                   <AvatarFallback className="rounded-lg">{user?.name ? user.name.charAt(0).toUpperCase() : "-"}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
@@ -47,6 +49,13 @@ export function NavUser() {
                 </div>
               </div>
             </DropdownMenuLabel>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem onClick={() => setOpenThemeDialog(true)} className="cursor-pointer">
+              <SunMoon />
+              Theme Settings
+            </DropdownMenuItem>
 
             <DropdownMenuSeparator />
 
@@ -60,6 +69,7 @@ export function NavUser() {
 
       {/* === Logout Confirmation Dialog === */}
       <LogoutConfirmationDialog isOpen={openLogoutDialog} setIsOpen={setOpenLogoutDialog} />
+      <ThemeSwitchDialog isOpen={openThemeDialog} setIsOpen={setOpenThemeDialog} />
     </SidebarMenu>
   );
 }

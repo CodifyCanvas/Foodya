@@ -143,7 +143,7 @@ export function ChartBarStacked() {
         {/* Income */}
         <Tooltip>
           <TooltipTrigger>
-            <div className="flex gap-2 leading-none text-neutral-500 text-center cursor-default">
+            <div className="flex gap-2 leading-none text-muted-foreground text-center cursor-default">
               Income: {fetchedData?.summary?.incomes ?? "0.00"} PKR
             </div>
           </TooltipTrigger>
@@ -157,7 +157,7 @@ export function ChartBarStacked() {
         {/* Expense */}
         <Tooltip>
           <TooltipTrigger>
-            <div className="flex gap-2 leading-none text-neutral-500 text-center cursor-default">
+            <div className="flex gap-2 leading-none text-muted-foreground text-center cursor-default">
               Expense: {fetchedData?.summary?.expense ?? "0.00"} PKR
             </div>
           </TooltipTrigger>
@@ -171,7 +171,7 @@ export function ChartBarStacked() {
         {/* Revenue (with color based on positive/negative) */}
         <Tooltip>
           <TooltipTrigger>
-            <div className={`flex gap-2 leading-none ${Number(fetchedData?.summary?.revenue) >= 0 ? 'text-emerald-500' : 'text-red-500' } font-medium text-center cursor-default`} >
+            <div className={`flex gap-2 leading-none ${Number(fetchedData?.summary?.revenue) >= 0 ? 'text-primary' : 'text-destructive'} font-medium text-center cursor-default`} >
               Revenue: {fetchedData?.summary?.revenue ?? "0.00"} PKR
             </div>
           </TooltipTrigger>
@@ -187,8 +187,8 @@ export function ChartBarStacked() {
 }
 
 // === Tooltip content for chart hover ===
-function CustomTooltipContent( props: TooltipProps<ValueType, NameType>, mode: "month" | "year") {
-  
+function CustomTooltipContent(props: TooltipProps<ValueType, NameType>, mode: "month" | "year") {
+
   const { active, payload, label } = props;
 
   if (!active || !payload || payload.length === 0) {
@@ -203,7 +203,7 @@ function CustomTooltipContent( props: TooltipProps<ValueType, NameType>, mode: "
   });
 
   return (
-    <div className="custom-tooltip bg-white p-2 rounded border shadow">
+    <div className="custom-tooltip bg-accent p-2 rounded-md border shadow">
       <p className="label font-bold">{formattedDate}</p>
       {payload.map((entry) => (
         <p key={entry.dataKey?.toString()} style={{ color: entry.color }}>

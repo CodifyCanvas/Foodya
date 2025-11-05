@@ -6,6 +6,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { EmployeePayrollInterface, InvoiceResponse, OrderItem, TransactionsTablesInterface } from '@/lib/definations';
 import { formatDateWithFns } from '@/lib/date-fns';
 import { formatMonthYear } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { HoverTransactionCardSkeleton } from '@/components/fallbacks/skeletons';
 
 interface Props {
     row: TransactionsTablesInterface;
@@ -44,19 +46,21 @@ export const TransactionDetailsHoverCard = ({ row }: Props) => {
 
     if (!shouldFetch || !sourceId) {
         return (
-            <div className="text-sm text-muted-foreground max-w-xs">
-                {description || 'No description provided.'}
+            <div className="font-rubik bg-card text-card-foreground shadow-sm rounded-lg overflow-hidden max-w-sm">
+                <div className="p-4">
+                    <div className="bg-muted/30 rounded-md p-3.5">
+                        <p className="text-xs text-center md:text-sm text-foreground/90 leading-relaxed">
+                            {description || 'No description provided.'}
+                        </p>
+                    </div>
+                </div>
             </div>
         );
     }
 
     if (loading) {
         return (
-            <div className="space-y-2">
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-                <Skeleton className="h-4 w-full" />
-            </div>
+            <HoverTransactionCardSkeleton />
         );
     }
 
@@ -69,76 +73,99 @@ export const TransactionDetailsHoverCard = ({ row }: Props) => {
         const invoiceData = data as InvoiceResponse;
         const invoice = invoiceData.invoice;
         const items = invoiceData.items;
-        const generatedBy = invoiceData.generatedBy; // if exists
-        const order = invoiceData.order; // if exists
+        const generatedBy = invoiceData.generatedBy;
+        const order = invoiceData.order;
 
         return (
-            <div className="space-y-2 text-sm">
-                <div className='capitalize'>
-                    <strong>Customer:</strong> {invoice.customerName}
-                </div>
-                <div className='capitalize'>
-                    <strong>Payment:</strong> {invoice.paymentMethod}
-                </div>
-                <div className='capitalize'>
-                    <strong>Order Type:</strong> {order.orderType}
+            <div className="font-rubik bg-card text-card-foreground shadow-sm rounded-lg overflow-hidden max-w-sm">
+                {/* Compact Header */}
+                <div className="bg-primary text-primary-foreground px-6 py-4 rounded-t-lg">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-bold">Invoice #{invoice.id || 'N/A'}</h3>
+                        {/* invoice.paymentMethod?.toLowerCase() */}
+                        <Badge className={`font-semibold uppercase ${invoice.paymentMethod?.toLowerCase() === 'cash'
+                            ? 'bg-green-100 text-green-700 dark:bg-green-900/75 dark:text-green-300'
+                            : invoice.paymentMethod?.toLowerCase() === 'card'
+                                ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/75 dark:text-yellow-300'
+                                : 'bg-indigo-100 text-indigo-500 dark:bg-indigo-900/75 dark:text-indigo-300'
+                            }`}>
+                            {invoice.paymentMethod}
+                        </Badge>
+                    </div>
                 </div>
 
-                <div className="grid w-full border-b rounded">
-                    <Table>
-                        <TableHeader>
-                            <TableRow className="bg-white sticky top-0 uppercase font-bold text-xs text-neutral-500">
-                                <TableHead className="pl-4">S.No</TableHead>
-                                <TableHead>Item Name</TableHead>
-                                <TableHead>Qty</TableHead>
-                                <TableHead>Price (PKR)</TableHead>
-                                <TableHead>Total</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {items?.map((item: OrderItem, index: number) => (
-                                <TableRow key={item.id} className="h-10 text-sm">
-                                    <TableCell className="pl-4">{String(index + 1).padStart(2, '0')}</TableCell>
-                                    <TableCell>
-                                        {item.menuItemName}
-                                        {item.menuItemOptionName && (
-                                            <span className="text-xs text-muted-foreground"> ({item.menuItemOptionName})</span>
-                                        )}
-                                    </TableCell>
-                                    <TableCell>{item.quantity}</TableCell>
-                                    <TableCell>{item.price}</TableCell>
-                                    <TableCell>{(parseFloat(item.price) * item.quantity).toFixed(2)}</TableCell>
-                                </TableRow>
+                <div className="p-4 space-y-3">
+                    {/* Quick Info */}
+                    <div className="flex justify-between items-start text-xs">
+                        <div>
+                            <p className="text-muted-foreground text-[0.7rem] md:text-xs uppercase">Customer</p>
+                            <p className="font-semibold text-xs md:text-sm capitalize mt-0.5">{invoice.customerName}</p>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-muted-foreground text-[0.7rem] md:text-xs uppercase">Order Type</p>
+                            <p className="font-semibold text-xs md:text-sm capitalize mt-0.5">{order.orderType?.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())}</p>
+                        </div>
+                    </div>
+
+                    {/* Items Preview */}
+                    <div className="bg-muted/30 rounded-md p-2.5">
+                        <div className="flex items-center justify-between text-xs mb-2">
+                            <span className="text-muted-foreground font-medium">Items</span>
+                            <span className="text-[0.7rem] md:text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">
+                                {items?.length || 0} items
+                            </span>
+                        </div>
+                        <div className="space-y-1.5 max-h-24 overflow-y-auto scroll-bar pr-2">
+                            {items?.map((item: OrderItem) => (
+                                <div key={item.id} className="flex justify-between text-xs md:text-sm">
+                                    <span className="text-foreground truncate mr-2">
+                                        {item.quantity}x {item.menuItemName}
+                                        {item.menuItemOptionName && <span className="text-muted-foreground text-[0.7rem] md:text-xs"> ({item.menuItemOptionName})</span>}
+                                    </span>
+                                    <span className="font-medium whitespace-nowrap">
+                                        Rs. {(parseFloat(item.price) * item.quantity).toFixed(0)}
+                                    </span>
+                                </div>
                             ))}
-                        </TableBody>
-                    </Table>
-                </div>
+                            {/* {items?.length > 3 && (
+                                <p className="text-[10px] text-muted-foreground italic text-center pt-1">
+                                    +{items.length - 3} more items...
+                                </p>
+                            )} */}
+                        </div>
+                    </div>
 
-                {/* --- Invoice Totals Summary --- */}
-                <div className="flex flex-col gap-2 text-sm">
-                    <div className="flex flex-row justify-between">
-                        <p>Subtotal</p>
-                        <p>{invoice.subTotalAmount}</p>
+                    {/* Totals Summary - Compact */}
+                    <div className="space-y-1.5 text-xs md:text-sm pt-2 border-t border-border/50">
+                        <div className="flex justify-between">
+                            <span className="text-muted-foreground">Subtotal</span>
+                            <span>Rs. {parseFloat(invoice.subTotalAmount).toFixed(0)}</span>
+                        </div>
+                        {Number(invoice.discount) > 0 && (
+                            <div className="flex justify-between">
+                                <span className="text-muted-foreground">Discount ({invoice.discount}%)</span>
+                                <span className="text-green-600 dark:text-green-500">
+                                    - Rs. {(parseFloat(invoice.subTotalAmount) - parseFloat(invoice.totalAmount)).toFixed(0)}
+                                </span>
+                            </div>
+                        )}
                     </div>
-                    <div className="flex flex-row justify-between">
-                        <p>Dis %</p>
-                        <p>{invoice.discount}%</p>
-                    </div>
-                    <div className="flex flex-row justify-between">
-                        <p>Total</p>
-                        <p>{invoice.totalAmount}</p>
-                    </div>
-                    <div className="flex flex-row font-semibold justify-between">
-                        <p>Grand Total</p>
-                        <p className="text-orange-500">
-                            {invoice.grandTotal} PKR
-                        </p>
-                    </div>
-                </div>
 
-                {generatedBy?.name && <div className="text-xs text-muted-foreground mt-1">
-                    Generated by: {generatedBy?.name}
-                </div>}
+                    {/* Grand Total - Highlighted */}
+                    <div className="bg-primary/10 dark:bg-primary/20 rounded-md p-2.5 flex justify-between items-center">
+                        <span className="font-bold text-xs md:text-sm">Grand Total</span>
+                        <span className="font-bold text-sm md:text-base text-primary">
+                            Rs. {parseFloat(invoice.grandTotal).toLocaleString()}
+                        </span>
+                    </div>
+
+                    {/* Footer */}
+                    {generatedBy?.name && (
+                        <div className="text-xs font-mono text-muted-foreground capitalize text-center pt-1">
+                            Invoiced By: {generatedBy.name}
+                        </div>
+                    )}
+                </div>
             </div>
         );
     }
@@ -148,59 +175,110 @@ export const TransactionDetailsHoverCard = ({ row }: Props) => {
         const payroll = data as EmployeePayrollInterface;
 
         return (
-            <div className="text-sm font-rubik space-y-4">
-                {/* Header */}
-                <div className="text-center">
-                    <h3 className="text-lg font-semibold">Payroll Slip</h3>
-                    <p className="text-muted-foreground text-sm">Month: {formatMonthYear(payroll.month)}</p>
+            <div className="font-rubik space-y-6 bg-card text-card-foreground shadow-sm">
+                {/* Header Section */}
+                <div className="bg-primary text-primary-foreground px-6 py-4 rounded-t-lg">
+                    <h3 className="text-xl font-bold text-center">Payroll Slip</h3>
+                    <p className="text-center text-sm opacity-90 mt-1">
+                        {formatMonthYear(payroll.month)}
+                    </p>
                 </div>
 
-                {/* Employee Info */}
-                <div className="grid grid-cols-1 gap-2 text-sm">
-                    {payroll.employeeId
-                        ? <div><strong>Employee ID:</strong> #{payroll.employeeId}</div>
-                        : <div className='text-red-600'><strong>Employee record not found or has been deleted.</strong></div>}
-                    <div><strong>Employee Name:</strong> {payroll.employeeName}</div>
-                    <div><strong>Email:</strong> {payroll.employeeEmail}</div>
-                    <div><strong>CNIC:</strong> {payroll.employeeCNIC}</div>
-                </div>
+                <div className="px-6 pb-4 space-y-5">
+                    {/* Employee Information Card */}
+                    <h4 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground mb-3">
+                        Employee Details
+                    </h4>
+                    <div className="bg-muted/50 rounded-lg p-4 space-y-2.5">
+                        {payroll.employeeId ? (
+                            <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Employee ID:</span>
+                                <span className="font-medium">#{payroll.employeeId}</span>
+                            </div>
+                        ) : (
+                            <div className="text-destructive text-sm font-medium">
+                                ⚠ Employee unavailable
+                            </div>
+                        )}
+                        <div className="flex justify-between capitalize text-sm">
+                            <span className="text-muted-foreground">Name:</span>
+                            <span className="font-medium">{payroll.employeeName}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Email:</span>
+                            <span className="font-medium">{payroll.employeeEmail}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">CNIC:</span>
+                            <span className="font-medium">{payroll.employeeCNIC}</span>
+                        </div>
+                    </div>
 
-                {/* Payroll Breakdown */}
-                <div className="border-t border-b py-2 text-sm space-y-2">
-                    <div className="flex justify-between">
-                        <span>Basic Pay:</span>
-                        <span>Rs. {payroll.basicPay}</span>
-                    </div>
-                    <div className="flex justify-between">
-                        <span>Bonus:</span>
-                        <span>Rs. {payroll.bonus}</span>
-                    </div>
-                    <div className="flex justify-between">
-                        <span>Penalty:</span>
-                        <span>Rs. {payroll.penalty}</span>
-                    </div>
-                    <div className="border-t pt-2 flex justify-between font-semibold">
-                        <span>Total Pay:</span>
-                        <span>Rs. {payroll.totalPay}</span>
-                    </div>
-                </div>
+                    {/* Payroll Breakdown Card */}
+                    <div className="space-y-3">
+                        <h4 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">
+                            Salary Breakdown
+                        </h4>
+                        <div className="bg-muted/30 rounded-lg p-4 space-y-3">
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-muted-foreground">Basic Pay</span>
+                                <span className="font-semibold">Rs. {payroll.basicPay.toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-muted-foreground">Bonus</span>
+                                <span className="font-semibold text-green-600 dark:text-green-500">
+                                    + Rs. {payroll.bonus.toLocaleString()}
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-muted-foreground">Penalty</span>
+                                <span className="font-semibold text-red-600 dark:text-red-500">
+                                    - Rs. {payroll.penalty.toLocaleString()}
+                                </span>
+                            </div>
 
-                {/* Additional Info */}
-                <div className="flex flex-col justify-between capitalize items-center text-sm">
-                    <span><strong>Status:</strong> <span className={payroll.status === 'paid' ? 'text-green-600' : 'text-red-600'}>{payroll.status}</span></span>
-                    {payroll.paidAt && (
-                        <span className="text-sm text-neutral-700">
-                            Paid on: {formatDateWithFns(payroll.paidAt, { showTime: true, separator: '/', showSeconds: true })}
-                        </span>
+                            {/* Total Pay - Highlighted */}
+                            <div className="border-t border-border pt-3 mt-3">
+                                <div className="flex justify-between items-center bg-primary/10 dark:bg-primary/20 rounded-md p-3">
+                                    <span className="font-bold text-sm md:text-base">Net Pay</span>
+                                    <span className="font-bold text-base md:text-lg text-primary">
+                                        Rs. {payroll.totalPay.toLocaleString()}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Status and Payment Info */}
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 pt-2">
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-muted-foreground">Status:</span>
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase ${payroll.status === 'paid'
+                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                                }`}>
+                                {payroll.status}
+                            </span>
+                        </div>
+                        {payroll.paidAt && (
+                            <div className="text-xs text-muted-foreground">
+                                Paid: {formatDateWithFns(payroll.paidAt, { showTime: true, separator: '/', showSeconds: true })}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Description/Notes */}
+                    {payroll.description && (
+                        <div className="bg-muted/50 rounded-lg p-4 border-l-4 border-primary">
+                            <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">
+                                Note
+                            </p>
+                            <p className="text-sm text-foreground italic">
+                                {payroll.description}
+                            </p>
+                        </div>
                     )}
                 </div>
-
-                {/* Optional Description */}
-                {payroll.description && (
-                    <div className="text-xs text-muted-foreground italic">
-                        Note: {payroll.description}
-                    </div>
-                )}
             </div>
         );
     }

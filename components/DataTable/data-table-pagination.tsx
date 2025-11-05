@@ -34,12 +34,12 @@ export function DataTablePagination<TData>({ table }: DataTablePaginationProps<T
 
         {/* === Rows per page selector === */}
         <div className="flex items-center space-x-2">
-          <p className="text-sm">Rows per page</p>
+          <p className="text-sm text-muted-foreground">Rows per page</p>
           <Select value={`${pageSize}`} onValueChange={(value) => table.setPageSize(Number(value))} >
             <SelectTrigger className="h-8 w-[70px] text-sm">
               <SelectValue placeholder={pageSize} />
             </SelectTrigger>
-            <SelectContent side="top" className="font-rubik">
+            <SelectContent side="top" className="font-sans">
               {[10, 20, 25, 30, 40, 50].map((size) => (
                 <SelectItem key={size} value={`${size}`}>
                   {size}
@@ -50,7 +50,7 @@ export function DataTablePagination<TData>({ table }: DataTablePaginationProps<T
         </div>
 
         {/* === Page info (e.g., "Page 2 of 5") === */}
-        <div className="flex w-[100px] items-center justify-center text-sm">
+        <div className="flex w-[100px] text-muted-foreground items-center justify-center text-sm">
           Page &nbsp;
           <span className="font-medium cursor-help" title="Current page number">
             {pageIndex + 1}

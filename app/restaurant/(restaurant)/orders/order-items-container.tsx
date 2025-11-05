@@ -143,11 +143,11 @@ const OrderItemsContainer: React.FC<OrderItemsContainerProps> = ({ restaurantTab
   }, [table]);
 
   return (
-    <div className="px-2">
+    <div className="px-2 w-full">
       {/* === Order Header === */}
       <p className="flex justify-between items-center py-2">
         <span className="text-lg font-medium">Order</span>
-        <span className="text-neutral-500 text-base">
+        <span className="text-muted-foreground text-base">
           {orderedMenu?.order?.id
             ? `#${String(orderedMenu.order.id).padStart(4, '0')}`
             : 'Fresh'}
@@ -171,8 +171,8 @@ const OrderItemsContainer: React.FC<OrderItemsContainerProps> = ({ restaurantTab
       <div className="flex justify-between items-center py-2">
         <p className="text-base">Order Items</p>
         {cart.length > 0 && (<div className='flex flex-row-reverse items-center gap-2'>
-          <Button variant={'ghost'} onClick={clearCart} className='p-2 text-red-400 hover:text-red-500 cursor-pointer' size={'sm'}><Trash2 /></Button>
-          <p className="text-neutral-500 text-sm">{cart.length}</p>
+          <Button variant={'ghost'} onClick={clearCart} title="Empty Cart" className='p-2 text-red-400 hover:text-red-500 cursor-pointer' size={'sm'}><Trash2 /></Button>
+          <p className="text-muted-foreground text-sm">{cart.length}</p>
         </div>
         )}
       </div>
@@ -183,7 +183,7 @@ const OrderItemsContainer: React.FC<OrderItemsContainerProps> = ({ restaurantTab
           cart.map((item) => (
             <Card
               key={`${item.menuItemId}-${item.menuItemOptionId ?? 'noopt'}`}
-              className="bg-white flex justify-between flex-row items-center px-2 py-2 gap-3"
+              className="bg-card dark:bg-secondary flex justify-between flex-row items-center px-2 py-2 gap-3"
             >
               <CardContent className="p-0 min-w-16">
                 <div className="relative w-16 h-16 aspect-square">
@@ -192,6 +192,7 @@ const OrderItemsContainer: React.FC<OrderItemsContainerProps> = ({ restaurantTab
                     alt="Menu Item"
                     className="rounded-lg object-cover"
                     fill
+                    sizes="64px"
                   />
                 </div>
               </CardContent>
@@ -208,11 +209,11 @@ const OrderItemsContainer: React.FC<OrderItemsContainerProps> = ({ restaurantTab
                     <div className="flex items-end gap-2">
                       <p className="text-xs">
                         Price:{' '}
-                        <span className="text-orange-600">{item.price}</span>
+                        <span className="text-orange-600 dark:text-orange-400">{item.price}</span>
                       </p>
                       <p className="text-xs">
                         Total:{' '}
-                        <span className="text-orange-600 sm:text-sm">
+                        <span className="text-orange-600 dark:text-orange-400 sm:text-sm">
                           {(item.price * item.quantity).toFixed(2)}
                         </span>
                       </p>
@@ -230,7 +231,7 @@ const OrderItemsContainer: React.FC<OrderItemsContainerProps> = ({ restaurantTab
                   />
                   <Button
                     size="icon"
-                    className="bg-red-400 hover:bg-red-500"
+                    variant="destructive"
                     onClick={() =>
                       removeItem(item.menuItemId!, item.menuItemOptionId || null)
                     }
@@ -279,13 +280,13 @@ const OrderItemsContainer: React.FC<OrderItemsContainerProps> = ({ restaurantTab
 
           <p className="flex justify-between w-full font-medium mt-2">
             <span>Grand Total</span>
-            <span className="text-orange-600">
+            <span className="text-orange-600 dark:text-orange-400">
               {Math.round(Number(grandTotal.toFixed(2)))} PKR
             </span>
           </p>
 
           {advancePaid > subtotal && (
-            <p className="text-orange-500 text-sm">
+            <p className="text-orange-500 dark:text-orange-400 text-sm">
               You&apos;ve overpaid by {(advancePaid - subtotal).toFixed(2)} PKR.
             </p>
           )}
@@ -324,7 +325,7 @@ const OrderItemsContainer: React.FC<OrderItemsContainerProps> = ({ restaurantTab
 
           {/* === Reset the complete Container Button === */}
           <Button
-            className="bg-red-400 hover:bg-red-500"
+            variant="destructive"
             size="icon"
             onClick={() => {
               clearCart();

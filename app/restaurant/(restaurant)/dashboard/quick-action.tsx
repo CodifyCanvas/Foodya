@@ -25,10 +25,10 @@ const QuickAction = () => {
                     <Button
                         variant="ghost"
                         onClick={() => handleNavigation(href)}
-                        className="flex py-7 cursor-pointer w-full flex-row items-center justify-start gap-3 transition-all duration-200 hover:bg-emerald-50"
+                        className="flex py-7 cursor-pointer w-full flex-row items-center justify-start gap-3 transition-all duration-200 hover:bg-accent"
                     >
                         {/* === Icon Wrapper === */}
-                        <div className="min-w-10 min-h-10 flex items-center justify-center relative overflow-hidden rounded-sm bg-black/5 transition-all duration-200">
+                        <div className="min-w-10 min-h-10 flex items-center justify-center relative overflow-hidden rounded-sm bg-accent transition-all duration-200">
                             <Image
                                 src={icon}
                                 alt={`${title} icon`}
@@ -41,7 +41,7 @@ const QuickAction = () => {
 
                         {/* === Text Content === */}
                         <div className="flex flex-col text-left">
-                            <span className="text-sm font-medium font-rubik-500 leading-none text-gray-800">
+                            <span className="text-sm font-medium font-rubik-500 leading-none text-accent-foreground ">
                                 {title}
                             </span>
                             <p className="text-muted-foreground font-rubik-400 text-xs mt-1 leading-snug line-clamp-2">

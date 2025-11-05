@@ -11,14 +11,14 @@ export const EmployeePayrollTable = ({ data }: { data: PayrollDialogSalaryRow[] 
             <Table>
                 {/* === Table Header === */}
                 <TableHeader>
-                    <TableRow className="bg-white text-neutral-500 hover:bg-white sticky top-0 uppercase text-xs [&>*]:whitespace-nowrap">
-                        <TableHead className="pl-4 text-neutral-500">S.No</TableHead>
-                        <TableHead className="text-neutral-500">Month</TableHead>
-                        <TableHead className="text-neutral-500">Basic Pay</TableHead>
-                        <TableHead className="text-neutral-500">Bonus</TableHead>
-                        <TableHead className="text-neutral-500">Penalty</TableHead>
-                        <TableHead className="text-neutral-500">Total</TableHead>
-                        <TableHead className="text-neutral-500">Status</TableHead>
+                    <TableRow className="bg-accent/50 text-neutral-500 hover:bg-white sticky top-0 uppercase text-xs font-sans font-extrabold [&>*]:whitespace-nowrap">
+                        <TableHead className="pl-4 text-neutral-500 font-bold">S.No</TableHead>
+                        <TableHead className="text-neutral-500 font-bold">Month</TableHead>
+                        <TableHead className="text-neutral-500 font-bold">Basic Pay</TableHead>
+                        <TableHead className="text-neutral-500 font-bold">Bonus</TableHead>
+                        <TableHead className="text-neutral-500 font-bold">Penalty</TableHead>
+                        <TableHead className="text-neutral-500 font-bold">Total</TableHead>
+                        <TableHead className="text-neutral-500 font-bold">Status</TableHead>
                     </TableRow>
                 </TableHeader>
 
@@ -44,7 +44,7 @@ export const EmployeePayrollTable = ({ data }: { data: PayrollDialogSalaryRow[] 
                                         </TooltipContent>
                                     </Tooltip>
                                 ) : (
-                                    <span className="text-red-500">—</span>
+                                    <span className="text-destructive">—</span>
                                 )}
                             </TableCell>
 
@@ -60,7 +60,7 @@ export const EmployeePayrollTable = ({ data }: { data: PayrollDialogSalaryRow[] 
                                         </TooltipContent>
                                     </Tooltip>
                                 ) : (
-                                    <span className="text-red-500">Unpaid</span>
+                                    <span className="text-destructive">Unpaid</span>
                                 )}
                             </TableCell>
                         </TableRow>

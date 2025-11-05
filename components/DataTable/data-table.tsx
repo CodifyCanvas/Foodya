@@ -18,7 +18,6 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
   filterColumns?: string[] // optional list of columns to filter on
   createComponent?: ReactNode;
-  loading?: boolean;
 }
 
 
@@ -41,14 +40,12 @@ interface DataTableProps<TData, TValue> {
  * @param data - Table row data
  * @param filterColumns - Columns included in global search (optional)
  * @param createComponent - Optional header component (e.g., "Add New" button)
- * @param loading - Loading state to show skeletons
  */
 export function DataTable<TData, TValue>({
   columns,
   data,
   filterColumns,
   createComponent,
-  loading = false,
 }: DataTableProps<TData, TValue>) {
 
   // === Local States ===
@@ -125,7 +122,7 @@ export function DataTable<TData, TValue>({
         {effectiveFilterColumns.length > 0 && (
           <div className='relative w-full max-w-xs mr-2'>
             <div className='text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
-              <Search className='size-4 text-black' />
+              <Search className='size-4 text-accent-foreground' />
               <span className='sr-only'>Search</span>
             </div>
             <Input type='text' variant="minimal" placeholder={filterColumns && filterColumns.length > 0 ? `Search ${effectiveFilterColumns.slice(0, 3).join(", ")}...` : "Search..."} className='peer w-full capitalize border-b ps-9' value={globalFilter} onChange={(e) => setGlobalFilter(e.target.value)} />
@@ -150,7 +147,7 @@ export function DataTable<TData, TValue>({
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className="text-gray-500 text-xs font-rubik-500 uppercase">
+                    <TableHead key={header.id} className="text-gray-500 text-xs font-sans uppercase">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -163,22 +160,12 @@ export function DataTable<TData, TValue>({
               ))}
             </TableHeader>
             <TableBody>
-              {loading ? (
-                Array.from({ length: 8 }).map((_, rowIndex) => (
-                  <TableRow key={`skeleton-row-${rowIndex}`} className="animate-pulse h-10">
-                    {columns.map((_, colIndex) => (
-                      <TableCell key={`skeleton-cell-${colIndex}`} className="px-3">
-                        <div className="h-4 rounded-lg bg-gray-200 dark:bg-gray-700 w-full" />
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : table.getRowModel().rows.length ? (
+              {table.getRowModel().rows.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className="font-rubik-400 text-sm text-gray-900"
+                    className="font-rubik-400 text-sm text-accent-foreground"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>

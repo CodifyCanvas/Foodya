@@ -1,4 +1,3 @@
-// components/table/cells/TransactionTitleCell.tsx
 'use client';
 
 import React from 'react';
@@ -24,14 +23,14 @@ const TransactionTitleCell: React.FC<Props> = ({ row }) => {
   return isMobile ? (
     <Popover>
       <PopoverTrigger asChild>{TriggerElement}</PopoverTrigger>
-      <PopoverContent className="w-96 p-4">
+      <PopoverContent className="w-96">
         <TransactionDetailsHoverCard row={row} />
       </PopoverContent>
     </Popover>
   ) : (
     <HoverCard>
       <HoverCardTrigger asChild>{TriggerElement}</HoverCardTrigger>
-      <HoverCardContent className="w-96 p-4">
+      <HoverCardContent className="w-96 p-0 rounded-lg">
         <TransactionDetailsHoverCard row={row} />
       </HoverCardContent>
     </HoverCard>

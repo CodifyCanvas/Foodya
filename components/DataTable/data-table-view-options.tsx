@@ -18,8 +18,8 @@ export function DataTableViewOptions<TData>({ table }: { table: Table<TData> }) 
           Columns
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[180px] font-rubik-400">
-        <DropdownMenuLabel className="text-xs">Toggle columns</DropdownMenuLabel>
+      <DropdownMenuContent align="end" className="w-[180px] bg-card font-rubik-400">
+        <DropdownMenuLabel className="text-xs text-mono">Toggle columns</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {table
           .getAllColumns()

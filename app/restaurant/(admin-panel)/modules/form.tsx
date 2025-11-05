@@ -152,7 +152,7 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
                   name="name"
                   render={({ field }) => (
                     <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                      <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                      <FormLabel className="bg-card text-muted-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                         Name
                       </FormLabel>
                       <FormControl>
@@ -164,7 +164,7 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
                         />
                       </FormControl>
                       {/* <FormDescription className="font-rubik-300">Used to check access for this page.</FormDescription> */}
-                      <FormDescription className="font-rubik-300 text-xs text-neutral-700">
+                      <FormDescription className="font-rubik-300 text-xs ">
                         Page name from the URL. E.g., &apos;.../page/roles?q=hello&apos; → &apos;roles&apos;.
                       </FormDescription>
                       <FormMessage />
@@ -180,7 +180,7 @@ export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
                   name="label"
                   render={({ field }) => (
                     <FormItem className="group relative w-auto sm:max-w-sm m-1">
-                      <FormLabel className="bg-background text-foreground absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
+                      <FormLabel className="bg-card text-muted-foreground  absolute start-2 top-0 z-10 block -translate-y-1/2 px-1 text-xs">
                         Label
                       </FormLabel>
                       <FormControl>

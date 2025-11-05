@@ -2,7 +2,7 @@
 
 import { db } from '@/lib/db'
 import { schema } from '@/lib/drizzle-schema';
-import { asc, eq, TablesRelationalConfig } from 'drizzle-orm'
+import { asc, desc, eq, TablesRelationalConfig } from 'drizzle-orm'
 import type { MySqlColumn, MySqlUpdateSetSource } from 'drizzle-orm/mysql-core'
 import { MySql2Database, MySql2Transaction } from 'drizzle-orm/mysql2';
 
@@ -28,16 +28,20 @@ type DBExecutor = MySql2Database<typeof schema> | MySql2Transaction<typeof schem
  *
  * @template T - Table name from schema
  * @param {T} tableName - The table to fetch data from.
+ * @param {'asc' | 'desc'} [orderBy='asc'] - The sort order for the `id` column.
  * @returns {Promise<Schema[T]["$inferSelect"][]>} - Array of selected rows.
  */
 export async function getAllData<T extends TableName>(
-  tableName: T
+  tableName: T,
+  orderBy: 'asc' | 'desc' = 'asc',
 ): Promise<Schema[T]["$inferSelect"][]> {
+
+  const table = schema[tableName];
 
   const result = await db
     .select()
     .from(schema[tableName])
-    .orderBy(asc(schema[tableName].id));
+    .orderBy(orderBy === 'desc' ? desc(table.id) : asc(table.id));
 
   return result as Schema[T]["$inferSelect"][];
 }

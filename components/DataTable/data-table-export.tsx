@@ -1,6 +1,15 @@
 "use client"
 
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Download } from "lucide-react"
 import { Table } from "@tanstack/react-table"
@@ -10,6 +19,7 @@ import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 import Image from "next/image"
 import { Icons } from "@/constants"
+import toast from "react-hot-toast"
 
 
 
@@ -67,6 +77,7 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
         } catch { }
       }
 
+
       return col.id.replace(/"/g, '""');
     });
 
@@ -94,6 +105,8 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
       .catch(err => {
         console.error("Failed to copy table:", err);
       });
+
+    toast.success("Data copied to clipboard");
   };
 
 
@@ -131,6 +144,8 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    toast.success("CSV file downloaded successfully");
   };
 
 
@@ -168,6 +183,7 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
     });
 
     saveAs(blob, "data.xlsx");
+    toast.success("Excel file downloaded successfully");
   };
 
 
@@ -218,6 +234,7 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
     });
 
     doc.save("data.pdf");
+    toast.success("PDF downloaded successfully");
   };
 
 
@@ -287,25 +304,37 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
 
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+    <Dialog>
+      <DialogTrigger asChild>
         <Button variant="outline" className="gap-2">
           <Download className="w-4 h-4" />
           <span className="md:block hidden font-rubik-400">Export</span>
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-xs md:w-sm flex font-rubik-400 flex-wrap text-sm">
-        <div className="w-1/2">
+      </DialogTrigger>
+
+      <DialogContent className="sm:max-w-[450px] bg-card font-rubik-400">
+        <DialogHeader>
+          <DialogTitle className="text-center">Export Options</DialogTitle>
+          <DialogDescription className="text-center">
+            Choose how you&apos;d like to export the data.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="flex flex-wrap gap-3 text-sm justify-center">
           <ExportItem icon={Icons.copy} label="Copy" onClick={exportCopy} />
           <ExportItem icon={Icons.csv} label="CSV" onClick={exportCSV} />
           <ExportItem icon={Icons.xls} label="Excel" onClick={exportExcel} />
-        </div>
-        <div className="w-1/2">
           <ExportItem icon={Icons.pdf} label="PDF" onClick={exportPDF} />
           <ExportItem icon={Icons.printer} label="Print" onClick={printTable} />
         </div>
-      </DropdownMenuContent>
-    </DropdownMenu>
+
+        <DialogFooter className="sr-only">
+          <DialogClose asChild>
+            <Button variant="outline">Close</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -327,10 +356,10 @@ interface ExportItemProps {
  * @returns - JSX element representing a dropdown item
  */
 const ExportItem: React.FC<ExportItemProps> = ({ icon, label, onClick }) => (
-  <DropdownMenuItem onClick={onClick} className="cursor-pointer">
-    <div className="min-w-10 min-h-10 flex items-center justify-center relative overflow-hidden rounded-sm bg-black/5 transition-colors duration-200">
+  <Button onClick={onClick} variant='outline' className="flex flex-col items-center font-sans active:bg-primary active:dark:bg-primary cursor-pointer gap-2 outline size-20 sm:size-28">
+    <div className="min-w-10 min-h-10 flex items-center justify-center relative overflow-hidden rounded-sm bg-accent transition-colors duration-200">
       <Image src={icon} alt={label} width={48} height={48} className="object-contain absolute w-7 h-7" />
     </div>
     {label}
-  </DropdownMenuItem>
+  </Button>
 )

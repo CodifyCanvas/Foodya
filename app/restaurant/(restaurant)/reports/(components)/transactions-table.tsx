@@ -102,7 +102,7 @@ export function TransactionTable() {
         <div className={`space-y-4 pt-5 ${open ? 'md:w-[calc(100vw-23rem)]' : 'md:w-[calc(100vw-8rem)]'}`}>
             {/* === Header === */}
             <div className="flex items-center justify-between">
-                <h2 className="text-3xl font-medium pt-3 text-emerald-600 text-start">Transactions</h2>
+                <h2 className="text-3xl font-medium pt-3 text-primary text-start">Transactions</h2>
             </div>
 
             {/* === Search and Filters === */}
@@ -155,7 +155,7 @@ export function TransactionTable() {
                                     <TableRow key={`skeleton-${index}`}>
                                         {Array(8).fill(0).map((_, cellIdx) => (
                                             <TableCell key={cellIdx}>
-                                                <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+                                                <div className="h-4 w-full bg-muted-foreground/20 rounded-lg animate-pulse"></div>
                                             </TableCell>
                                         ))}
                                     </TableRow>
