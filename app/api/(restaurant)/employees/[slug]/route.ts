@@ -80,7 +80,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug
     try {
       parsed = EmployeePersonalInfoFormSchema.parse(JSON.parse(jsonData));
     } catch (err) {
-      console.log(`[PUT ${path}] Validation failed:`);
+      console.error(`[PUT ${path}] Validation failed:`);
       return NextResponse.json({ error: "Invalid input data. Please review the fields and try again.", details: err }, { status: 400 });
     }
 

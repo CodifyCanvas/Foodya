@@ -9,13 +9,15 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <main className="w-[100vw] h-[100vh] flex flex-1 bg-white rounded-lg justify-center items-center font-rubik-400">
-      <div className="flex flex-col items-center scale-90 sm:scale-125 transition-all duration-300 md:scale-150">
-        <h3 className="text-lg">Not Found</h3>
-        <h1 className="text-9xl font-rubik-800 text-emerald-600 p-0 m-0">404</h1>
-        <h3 className="text-base text-red-500">Could not find requested resource</h3>
-        <Link href="/restaurant/dashboard" className='text-white text-sm bg-emerald-600 hover:bg-emerald-500 hover:cursor-pointer mt-2 px-2 py-1 rounded-sm'>Return Home</Link>
-      </div>
+    <main className="w-[100vw] h-[100vh] flex flex-1 bg-background rounded-lg justify-center items-center font-rubik-400">
+      <section className="flex flex-col items-center transition-all duration-300 space-y-6 bg-card w-fit sm:min-w-md md:min-w-lg p-10 rounded-lg outline outline-border">
+        <h3 className="text-base sm:text-lg md:text-2xl leading-none">Not Found</h3>
+        <h1 className="text-9xl sm:text-[10rem] md:text-[12rem] font-rubik-800 text-primary leading-none m-0 p-0">404</h1>
+        <h3 className="text-sm sm:text-base md:text-xl text-destructive leading-none">Could not find requested resource</h3>
+        <Link href="/restaurant/dashboard" className="bg-primary/90 text-sm sm:text-base md:text-lg text-white shadow-xs hover:bg-primary/80 hover:cursor-pointer px-4 py-2 rounded-md">
+          Return Home
+        </Link>
+      </section>
     </main>
   )
 }

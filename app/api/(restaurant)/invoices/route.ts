@@ -72,8 +72,6 @@ export async function POST(req: NextRequest) {
     const dineInInvoice = body?.invoice;
     const orderItems = body?.items;
 
-    console.log(body);
-
     // === DINE-IN Order Invoice ===
     if (dineInInvoice?.orderType === "dine_in") {
 

@@ -28,6 +28,18 @@ export const appConfigurations = {
 
 
 /**
+ * === Website Navigation Links ===
+ * Defines the Top Navbar structure.
+ */
+export const WebsiteNavLinks = [
+  { label: "Home", href: "/" },
+  { label: "Menu", href: "/menu" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
+];
+
+
+/**
  * === Navigation Sidebar Links ===
  * Defines the sidebar structure, including headings, groups, icons, and child routes.
  */
@@ -115,6 +127,16 @@ export const navLink = [
  */
 export const Icons = {
   gmail: '/icons/gmail.png',
+  vercel: '/icons/vercel.png',
+  authjs: '/icons/authjs.png',
+  drizzleORM: '/icons/drizzle-orm.png',
+  tailwind: '/icons/tailwind.png',
+  mysql: '/icons/mysql.png',
+  nodejs: '/icons/nodejs.png',
+  shadcnUI: '/icons/shadcn-ui.png',
+  typescript: '/icons/typescript.png',
+  reactjs: '/icons/reactjs.png',
+  nextjs: '/icons/nextjs.png',
   whatsapp: '/icons/whatsapp.png',
   github: '/icons/github.png',
   google: '/icons/google.png',
@@ -133,6 +155,8 @@ export const Icons = {
   tables: '/icons/tables.png',
   users: '/icons/users.png',
   xls: '/icons/xls-file.png',
+  linkedin: '/icons/linkedin.png',
+  html: '/icons/html.png',
 };
 
 
@@ -166,4 +190,5 @@ export const HelpLinks = [
   { title: "Gmail", icon: Icons.gmail, href: "https://mail.google.com/mail/?view=cm&fs=1&to=shahzaibawan1357@gmail.com" },
   { title: "Whatsapp", icon: Icons.whatsapp, href: "https://web.whatsapp.com/send?phone=+923118480102" },
   { title: "Github", icon: Icons.github, href: "https://github.com/CodifyCanvas" },
+  { title: "Linked In", icon: Icons.linkedin, href: "https://github.com/CodifyCanvas" },
 ];

@@ -34,18 +34,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={` ${geistMono.variable} ${rubik.variable} antialiased`}
-      >
+      <body className={` ${geistMono.variable} ${rubik.variable} antialiased`}>
+
         <Toaster position="top-center" reverseOrder={false} />
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
         </ThemeProvider>
+
       </body>
     </html>
   );

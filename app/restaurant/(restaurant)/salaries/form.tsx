@@ -142,8 +142,6 @@ export function RoleForm({ open, onOpenChange, data: dataProp }: FormDialogProps
       return;
     }
 
-    console.log("Submitting only:", filtered);
-
     const requestOptions = {
       method: "POST",
       headers: {

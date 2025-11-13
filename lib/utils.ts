@@ -196,3 +196,26 @@ export const truncateText = (text: string = "", maxLength: number = 30): string 
   if (!text) return "";
   return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 };
+
+
+
+/**
+ * Finds an object in an array by matching a specific key/value pair.
+ * @param items - The array of objects
+ * @param key - The key of the property to match
+ * @param value - The value to match (case-insensitive if string)
+ * @returns The matching object or undefined if not found
+ */
+export function findItemByKey<T, K extends keyof T>(
+  items: T[],
+  key: K,
+  value: T[K]
+): T | undefined {
+  return items.find(item => {
+    const itemValue = item[key];
+    if (typeof itemValue === "string" && typeof value === "string") {
+      return itemValue.toLowerCase() === value.toLowerCase();
+    }
+    return itemValue === value;
+  });
+}
