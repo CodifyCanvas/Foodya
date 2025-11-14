@@ -609,3 +609,30 @@ export interface TransactionsReportResult {
   pageSize: number;
   transactions: TransactionsTablesInterface[];
 }
+
+
+
+// =========================
+// === WEBSITE MENU PAGE ===
+// =========================
+
+/**
+ * Filter Category Bar.
+ */
+export interface MenuCategoryWithItemCount {
+  id: number;
+  category: string;
+  description: string | null;
+  total_items: number;
+}
+
+
+
+export interface MenuResponse {
+  query: string | null;
+  totalRecords: number;
+  page: number;
+  totalPages: number;
+  pageSize: number;
+  menuItems: ItemWithOptions[];
+}

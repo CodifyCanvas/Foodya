@@ -1,12 +1,13 @@
 "use client"
 
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AvatarGroup } from "@/components/ui/AvatarGroup";
-import { ArrowLeft, ArrowRight, Star } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import MenuItemCard from "./menu/menu-item-card";
 
 export default function HeroSection() {
 
@@ -84,7 +85,7 @@ export default function HeroSection() {
 
       <div className="flex flex-row justify-center flex-wrap gap-16">
 
-        {/* <MenuItemCard /> */}
+        <MenuItemCard />
 
         <div className="flex flex-col w-20 gap-4 justify-center">
           <Button className="inline-flex items-center justify-center w-10 p-3 bg-neutral-900 group rounded-full hover:w-20 cursor-pointer transition-all duration-300 overflow-hidden">
@@ -106,63 +107,3 @@ export default function HeroSection() {
     </section>
   );
 }
-
-// const MenuItemCard = ({ items }: any) => {
-
-//   return (
-//     <>
-//       {items.map((item, idx) => (
-//         <Card
-//           key={idx}
-//           className="relative w-[17rem] border-neutral-700/70 overflow-visible rounded-xl bg-neutral-900/90 text-white p-4 backdrop-blur-sm shadow-xl hover:shadow-emerald-600/25 transition-all duration-300 hover:border-emerald-500/70"
-//         >
-//           {/* Top accent line */}
-//           <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-500/75 to-transparent opacity-80 transition-all duration-300 group-hover:via-emerald-500" />
-
-//           {/* Floating Product Image */}
-//           <div className="absolute top-0 left-0 -translate-x-1/3 -translate-y-1/3 w-28 h-28 z-10">
-//             <div className="relative w-28 h-28 group-hover:scale-105 transition-transform duration-300">
-//               <div className="absolute inset-0 bg-emerald-600/20 rounded-full blur-lg"></div>
-//               <div className="relative w-full h-full rounded-full overflow-hidden ring-emerald-400/40 group-hover:ring-emerald-300/75 ring-2 shadow-lg shadow-emerald-600/25 transition-all duration-300">
-//                 <Image
-//                   src={item.image}
-//                   alt={item.name}
-//                   fill
-//                   className="object-cover rounded-full"
-//                   loading="lazy"
-//                 />
-//               </div>
-//             </div>
-//           </div>
-
-//           {/* Product Info */}
-//           <CardContent className="space-y-3 p-0">
-//             <h3 className="text-lg font-semibold pl-7">{item.name}</h3>
-
-//             {/* Rating & Price */}
-//             <div className="flex items-center justify-between pl-14 w-full">
-//               <div className="flex gap-1">
-//                 {Array.from({ length: 5 }).map((_, i) => (
-//                   <Star key={i} className="w-4 h-4 fill-yellow-500 stroke-yellow-500" />
-//                 ))}
-//               </div>
-//               <span className="text-orange-500 font-semibold text-lg">{item.price}</span>
-//             </div>
-
-//             {/* Sizes */}
-//             <div className="grid grid-cols-3 gap-2 text-sm">
-//               {item.sizes.map((size, i) => (
-//                 <p key={i} className="font-semibold flex flex-col text-white/50 text-sm group hover:underline">
-//                   {size.label}
-//                   <span className="text-white/75 group-hover:text-white transition-colors duration-200">
-//                     {size.price}
-//                   </span>
-//                 </p>
-//               ))}
-//             </div>
-//           </CardContent>
-//         </Card>
-//       ))}
-//     </>
-//   );
-// };
