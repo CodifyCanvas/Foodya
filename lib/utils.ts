@@ -219,3 +219,47 @@ export function findItemByKey<T, K extends keyof T>(
     return itemValue === value;
   });
 }
+
+
+
+/**
+ * Generates an array of visible page numbers for pagination, using ellipses ("...") for skipped ranges.
+ *
+ * @param {number} current - The current active page.
+ * @param {number} total - Total number of pages.
+ * @returns {(number | string)[]} Array of page numbers and ellipses representing visible pages.
+ *
+ * @example
+ * getVisiblePages(6, 12);
+ * // Returns: [1, "...", 5, 6, 7, "...", 12]
+ */
+export const getVisiblePages = (current: number, total: number): (number | string)[] => {
+  const pages: (number | string)[] = [];
+
+  // Always show first page
+  if (total <= 7) {
+    // If pages are small, show all
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+
+  pages.push(1);
+
+  if (current > 3) {
+    pages.push("...");
+  }
+
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+
+  if (current < total - 2) {
+    pages.push("...");
+  }
+
+  pages.push(total);
+
+  return pages;
+};

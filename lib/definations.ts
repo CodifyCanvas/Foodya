@@ -138,7 +138,7 @@ export interface MenuItemOptions {
  * Menu Item with Options Interface Definition
  */
 export interface ItemWithOptions {
-  id?: number;
+  id: number;
   image?: string | null;
   item: string;
   description: string;

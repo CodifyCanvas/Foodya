@@ -9,7 +9,7 @@ import Footer from "@/components/custom/Landing-page/components/Footer";
 /* === Metadata Configuration === */
 export const metadata: Metadata = {
     title:
-        "Foodya Restaurant POS System | Complete Dashboard, Invoices, Employee & Inventory Management",
+        "Foodya Restaurant POS System",
     description:
         "Foodya is an all-in-one cloud-based restaurant POS system offering powerful features including order management, invoicing, employee tracking, inventory control, and billing. Streamline your restaurant operations with our intuitive dashboard and comprehensive tools.",
     icons: {

@@ -4,6 +4,7 @@ import { Card, CardFooter, CardHeader, CardTitle, CardDescription } from "@/comp
 import { cn } from "@/lib/utils"
 import { TableRow, TableCell } from "../ui/table"
 import { Skeleton } from "../ui/skeleton"
+import Masonry from "react-masonry-css"
 
 
 
@@ -157,3 +158,79 @@ export function HoverTransactionCardSkeleton() {
     </div>
   )
 }
+
+
+
+/**
+ * === Masonry Menu Items Loading Skeleton ===
+ * Displays a skeleton table with configurable number of columns and rows.
+ * 
+ * @param count - Number of columns (default: 5)
+ */
+export const MenuItemSkeleton = ({ count = 12 }) => {
+
+  const fixedHeights = [320, 380, 410, 450, 500];
+
+  return (
+    <Masonry
+      breakpointCols={{
+        default: 4,
+        1200: 3,
+        900: 2,
+        500: 1,
+      }}
+      className="flex w-full gap-8 pt-8 px-4"
+      columnClassName="flex flex-col gap-16"
+    >
+      {Array.from({ length: count }).map((_, i) => {
+        const height = fixedHeights[i % fixedHeights.length];
+
+        return (
+          <div
+            key={i}
+            className="w-[17rem] mx-auto rounded-lg bg-white/10 backdrop-blur-2xl animate-pulse"
+            style={{ height: `${height}px` }}
+          />
+        );
+      })}
+    </Masonry>
+  );
+};
+
+
+
+/**
+ * === Categories Bar Loading Skeleton ===
+ * Displays a horizontal skeleton placeholder with gradient edges,
+ */
+export const SkeletonCategoriesBar = () => {
+  return (
+    <div className="relative flex items-center justify-center select-none animate-pulse">
+      {/* Left gradient */}
+      <div className="pointer-events-none absolute left-0 top-0 h-full w-10 bg-gradient-to-r from-black/10 to-transparent z-10" />
+
+      {/* Right gradient */}
+      <div className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-black/10 to-transparent z-10" />
+
+      {/* Scroll Area */}
+      <div className="overflow-x-hidden scrollbar-hidden px-10 py-2 mb-4">
+        <div className="flex gap-3 min-w-max">
+          {/* Fake skeleton buttons */}
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="h-10 sm:h-12 w-full sm:w-32 rounded-md bg-white/10 backdrop-blur-2xl border border-neutral-700/40"
+            >
+              {/* Inner badge placeholder */}
+              <div className="h-full w-full flex items-center justify-between gap-2 px-4">
+                <div className="h-3 w-14 bg-white/20 rounded" />
+
+                <div className="h-4 w-4 bg-white/20 rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};

@@ -107,7 +107,7 @@ const AboutProject = () => {
             // Header animations - play immediately on load
             const tl = gsap.timeline({
                 defaults: { ease: "power3.out" },
-                delay: 0.2 // Small delay to ensure rendering
+                delay: 0.2
             });
 
             tl.from(badgeRef.current, {
@@ -133,17 +133,16 @@ const AboutProject = () => {
                 gsap.from(statElements, {
                     scrollTrigger: {
                         trigger: statsRef.current,
-                        start: "top 90%", // Start earlier (was 80%)
+                        start: "top 90%",
                         end: "bottom 20%",
-                        toggleActions: "play none none none", // Only play once
-                        // markers: true, // Uncomment to debug
+                        toggleActions: "play none none none",
                     },
                     opacity: 0,
                     y: 50,
                     stagger: 0.1,
                     duration: 0.8,
                     ease: "power3.out",
-                    immediateRender: false, // Prevent initial invisible state
+                    immediateRender: false,
                 });
 
                 // Animate stat values
@@ -185,7 +184,7 @@ const AboutProject = () => {
                 gsap.from(overviewRef.current, {
                     scrollTrigger: {
                         trigger: overviewRef.current,
-                        start: "top 85%", // Start earlier
+                        start: "top 85%",
                         toggleActions: "play none none none",
                     },
                     opacity: 0,

@@ -5,16 +5,14 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { AvatarGroup } from "@/components/ui/AvatarGroup";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import MenuItemCard from "./menu/menu-item-card";
+import { AvatarGroup } from "@/components/ui/avatar-group";
 
 export default function HeroSection() {
 
   return (
     <section
       id="home"
-      className="mt-10 sm:mt-0 sm:scroll-mt-[100px] w-full min-h-[calc(100vh-60px)] flex flex-col items-center justify-center text-center text-white px-5"
+      className="mt-10 sm:mt-0 sm:scroll-mt-[100px] w-full min-h-[calc(100vh-21vh)] flex flex-col items-center justify-center text-center text-white px-5"
     >
 
       <div className="w-full mx-auto container flex flex-col md:flex-row gap-8 items-center py-12">
@@ -76,32 +74,11 @@ export default function HeroSection() {
               src="/images/landing_page_hero.png"
               alt="Hero Section Image"
               fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
               className="object-contain rounded"
               priority
             />
           </div>
-        </div>
-      </div>
-
-      <div className="flex flex-row justify-center flex-wrap gap-16">
-
-        <MenuItemCard />
-
-        <div className="flex flex-col w-20 gap-4 justify-center">
-          <Button className="inline-flex items-center justify-center w-10 p-3 bg-neutral-900 group rounded-full hover:w-20 cursor-pointer transition-all duration-300 overflow-hidden">
-            <span className="relative flex items-center transition-all duration-300">
-              <ArrowRight className="text-white transition-all duration-300 group-hover:translate-x-1" />
-              <span className="absolute right-[4px] h-[2px] w-0 bg-white rounded-full transition-all duration-300 group-hover:w-3"></span>
-            </span>
-          </Button>
-
-          <Button className="inline-flex items-center justify-center w-10 p-3 bg-neutral-900 group rounded-full hover:w-20 cursor-pointer transition-all duration-300 overflow-hidden">
-            <span className="relative flex items-center transition-all duration-300">
-              <ArrowLeft className="text-white transition-all duration-300 group-hover:-translate-x-1" />
-              <span className="absolute left-[4px] h-[2px] w-0 bg-white rounded-full transition-all duration-300 group-hover:w-3"></span>
-            </span>
-          </Button>
-
         </div>
       </div>
     </section>
