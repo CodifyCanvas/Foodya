@@ -83,26 +83,6 @@ const AboutProject = () => {
     // Use useLayoutEffect to ensure DOM is ready before animations
     useLayoutEffect(() => {
         const ctx = gsap.context(() => {
-            // Animate background blobs
-            gsap.to(".bg-blob-1", {
-                x: 50,
-                y: -50,
-                scale: 1.2,
-                duration: 4,
-                repeat: -1,
-                yoyo: true,
-                ease: "sine.inOut",
-            });
-
-            gsap.to(".bg-blob-2", {
-                x: -50,
-                y: 50,
-                scale: 0.8,
-                duration: 5,
-                repeat: -1,
-                yoyo: true,
-                ease: "sine.inOut",
-            });
 
             // Header animations - play immediately on load
             const tl = gsap.timeline({
@@ -126,7 +106,7 @@ const AboutProject = () => {
                     duration: 0.8,
                 }, "-=0.5");
 
-            // Stats counter animation - FIXED
+            // Stats counter animation 
             if (statsRef.current) {
                 const statElements = statsRef.current.querySelectorAll(".stat-card");
 
@@ -179,7 +159,7 @@ const AboutProject = () => {
                 });
             }
 
-            // Overview card animation - FIXED
+            // Overview card animation
             if (overviewRef.current) {
                 gsap.from(overviewRef.current, {
                     scrollTrigger: {
@@ -210,7 +190,7 @@ const AboutProject = () => {
                 });
             }
 
-            // Mission & Vision animation - FIXED
+            // Mission & Vision animation
             if (missionVisionRef.current) {
                 const cards = missionVisionRef.current.querySelectorAll(".mission-vision-card");
                 gsap.from(cards, {
@@ -228,7 +208,7 @@ const AboutProject = () => {
                 });
             }
 
-            // Features grid animation - FIXED
+            // Features grid animation 
             if (featuresRef.current) {
                 const featureCards = featuresRef.current.querySelectorAll(".feature-card");
                 gsap.from(featureCards, {
@@ -247,7 +227,7 @@ const AboutProject = () => {
                 });
             }
 
-            // Tech stack animation - FIXED
+            // Tech stack animation 
             if (techStackRef.current) {
                 gsap.from(techStackRef.current, {
                     scrollTrigger: {
@@ -263,6 +243,7 @@ const AboutProject = () => {
                 });
 
                 const techItems = techStackRef.current.querySelectorAll(".tech-item");
+                if (techItems.length === 0) return;
                 gsap.from(techItems, {
                     scrollTrigger: {
                         trigger: techStackRef.current,
@@ -278,7 +259,7 @@ const AboutProject = () => {
                 });
             }
 
-            // CTA animation - FIXED
+            // CTA animation 
             if (ctaRef.current) {
                 gsap.from(ctaRef.current, {
                     scrollTrigger: {
@@ -476,8 +457,6 @@ const AboutProject = () => {
             ref={containerRef}
             className="w-full mx-auto flex flex-col items-center gap-12 sm:gap-16 md:gap-20 lg:gap-24 py-8 sm:py-12 md:py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
         >
-            {/* === Animated Background === */}
-            <BackgroundBlobs />
 
             {/* === Header Section === */}
             <Header ref={headerRef} badgeRef={badgeRef} titleRef={titleRef} descriptionRef={descriptionRef} />
@@ -486,13 +465,13 @@ const AboutProject = () => {
             <StatCards ref={statsRef} stats={stats} />
 
 
-            {/* === Overview Card - Enhanced === */}
+            {/* === Overview Card  === */}
             <OverviewCard ref={overviewRef} features={features} />
 
             {/* === Mission & Vision Cards === */}
             <MissionVision ref={missionVisionRef} />
 
-            {/* === Key Features Grid - Enhanced === */}
+            {/* === Key Features Grid  === */}
             <KeyFeatureCards ref={featuresRef} keyFeatures={keyfeatures} />
 
             {/* === Tech Stack Section - Redesigned === */}
@@ -508,15 +487,6 @@ const AboutProject = () => {
 };
 
 export default AboutProject;
-
-
-// === Background Animated Blobs Component ===
-const BackgroundBlobs: React.FC = () => (
-    <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="bg-blob-1 absolute top-1/4 left-1/4 w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 bg-emerald-500/5 rounded-full blur-3xl"></div>
-        <div className="bg-blob-2 absolute bottom-1/3 right-1/4 w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 bg-teal-500/5 rounded-full blur-3xl"></div>
-    </div>
-);
 
 
 

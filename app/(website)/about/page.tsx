@@ -1,24 +1,36 @@
-"use client"
+"use client";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation"; // Next.js 13+ hooks
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AboutMe from "./about-me";
 import AboutProject from "./about-project";
 
 const tabs = [
-    {
-        name: 'About Project',
-        value: 'about-project',
-        content: <AboutProject />
-    },
-    {
-        name: 'About Me',
-        value: 'about-me',
-        content: <AboutMe />
-    },
-]
+    { name: 'About Project', value: 'about-project', content: <AboutProject /> },
+    { name: 'About Me', value: 'about-me', content: <AboutMe /> },
+];
 
-// === About Page ===
 export default function AboutPage() {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const tabParam = searchParams.get("tab");
+    const [activeTab, setActiveTab] = useState(tabParam || "about-project");
+
+    // Update active tab if URL param changes (back/forward browser navigation)
+    useEffect(() => {
+        if (tabParam && tabParam !== activeTab) {
+            setActiveTab(tabParam);
+        }
+    }, [tabParam]);
+
+    // Update URL when tab changes
+    const handleTabChange = (value: string) => {
+        setActiveTab(value);
+        const url = new URL(window.location.href);
+        url.searchParams.set("tab", value);
+        router.replace(url.toString(), { scroll: false }); // replace avoids scroll jump
+    };
 
     return (
         <section
@@ -26,7 +38,7 @@ export default function AboutPage() {
             className="mt-20 sm:scroll-mt-[100px] w-full min-h-[calc(100vh-60px)] flex flex-col items-center text-center text-white px-5 py-12"
         >
             <div className='w-full container'>
-                <Tabs defaultValue='about-project' className='gap-4 p-0 w-full items-center'>
+                <Tabs value={activeTab} onValueChange={handleTabChange} className='gap-4 p-0 w-full items-center'>
                     <TabsList className='bg-transparent gap-1 border border-white/20 px-1 py-5 rounded-full'>
                         {tabs.map(tab => (
                             <TabsTrigger

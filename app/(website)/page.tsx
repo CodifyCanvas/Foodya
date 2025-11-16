@@ -1,11 +1,10 @@
-"use client"
-
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AvatarGroup } from "@/components/ui/avatar-group";
+import Link from "next/link";
 
 export default function HeroSection() {
 
@@ -25,7 +24,9 @@ export default function HeroSection() {
           </p>
           <div className="flex justify-center md:justify-start gap-4"> {/* Buttons centered on mobile, left on desktop */}
             <Button>Order Now</Button>
-            <Button variant="link" className="cursor-pointer">View Menu</Button>
+            <Link href="/menu">
+              <Button variant="link" className="cursor-pointer">View Menu</Button>
+            </Link>
           </div>
         </div>
 

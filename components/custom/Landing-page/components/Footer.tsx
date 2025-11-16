@@ -28,9 +28,10 @@ const Footer = () => {
             tl.fromTo(
                 footerRef.current,
                 { y: 20, opacity: 0 },
-                { y: 0, opacity: 1, delay: 0.3, duration: 0.5 }
+                { y: 0, opacity: 100, delay: 0.3, duration: 0.5 }
             );
         }, footerRef);
+        ScrollTrigger.refresh();
 
         return () => ctx.revert();
     }, []);

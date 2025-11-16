@@ -35,7 +35,7 @@ export const WebsiteNavLinks = [
   { label: "Home", href: "/" },
   { label: "Menu", href: "/menu" },
   { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
+  { label: "Contact", href: "https://www.linkedin.com/in/shahzaib-awan-dev/" },
 ];
 
 
@@ -190,5 +190,5 @@ export const HelpLinks = [
   { title: "Gmail", icon: Icons.gmail, href: "https://mail.google.com/mail/?view=cm&fs=1&to=shahzaibawan1357@gmail.com" },
   { title: "Whatsapp", icon: Icons.whatsapp, href: "https://web.whatsapp.com/send?phone=+923118480102" },
   { title: "Github", icon: Icons.github, href: "https://github.com/CodifyCanvas" },
-  { title: "Linked In", icon: Icons.linkedin, href: "https://github.com/CodifyCanvas" },
+  { title: "Linked In", icon: Icons.linkedin, href: "https://www.linkedin.com/in/shahzaib-awan-dev/" },
 ];

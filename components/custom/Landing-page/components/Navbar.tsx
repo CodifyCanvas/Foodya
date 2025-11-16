@@ -178,6 +178,7 @@ export default function Navbar() {
                             className="relative text-md font-medium text-white/90 transition duration-300 group  text-nowrap"
                         >
                             {link.label}
+
                             {/* underline */}
                             <span
                                 className="absolute left-1/2 bottom-0 block h-0.5 w-0 bg-emerald-500 

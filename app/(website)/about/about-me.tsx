@@ -74,63 +74,19 @@ const AboutMe = () => {
     // Use useLayoutEffect to ensure DOM is ready before animations
     useLayoutEffect(() => {
         const ctx = gsap.context(() => {
-            // Animate background blobs
-            gsap.to(".bg-blob-1", {
-                x: 100,
-                y: -80,
-                scale: 1.3,
-                duration: 8,
-                repeat: -1,
-                yoyo: true,
-                ease: "sine.inOut",
-            });
-
-            gsap.to(".bg-blob-2", {
-                x: -80,
-                y: 60,
-                scale: 0.9,
-                duration: 10,
-                repeat: -1,
-                yoyo: true,
-                ease: "sine.inOut",
-            });
-
-            gsap.to(".bg-blob-3", {
-                x: 50,
-                y: 100,
-                scale: 1.1,
-                duration: 12,
-                repeat: -1,
-                yoyo: true,
-                ease: "sine.inOut",
-            });
 
             // Hero animations
-            const heroTl = gsap.timeline({ delay: 0.2 });
-            heroTl.from(".hero-badge", {
-                opacity: 0,
-                y: -30,
-                duration: 0.8,
-                ease: "power3.out",
-            })
-                .from(".hero-title", {
+            if (heroRef.current) {
+                const elements = heroRef.current.children; // all direct children
+
+                gsap.from(elements, {
                     opacity: 0,
-                    y: 50,
-                    duration: 1,
-                    ease: "power3.out",
-                }, "-=0.4")
-                .from(".hero-subtitle", {
-                    opacity: 0,
-                    y: 30,
+                    y: 40,
+                    stagger: 0.2,   // animate one by one
                     duration: 0.8,
                     ease: "power3.out",
-                }, "-=0.6")
-                .from(".hero-cta", {
-                    opacity: 0,
-                    y: 20,
-                    duration: 0.6,
-                    ease: "power3.out",
-                }, "-=0.4");
+                });
+            }
 
             // Stats counter animation
             if (statsRef.current) {
@@ -182,72 +138,91 @@ const AboutMe = () => {
 
             // About section animation
             if (aboutRef.current) {
-                gsap.from(aboutRef.current, {
-                    scrollTrigger: {
-                        trigger: aboutRef.current,
-                        start: "top 80%",
-                        toggleActions: "play none none none",
-                    },
-                    opacity: 0,
-                    y: 80,
-                    duration: 1.2,
-                    ease: "power3.out",
-                    immediateRender: false,
-                });
 
+                // Animate the whole about section
+                gsap.fromTo(
+                    aboutRef.current,
+                    { opacity: 0, y: 80 }, // from: invisible and below
+                    {
+                        opacity: 1,
+                        y: 0, // to: visible and in place
+                        duration: 1.2,
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: aboutRef.current,
+                            start: "top 80%",
+                            toggleActions: "play none none none",
+                        },
+                    }
+                );
+
+                // Animate each feature item
                 const featureItems = aboutRef.current.querySelectorAll(".feature-item");
-                gsap.from(featureItems, {
-                    scrollTrigger: {
-                        trigger: aboutRef.current,
-                        start: "top 75%",
-                        toggleActions: "play none none none",
-                    },
-                    opacity: 0,
-                    x: -40,
-                    stagger: 0.15,
-                    duration: 0.8,
-                    ease: "power2.out",
-                    immediateRender: false,
-                });
-            }
+                if (featureItems.length === 0) return;
+                gsap.fromTo(
+                    featureItems,
+                    { opacity: 0, x: -40 }, // from: invisible and left
+                    {
+                        opacity: 1,
+                        x: 0, // to: visible and in place
+                        duration: 0.8,
+                        ease: "power2.out",
+                        stagger: 0.15, // one by one
+                        scrollTrigger: {
+                            trigger: aboutRef.current,
+                            start: "top 75%",
+                            toggleActions: "play none none none",
+                        },
+                    }
+                );
+            };
 
             // Journey cards animation
             if (journeyRef.current) {
                 const cards = journeyRef.current.querySelectorAll(".journey-card");
-                gsap.from(cards, {
-                    scrollTrigger: {
-                        trigger: journeyRef.current,
-                        start: "top 80%",
-                        toggleActions: "play none none none",
-                    },
-                    opacity: 0,
-                    y: 60,
-                    scale: 0.9,
-                    stagger: 0.3,
-                    duration: 0.8,
-                    ease: "back.out(1.2)",
-                    immediateRender: false,
-                });
+
+                gsap.fromTo(
+                    cards,
+                    { opacity: 0, y: 60, scale: 0.9 }, // from (hidden)
+                    {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1, // to (visible)
+                        stagger: 0.3,
+                        duration: 0.8,
+                        ease: "back.out(1.2)",
+                        scrollTrigger: {
+                            trigger: journeyRef.current,
+                            start: "top 80%",
+                            toggleActions: "play none none none",
+                        },
+                    }
+                );
             }
 
-            // Skills grid animation
+            // Skills
             if (skillsRef.current) {
                 const skillCards = skillsRef.current.querySelectorAll(".skill-card");
-                gsap.from(skillCards, {
-                    scrollTrigger: {
-                        trigger: skillsRef.current,
-                        start: "top 80%",
-                        toggleActions: "play none none none",
-                    },
-                    opacity: 0,
-                    y: 80,
-                    scale: 0.8,
-                    stagger: 0.1,
-                    duration: 0.8,
-                    ease: "back.out(1.4)",
-                    immediateRender: false,
-                });
+
+                gsap.fromTo(
+                    skillCards,
+                    { opacity: 0, y: 20, scale: 0.9 }, // start hidden
+                    {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1, // end visible
+                        stagger: 0.1,
+                        duration: 0.6,
+                        ease: "back.out(1.4)",
+                        scrollTrigger: {
+                            trigger: skillsRef.current,
+                            start: "top 80%",
+                            toggleActions: "play none none none",
+                        },
+                    }
+                );
             }
+
 
             // Tech stack animation
             if (techStackRef.current) {
@@ -383,12 +358,6 @@ const AboutMe = () => {
             ref={containerRef}
             className="w-full mx-auto flex flex-col items-center gap-16 sm:gap-20 md:gap-24 lg:gap-28 py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
         >
-            {/* === Animated Background === */}
-            <div className="absolute inset-0 -z-10 overflow-hidden">
-                <div className="bg-blob-1 absolute top-1/4 left-1/6 w-96 h-96 sm:w-[32rem] sm:h-[32rem] md:w-[40rem] md:h-[40rem] bg-gradient-to-br from-blue-500/8 via-cyan-500/4 to-transparent rounded-full blur-3xl"></div>
-                <div className="bg-blob-2 absolute bottom-1/4 right-1/6 w-80 h-80 sm:w-[28rem] sm:h-[28rem] md:w-[36rem] md:h-[36rem] bg-gradient-to-br from-purple-500/8 via-pink-500/4 to-transparent rounded-full blur-3xl"></div>
-                <div className="bg-blob-3 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 bg-gradient-to-br from-emerald-500/6 via-teal-500/3 to-transparent rounded-full blur-3xl"></div>
-            </div>
 
             {/* === Header Section === */}
             <Header ref={heroRef} />
@@ -518,7 +487,7 @@ StatsCard.displayName = 'Stats Card';
 const About = forwardRef<HTMLDivElement, { highlights: Highlight[] }>(
     (props, ref) => {
         return (
-            <div ref={ref} {...props} className="w-full max-w-7xl space-y-16">
+            <div ref={ref} {...props} className="w-full opacity-0 max-w-7xl space-y-16">
                 {/* Section Header */}
                 <div className="text-center space-y-6">
                     <div className="inline-block">
