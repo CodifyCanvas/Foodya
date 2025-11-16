@@ -7,7 +7,7 @@ import type { MySqlColumn, MySqlUpdateSetSource } from 'drizzle-orm/mysql-core'
 import { MySql2Database, MySql2Transaction } from 'drizzle-orm/mysql2';
 
 
-
+// === Types ===
 type Schema = typeof schema
 type TableName = keyof Schema
 type TableType<T extends TableName> = Schema[T]
@@ -163,7 +163,7 @@ export async function deleteData<T extends TableName, K extends ColumnName<T>>(
 export async function checkDuplicate<T extends TableName, K extends ColumnName<T>>(
   tableName: T,
   columnName: K,
-  value: any,
+  value: TableType<T>["$inferSelect"][K & keyof TableType<T>["$inferSelect"]],
   tx?: DBExecutor,
 ): Promise<boolean> {
 

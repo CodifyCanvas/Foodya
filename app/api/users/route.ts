@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
     const duplicate = await checkDuplicate("users", "email", email);
     if (duplicate) {
       return NextResponse.json(
-        { message: "Email already exists. Please use another." },
+        { error: "Email already exists. Please use another." },
         { status: 409 }
       );
     }

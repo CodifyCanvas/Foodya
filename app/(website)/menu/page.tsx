@@ -18,12 +18,10 @@ const MenuPage = () => {
                 </p>
             </header>
 
-
             {/* Menu Items */}
             <MenuItemContainer />
         </section>
     );
 };
-
 
 export default MenuPage;

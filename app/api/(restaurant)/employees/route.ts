@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     const duplicate = await checkDuplicate("employeesTable", "CNIC", personalInfo.CNIC);
     if (duplicate) {
       return NextResponse.json(
-        { message: "An employee with this CNIC already exists." },
+        { error: "An employee with this CNIC already exists." },
         { status: 409 }
       );
     }

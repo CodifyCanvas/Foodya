@@ -115,14 +115,13 @@ export function CreateEmployeeForm({ open, onOpenChange, data }: FormDialogProps
       const result = await response.json()
 
       // === Handle Duplicate / 409 Error ===
-      if (result.status === 409) {
-        toast.error(result?.message ?? "Duplicate value found.");
+      if (response.status === 409) {
+        toast.error(result?.error ?? "Duplicate value found.");
         return;
       }
 
       if (!response.ok) {
-        toast.error(result?.message ?? "Employee can't be created. Please try again.")
-        console.error(result?.error)
+        toast.error(result?.error ?? "Employee can't be created. Please try again.")
         return
       }
 

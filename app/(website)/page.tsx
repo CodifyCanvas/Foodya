@@ -9,10 +9,7 @@ import Link from "next/link";
 export default function HeroSection() {
 
   return (
-    <section
-      id="home"
-      className="mt-10 sm:mt-0 sm:scroll-mt-[100px] w-full min-h-[calc(100vh-21vh)] flex flex-col items-center justify-center text-center text-white px-5"
-    >
+    <section id="home" className="mt-10 sm:mt-0 sm:scroll-mt-[100px] w-full min-h-[calc(100vh-21vh)] flex flex-col items-center justify-center text-center text-white px-5">
 
       <div className="w-full mx-auto container flex flex-col md:flex-row gap-8 items-center py-12">
         <div className="w-full md:w-1/2 lg:w-7/12 flex flex-col text-center md:text-left gap-6">
@@ -34,16 +31,14 @@ export default function HeroSection() {
           {/* Avatar Card */}
           <Card
             className="
-                                  relative md:absolute md:right-0 md:top-6 
-                                  w-fit z-20 text-center 
-                                  px-4 py-5 flex flex-col items-center gap-2 
-                                  bg-white/5 backdrop-blur-md
-                                  border-white/20
-                                "
+              relative md:absolute md:right-0 md:top-6 
+              w-fit z-20 text-center 
+              px-4 py-5 flex flex-col items-center gap-2 
+              bg-white/5 backdrop-blur-md
+              border-white/20
+            "
           >
-            <p className="font-sans text-sm font-semibold text-white">
-              Our Happy Customers
-            </p>
+            <p className="font-sans text-sm font-semibold text-white">Our Happy Customers</p>
 
             <AvatarGroup className="justify-center mt-2">
               <Avatar>

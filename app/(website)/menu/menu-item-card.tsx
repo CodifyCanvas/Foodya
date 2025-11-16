@@ -14,17 +14,17 @@ const MenuItemCard = ({ data }: { data: ItemWithOptions }) => {
 
                 {/* Top Catogary */}
                 <div className={`
-                          overflow-hidden
-                          flex items-center justify-center
-                          text-neutral-900 font-semibold
-                          h-7 py-0 pl-8 pr-3 min-w-26 max-w-44
-                          transition-all duration-500
-                          ${data?.is_available ? 'bg-emerald-500' : 'bg-neutral-400'} text-sm absolute
-                          -z-10 right-5 top-0
-                          group-hover:-translate-y-6 opacity-0 group-hover:opacity-100
-                          [clip-path:polygon(25%_0%,100%_0%,100%_100%,0%_100%)]
-                          rounded-tr-sm
-                        `}
+                      overflow-hidden
+                      flex items-center justify-center
+                      text-neutral-900 font-semibold
+                      h-7 py-0 pl-8 pr-3 min-w-26 max-w-44
+                      transition-all duration-500
+                      ${data?.is_available ? 'bg-emerald-500' : 'bg-neutral-400'} text-sm absolute
+                      -z-10 right-5 top-0
+                      group-hover:-translate-y-6 opacity-0 group-hover:opacity-100
+                      [clip-path:polygon(25%_0%,100%_0%,100%_100%,0%_100%)]
+                      rounded-tr-sm
+                    `}
                 >
                     <p className="text-center leading-10">{data?.category || 'title'}</p>
                 </div>

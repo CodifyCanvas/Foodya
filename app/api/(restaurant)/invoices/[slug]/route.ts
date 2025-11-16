@@ -123,7 +123,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug
     const { slug } = await params;
     if (slug !== 'update') {
       return NextResponse.json(
-        { message: "Invalid API endpoint. Please verify the [Slug] and try again." },
+        { error: "Invalid API endpoint. Please verify the [Slug] and try again." },
         { status: 400 }
       );
     }

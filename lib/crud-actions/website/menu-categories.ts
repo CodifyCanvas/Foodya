@@ -40,4 +40,3 @@ export const getMenuCategoryWithItemCount = async (): Promise<MenuCategoryWithIt
 
     return result;
 };
-

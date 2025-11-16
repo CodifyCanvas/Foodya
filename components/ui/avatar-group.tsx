@@ -3,19 +3,38 @@ import * as React from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
+
+
 type AvatarProps = React.ComponentProps<typeof Avatar>;
+
+
 
 interface AvatarGroupProps extends React.ComponentProps<"div"> {
     children: React.ReactElement<AvatarProps>[];
     max?: number;
 }
 
+
+
+/**
+ * === Avatar Group Component ===
+ *
+ * Renders a compact, overlapping group of Avatar components.
+ * Supports limiting the number of displayed avatars and shows a
+ * “+X” indicator for remaining hidden avatars.
+ *
+ * @param children - The list of Avatar components to group.
+ * @param max - Maximum number of avatars to display before collapsing.
+ * @param className - Optional custom class names for the wrapper.
+ */
 export const AvatarGroup = ({
     children,
     max,
     className,
     ...props
 }: AvatarGroupProps) => {
+
+    // === Count avatars & compute visible/remaining ===
     const totalAvatars = React.Children.count(children);
     const displayedAvatars = React.Children.toArray(children)
         .slice(0, max)
@@ -27,6 +46,8 @@ export const AvatarGroup = ({
             className={cn("flex items-center flex-row-reverse", className)}
             {...props}
         >
+
+            {/* === Render +X overflow avatar === */}
             {remainingAvatars > 0 && (
                 <Avatar className="-ml-2 hover:z-10 hover:scale-110 transition-all duration-300 relative ring-2 ring-white/20">
                     <AvatarFallback className="bg-muted-foreground text-white">

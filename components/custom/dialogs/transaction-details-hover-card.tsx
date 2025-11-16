@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { EmployeePayrollInterface, InvoiceResponse, OrderItem, TransactionsTablesInterface } from '@/lib/definations';
 import { formatDateWithFns } from '@/lib/date-fns';
 import { formatMonthYear } from '@/lib/utils';

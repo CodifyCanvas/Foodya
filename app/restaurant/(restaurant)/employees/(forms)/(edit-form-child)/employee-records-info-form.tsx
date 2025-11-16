@@ -63,13 +63,13 @@ export function EmployeeRecordsInfoForm({ data }: FormDialogProps) {
       const result = await response.json()
 
       // === Handle Duplicate / 409 Error ===
-      if (result.status === 409) {
-        toast.error(result?.message ?? "Duplicate value found.");
+      if (response.status === 409) {
+        toast.error(result?.error ?? "Duplicate value found.");
         return;
       }
 
       if (!response.ok) {
-        toast.error(result?.message ?? "Employee record can't be updated. Please try again.")
+        toast.error(result?.error ?? "Employee record can't be updated. Please try again.")
         return
       }
 

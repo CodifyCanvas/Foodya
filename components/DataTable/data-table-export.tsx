@@ -20,6 +20,8 @@ import autoTable from "jspdf-autotable"
 import Image from "next/image"
 import { Icons } from "@/constants"
 import toast from "react-hot-toast"
+import download from 'downloadjs';
+import Papa from 'papaparse';
 
 
 
@@ -40,7 +42,7 @@ interface ExportButtonProps<TData> {
  * @param {ExportButtonProps<TData>} props - Props containing the table instance
  * @returns - A dropdown menu with export options
  */
-export function DataTableExport<TData extends Record<string, any>>({ table }: ExportButtonProps<TData>) {
+export function DataTableExport<TData>({ table }: ExportButtonProps<TData>) {
 
   const data = table.getFilteredRowModel().rows.map((row) => row.original)
 
@@ -50,13 +52,8 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
    * Includes only visible columns except columns with id "actions".
    */
   const exportCopy = () => {
-
-    // Get all filtered rows (ignores pagination)
-    // const rows = table.getFilteredRowModel().rows;
-
     // Get rows shown on this page (with filters and pagination)
     const rows = table.getPaginationRowModel().rows;
-
 
     // Filter columns excluding those with id "actions"
     const columns = table
@@ -72,11 +69,10 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
       if (typeof header === "string") return header.replace(/"/g, '""');
       if (typeof header === "function") {
         try {
-          const result = (header as any)({ column: col });
+          const result = header({ column: col } as Parameters<typeof header>[0]);
           if (typeof result === "string") return result.replace(/"/g, '""');
         } catch { }
       }
-
 
       return col.id.replace(/"/g, '""');
     });
@@ -100,13 +96,11 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
 
     navigator.clipboard.writeText(csv)
       .then(() => {
-        console.log("Table copied to clipboard in CSV format");
+        toast.success("Data copied to clipboard");
       })
       .catch(err => {
         console.error("Failed to copy table:", err);
       });
-
-    toast.success("Data copied to clipboard");
   };
 
 
@@ -115,35 +109,28 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
    * Excludes columns with id "actions".
    */
   const exportCSV = () => {
+    const visibleColumns = table
+      .getVisibleFlatColumns()
+      .filter((col) => col.id !== "actions");
 
-    // Filter columns excluding those with id "actions"
-    const columns = table.getVisibleFlatColumns().filter((col) => col.id !== "actions").map((col) => col.id);
+    if (data.length === 0 || visibleColumns.length === 0) return;
 
-    if (data.length === 0 || columns.length === 0) return;
+    const exportData = data.map((row) => {
+      const obj: Partial<TData> = {};
+      visibleColumns.forEach((col) => {
+        const key = col.id as keyof TData;
+        obj[key] = row[key];
+      });
+      return obj;
+    });
 
-    // Build CSV string from header and data rows
-    const csvRows = [
-      columns.join(","), // <- header row with visible columns
-      ...data.map((row) =>
-        columns
-          .map((col) => {
-            const val = row[col];
-            return `"${String(val ?? "").replace(/"/g, '""')}"`
-          })
-          .join(",")
-      ),
-    ];
+    const csv = Papa.unparse(exportData, {
+      quotes: true,
+      header: true,
+      skipEmptyLines: true,
+    });
 
-    const csv = csvRows.join("\n");
-
-    // Trigger CSV download
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", "data.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    download(csv, 'data.csv', 'text/csv');
 
     toast.success("CSV file downloaded successfully");
   };
@@ -170,9 +157,10 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
     worksheet.columns = columns;
 
     data.forEach((row) => {
-      const filteredRow: Record<string, any> = {};
+      const filteredRow: Partial<TData> = {};
       columns.forEach((col) => {
-        filteredRow[col.key] = row[col.key];
+        const key = col.key as keyof TData;
+        filteredRow[key] = row[key];
       });
       worksheet.addRow(filteredRow);
     });
@@ -188,9 +176,9 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
 
 
   /**
-   * Export the filtered data as a PDF file with a table.
-   * Excludes columns with id "actions".
-   */
+ * Export the filtered data as a PDF file with a table.
+ * Excludes columns with id "actions".
+ */
   const exportPDF = () => {
     const doc = new jsPDF();
 
@@ -216,7 +204,7 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
     // Prepare data rows with only visible keys
     const rows = data.map((row) =>
       keys.map((key) => {
-        const value = row[key];
+        const value = row[key as keyof TData];
         return typeof value === "boolean"
           ? value ? "Online" : "Offline"
           : String(value ?? "");
@@ -236,7 +224,6 @@ export function DataTableExport<TData extends Record<string, any>>({ table }: Ex
     doc.save("data.pdf");
     toast.success("PDF downloaded successfully");
   };
-
 
   /**
    * Print the current visible table (excluding the "actions" column).

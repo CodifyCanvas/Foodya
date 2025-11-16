@@ -157,13 +157,13 @@ export function RoleForm({ open, onOpenChange, data: dataProp }: FormDialogProps
       const result = await response.json()
 
       {/* === Show warning toast for duplicate/409 error === */ }
-      if (result.status === 409) {
-        toast.error(result?.message ?? "Duplicate value found.");
+      if (response.status === 409) {
+        toast.error(result?.error ?? "Duplicate value found.");
         return;
       }
 
       if (!response.ok) {
-        toast.error(result?.message ?? "Submission failed. Try again.")
+        toast.error(result?.error ?? "Submission failed. Try again.")
         return
       }
 

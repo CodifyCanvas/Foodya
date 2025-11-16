@@ -628,6 +628,9 @@ export interface MenuCategoryWithItemCount {
 
 
 
+/**
+ * Menu Response Come From Api
+ */
 export interface MenuResponse {
   query: string | null;
   totalRecords: number;

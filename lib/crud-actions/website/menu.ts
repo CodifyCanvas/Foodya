@@ -13,6 +13,19 @@ const menuCategories = schema.menuCategories;
 
 
 
+/**
+ * === Get All Website Menu Items (Paginated) ===
+ *
+ * Fetches menu items with optional filtering by search term, category, and availability.
+ * Returns paginated results, joined categories, and mapped item options.
+ *
+ * @param searchTerm - Text to filter menu item names.
+ * @param pageNumber - Page number for pagination (default: 1).
+ * @param pageSize - Number of items per page (default: 16).
+ * @param category - Optional category filter.
+ * @param availability - Optional availability filter.
+ * @returns {Promise<MenuResponse>} Paginated list of menu items with options.
+ */
 export const getAllMenuItemsForWebsite = async (
     searchTerm: string = "",
     pageNumber: number = 1,

@@ -7,9 +7,9 @@ const path = '/api/categories';
 
 
 
-/*========================================================
+/*===========================================================
 === [GET] Fetch all menu categories with total item count ===
-======================================================= */
+========================================================== */
 export async function GET() {
     try {
         const categories = await getMenuCategoryWithItemCount();

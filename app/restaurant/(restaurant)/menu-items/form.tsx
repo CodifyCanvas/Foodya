@@ -126,7 +126,7 @@ export function RoleForm({ open, onOpenChange, data, categories }: FormDialogPro
       const result = await response.json()
 
       {/* === Handle duplicate (409) errors === */ }
-      if (result.status === 409) {
+      if (response.status === 409) {
         toast.error(result?.error ?? "Duplicate value found.");
         return;
       }

@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation'
 
 const WelcomePage = () => {
   redirect('/restaurant/dashboard')
-  return null
 }
 
 export default WelcomePage

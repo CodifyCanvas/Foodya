@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
  * === Represents a custom error returned when DB connection fails. ===
  */
 type DbError = {
-    message: string;
+    error: string;
     status: number;
 };
 
@@ -30,7 +30,7 @@ const fetcher = async (url: string) => {
     if (!res.ok) {
         // Throw custom error with both message and status
         const errorData: DbError = {
-            message: "Database Connection failed",
+            error: "Database Connection failed",
             status: res.status,
         };
         throw errorData;
@@ -59,9 +59,9 @@ export function useDbCheck(): void {
 
     if (error) {
         // Ensure we handle both status and message
-        const msg = encodeURIComponent(error.message || "Unknown error");
+        const msg = encodeURIComponent(error.error || "Unknown error");
         const status = error.status || 503;
-        
+
         router.push(`/errors/database?msg=${msg}&status=${status}`);
     }
 }

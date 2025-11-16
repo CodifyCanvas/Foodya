@@ -124,7 +124,7 @@ export function RoleForm({ open, onOpenChange, data, refetchPermissions }: FormD
 
       if (!response.ok) {
         // === Show warning toast for server error ===
-        toast.error(result?.message || "Failed to update permissions.");
+        toast.error(result?.error || "Failed to update permissions.");
         return;
       }
 

@@ -31,6 +31,33 @@ interface DeleteConfirmationDialogProps<T> {
     };
 }
 
+
+
+/**
+ * === Delete Confirmation Dialog ===
+ *
+ * A reusable dialog component for confirming deletion actions.
+ * Sends a DELETE request, handles loading state, shows toast feedback,
+ * and optionally renders a checkbox for additional confirmation logic.
+ *
+ * Features:
+ * - Displays warning UI with customizable title/message
+ * - Executes DELETE request with provided payload & endpoint
+ * - Shows success/error toast messages
+ * - Supports optional revalidation endpoint for SWR cache refresh
+ * - Optional checkbox for user confirmation (e.g., “Also remove related data”)
+ *
+ * @template T - Shape of the payload sent to the delete endpoint.
+ *
+ * @param isOpen - Controls dialog visibility.
+ * @param setIsOpen - Setter to open/close the dialog.
+ * @param deletePayload - Payload included in the DELETE request body.
+ * @param deleteEndpoint - API route for the DELETE request.
+ * @param title - Optional custom dialog title.
+ * @param confirmMessage - Optional custom description message.
+ * @param revalidateEndpoint - Optional SWR endpoint to refresh after deletion.
+ * @param checkbox - Optional confirmation checkbox configuration.
+ */
 export default function DeleteConfirmationDialog<T>({
     isOpen,
     setIsOpen,
@@ -70,8 +97,6 @@ export default function DeleteConfirmationDialog<T>({
             setIsDeleting(false);
         }
     }, [deletePayload, deleteEndpoint, revalidateEndpoint, setIsOpen]);
-
-    console.warn("Delete component render:");
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>

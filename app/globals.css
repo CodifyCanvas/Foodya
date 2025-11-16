@@ -270,4 +270,3 @@ input[type="number"].hide-spinner::-webkit-inner-spin-button {
 input[type="number"].hide-spinner {
   -moz-appearance: textfield;
 }
-

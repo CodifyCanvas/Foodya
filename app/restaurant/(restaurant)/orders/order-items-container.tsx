@@ -104,7 +104,7 @@ const OrderItemsContainer: React.FC<OrderItemsContainerProps> = ({ restaurantTab
       const result = await response.json();
 
       if (!response.ok) {
-        toast.error(result?.message ?? (isEditing
+        toast.error(result?.error ?? (isEditing
           ? "Order can't be updated. Please try again."
           : "Order can't be created. Please try again."))
         return

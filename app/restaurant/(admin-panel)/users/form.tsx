@@ -35,8 +35,7 @@ interface FormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   data: User | null
-  roles?: { label: string; value: string }[]
-  [key: string]: unknown
+  [key: string]: any
 }
 
 
@@ -112,13 +111,13 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
       const result = await response.json()
 
       {/* === Show warning toast for duplicate/409 error === */ }
-      if (result.status === 409) {
-        toast.error(result?.message ?? "Duplicate value found.");
+      if (response.status === 409) {
+        toast.error(result?.error ?? "Duplicate value found.");
         return;
       }
 
       if (!response.ok) {
-        toast.error(result?.message ?? (isEditing
+        toast.error(result?.error ?? (isEditing
           ? "User can't be updated. Please try again."
           : "User can't be created. Please try again."))
         return
@@ -189,7 +188,7 @@ export function FormDialog({ open, onOpenChange, data, roles = [] }: FormDialogP
                           control={form.control}
                           name="image"
                           allowedTypes={["png", "jpg", "jpeg", "webp"]}
-                          currentImageUrl={data?.image ?? undefined} // <- optional existing image
+                          currentImageUrl={data?.image ?? undefined}
                           className="rounded-lg size-30 sm:size-40"
                           imageClassName="rounded-lg"
                         />

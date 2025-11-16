@@ -19,6 +19,18 @@ interface LogoutConfirmationDialogProps {
     setIsOpen: (open: boolean) => void;
 }
 
+
+
+/**
+ * === Logout Confirmation Dialog ===
+ *
+ * Displays a confirmation prompt before logging the user out.
+ * Handles loading state, triggers NextAuth sign-out, and redirects
+ * to the configured logout URL.
+ *
+ * @param isOpen - Whether the dialog is visible.
+ * @param setIsOpen - Function to toggle dialog visibility.
+ */
 export default function LogoutConfirmationDialog({
     isOpen,
     setIsOpen,

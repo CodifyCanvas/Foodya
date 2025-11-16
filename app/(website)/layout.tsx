@@ -8,10 +8,22 @@ import Footer from "@/components/custom/Landing-page/components/Footer";
 
 /* === Metadata Configuration === */
 export const metadata: Metadata = {
-    title:
-        "Foodya Restaurant POS System",
+    title: "Foodya - Cloud-Based Restaurant POS System",
     description:
-        "Foodya is an all-in-one cloud-based restaurant POS system offering powerful features including order management, invoicing, employee tracking, inventory control, and billing. Streamline your restaurant operations with our intuitive dashboard and comprehensive tools.",
+        "Foodya is a modern, cloud-powered restaurant POS system designed to simplify operations. Manage orders, billing, invoices, employees, tables, and inventory with an intuitive dashboard built for restaurants, cafés, and food businesses of all sizes.",
+    keywords: [
+        "Foodya",
+        "restaurant pos system",
+        "cloud pos",
+        "restaurant billing software",
+        "inventory management",
+        "order management system",
+        "restaurant invoice system",
+        "employee management",
+        "POS for restaurants",
+        "cafe POS",
+        "food business software"
+    ],
     icons: {
         icon: logo.favicon,
     },
