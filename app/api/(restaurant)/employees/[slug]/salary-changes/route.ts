@@ -13,7 +13,7 @@ const path = '/api/employees/[slug]/salary-changes';
 /* ================================================================== 
 === [POST] Add a New Salary Change Record for a Specific Employee ===
 ================================================================== */
-export async function POST(req: NextRequest, { params }: { params: Promise<{ slug: number }> }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const session = await auth();
     const userId = session?.user.id
@@ -24,7 +24,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     }
 
     // === Extract Employee ID from Params ===
-    const { slug: EmployeeId } = await params;
+    const { slug } = await params;
+    const EmployeeId = Number(slug);
 
     // === Parse & Validate Request Body ===
     const body = await req.json();

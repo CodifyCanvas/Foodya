@@ -11,7 +11,7 @@ const path = '/api/payrolls/detail/[id]';
 /* =======================================================
 === [GET] Fetch Specific Payroll with Detailed Records ===
 ======================================================= */
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: number }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth();
     const userId = session?.user.id;
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     // === Extract and Validate ID from Route Parameters ===
     const { id } = await params;
 
-    if (!id || isNaN(id)) {
+    if (!id || isNaN(Number(id))) {
       return NextResponse.json(
         { error: "Invalid payroll ID provided. Please check and try again." },
         { status: 400 }
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     }
 
     // === Fetch Payroll Detail from Database ===
-    const payrollDetail = await fetchPayrollWithDetail(id);
+    const payrollDetail = await fetchPayrollWithDetail(Number(id));
 
     if (!payrollDetail) {
       return NextResponse.json(

@@ -12,7 +12,7 @@ const path = '/api/payrolls/employee/[slug]';
 /* ==================================================================
 === [GET] Fetch All Unpaid Payrolls for a Specific Employee by ID ===
 ================================================================== */
-export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: number }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const session = await auth();
     const userId = session?.user.id;
@@ -24,8 +24,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
 
     // === Extract and Validate Employee ID ===
     const { slug } = await params;
+    const empleeyId = Number(slug);
 
-    if (!slug || isNaN(slug)) {
+    if (!empleeyId || isNaN(empleeyId)) {
       return NextResponse.json(
         { error: "Invalid employee ID provided. Please check and try again." },
         { status: 400 }
@@ -33,7 +34,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
     }
 
     // === Fetch Unpaid Payrolls for the Given Employee ===
-    const unpaidPayrolls = await fetchEmployeeUnpaidPayrolls(slug, 'pending');
+    const unpaidPayrolls = await fetchEmployeeUnpaidPayrolls(empleeyId, 'pending');
 
     return NextResponse.json(unpaidPayrolls, { status: 200 });
   } catch (error) {
@@ -51,7 +52,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
 /* =========================================================
 === [POST] Mark All Unpaid Payrolls as Paid for Employee ===
 ========================================================= */
-export async function POST(req: NextRequest, { params }: { params: Promise<{ slug: number }> }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const session = await auth();
     const userId = Number(session?.user.id);
@@ -63,8 +64,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
 
     // === Extract and Validate Employee ID ===
     const { slug } = await params;
+    const empleeyId = Number(slug);
 
-    if (!slug || isNaN(slug)) {
+    if (!empleeyId || isNaN(empleeyId)) {
       return NextResponse.json(
         { error: "Invalid employee ID. Please verify and try again." },
         { status: 400 }
@@ -76,7 +78,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     const { salaries } = EmployeeSalaryPostingFormSchema.parse(body);
 
     // === Mark Payrolls as Paid ===
-    const update = await markUnpaidPayrollsAsPaid(salaries, slug);
+    const update = await markUnpaidPayrollsAsPaid(salaries, empleeyId);
 
     // === Return success response ===
     return NextResponse.json(

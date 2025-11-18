@@ -13,7 +13,7 @@ const path = '/api/invoices/[slug]';
 /* =======================================================================
 === [GET] Fetch Specific Invoice by Id with Linked Order + Order Items ===
 ======================================================================= */
-export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: number }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const session = await auth();
     const userId = session?.user.id;
@@ -24,7 +24,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
     }
 
     // === Validate slug parameter === 
-    const { slug: invoiceId } = await params;
+    const { slug } = await params;
+    const invoiceId = Number(slug);
+
     if (!invoiceId || isNaN(Number(invoiceId))) {
       return NextResponse.json(
         { error: "Invalid invoice ID. Please verify the URL and try again." },

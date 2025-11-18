@@ -16,7 +16,7 @@ const salaryChangesTable = schema.salaryChangesTable;
 /* ============================================================================ 
 === [POST] Create a New Employment Record for a Specific Employee (by ID) ===
 ============================================================================ */
-export async function POST(req: NextRequest, { params }: { params: Promise<{ slug: number }> }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const session = await auth();
     const userId = session?.user.id
@@ -27,7 +27,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     }
 
     // === Extract Employee ID from Params ===
-    const { slug: employeeId } = await params;
+    const { slug } = await params;
+    const employeeId = Number(slug);
 
     // === Parse & Validate Request Body ===
     const body = await req.json();

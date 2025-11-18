@@ -19,5 +19,8 @@ export default defineConfig({
   dialect: 'mysql',                   // <- Database dialect (Options: 'mysql' | 'pg' | 'sqlite')
   dbCredentials: {
     url: `mysql://${process.env.DATABASE_USER}:${process.env.DATABASE_PASSWORD}@${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}/${process.env.DATABASE_NAME}`,   // <- Database connection URL from environment variable
+    ssl: {
+      ca: process.env.DATABASE_CA_CERT?.replace(/\\n/g, '\n'), // <- SSL certificate for secure MySQL connection
+    },
   },
 });

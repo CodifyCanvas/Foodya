@@ -7,10 +7,9 @@ dotenv.config();
 // === Import Dependencies ===
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
-import { schema } from '@/lib/drizzle-schema/';
-// import * as schema from '@/lib/drizzle-schema/admin-panel.schema';
+import { schema } from '../drizzle-schema/index';
 import { and, eq } from 'drizzle-orm';
-import { navLink } from '@/constants';
+import { navLink } from '../../constants';
 
 //  === Create MySQL Pool Connection === 
 const pool = mysql.createPool({

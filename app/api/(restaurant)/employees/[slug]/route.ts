@@ -14,7 +14,7 @@ const path = '/api/employees/[slug]';
 /* ===========================================================
 === [GET] Fetch a Specific Employee by ID with Full Details===
 =========================================================== */
-export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: number }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const session = await auth();
     const userId = session?.user.id;
@@ -25,7 +25,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
     }
 
     // === Extract Employee ID from Params ===
-    const { slug: employeeId } = await params;
+    const { slug } = await params;
+    const employeeId = Number(slug);
 
     // === Fetch Employee Record ===
     const employee = await fetchEmployee(employeeId);
@@ -53,7 +54,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
 /* ==========================================================
 === [PUT] Update an Employee's Personal Info (with image) ===
 ========================================================== */
-export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug: number }> }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const session = await auth();
     const userId = session?.user.id
@@ -64,7 +65,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug
     }
 
     // === Extract Employee ID from Params ===
-    const { slug: Employeeid } = await params;
+    const { slug } = await params;
+    const Employeeid = Number(slug);
 
     // === Parse Multipart Form ===
     const formData = await req.formData();
