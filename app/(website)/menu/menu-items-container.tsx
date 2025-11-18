@@ -75,10 +75,12 @@ const MenuItemContainer: React.FC = () => {
     if (error) {
         console.error("[MenuItemPage] SWR Error:", error);
         return (
-            <ServiceUnavailable
-                title="Service Unavailable"
-                description="Please try again later."
-            />
+            <main className="w-full h-full flex flex-1 bg-gradient-to-tr from-white/5 to-white/10 backdrop-blur-2xl rounded-lg justify-center items-center font-rubik-400">
+                <div className="flex flex-col items-center scale-90 sm:scale-125 transition-all duration-300 md:scale-150">
+                    <h3 className="text-lg text-white">Service Unavailable</h3>
+                    <h3 className="text-lg text-red-500">Please try again later.</h3>
+                </div>
+            </main>
         );
     }
 
@@ -124,7 +126,7 @@ const MenuItemContainer: React.FC = () => {
 
             {/* Skeleton (Only first load) */}
             {!data && isLoading ? (
-                <MenuItemSkeleton count={16} />
+                <MenuItemSkeleton count={12} />
             ) : (
                 <>
                     {/* Small indicator (optional) */}

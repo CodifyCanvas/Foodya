@@ -17,19 +17,19 @@ export default function AboutPage() {
     const tabParam = searchParams.get("tab");
     const [activeTab, setActiveTab] = useState(tabParam || "about-project");
 
-    // Update active tab if URL param changes (back/forward browser navigation)
+    // === Update active tab if URL param changes (back/forward browser navigation) ===
     useEffect(() => {
         if (tabParam && tabParam !== activeTab) {
             setActiveTab(tabParam);
         }
     }, [tabParam]);
 
-    // Update URL when tab changes
+    // === Update URL when tab changes ===
     const handleTabChange = (value: string) => {
         setActiveTab(value);
         const url = new URL(window.location.href);
         url.searchParams.set("tab", value);
-        router.replace(url.toString(), { scroll: false }); // replace avoids scroll jump
+        router.replace(url.toString(), { scroll: false });
     };
 
     return (

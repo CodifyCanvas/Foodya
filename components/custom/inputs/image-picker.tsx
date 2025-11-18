@@ -39,7 +39,7 @@ interface ImagePickerProps<TFieldValues extends FieldValues = FieldValues> {
  * @returns {JSX.Element} A controlled image upload component with preview and clear functionality.
  *
  * @example
- * <ImagePicker<UserFormValues,>
+ * <ImagePicker
  *   control={control}
  *   name="profilePicture"
  *   label="Upload your profile picture"

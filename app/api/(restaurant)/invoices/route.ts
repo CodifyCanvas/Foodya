@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
       }
 
       // === Prevent duplicate invoice ===
-      const isDuplicate = await checkDuplicate("InvoicesTable", "orderId", dineInInvoice.orderId);
+      const isDuplicate = await checkDuplicate("InvoicesTable", "orderId", Number(dineInInvoice.orderId));
       if (isDuplicate) {
         return NextResponse.json(
           { error: "This order invoice already exists." },

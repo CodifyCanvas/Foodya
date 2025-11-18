@@ -71,7 +71,6 @@ const AboutMe = () => {
     const techStackRef = useRef<HTMLDivElement>(null);
     const ctaRef = useRef<HTMLDivElement>(null);
 
-    // Use useLayoutEffect to ensure DOM is ready before animations
     useLayoutEffect(() => {
         const ctx = gsap.context(() => {
 
@@ -91,6 +90,7 @@ const AboutMe = () => {
             // Stats counter animation
             if (statsRef.current) {
                 const statElements = statsRef.current.querySelectorAll(".stat-card");
+                if (statElements.length === 0) return;
 
                 gsap.from(statElements, {
                     scrollTrigger: {
@@ -159,6 +159,7 @@ const AboutMe = () => {
                 // Animate each feature item
                 const featureItems = aboutRef.current.querySelectorAll(".feature-item");
                 if (featureItems.length === 0) return;
+
                 gsap.fromTo(
                     featureItems,
                     { opacity: 0, x: -40 }, // from: invisible and left
@@ -180,6 +181,7 @@ const AboutMe = () => {
             // Journey cards animation
             if (journeyRef.current) {
                 const cards = journeyRef.current.querySelectorAll(".journey-card");
+                if (cards.length === 0) return;
 
                 gsap.fromTo(
                     cards,
@@ -203,6 +205,7 @@ const AboutMe = () => {
             // Skills
             if (skillsRef.current) {
                 const skillCards = skillsRef.current.querySelectorAll(".skill-card");
+                if (skillCards.length === 0) return;
 
                 gsap.fromTo(
                     skillCards,
@@ -227,6 +230,8 @@ const AboutMe = () => {
             // Tech stack animation
             if (techStackRef.current) {
                 const techItems = techStackRef.current.querySelectorAll(".tech-item");
+                if (techItems.length === 0) return;
+
                 gsap.from(techItems, {
                     scrollTrigger: {
                         trigger: techStackRef.current,
@@ -769,6 +774,7 @@ const Vision = forwardRef<HTMLDivElement, React.DetailedHTMLProps<React.HTMLProp
     }
 );
 Vision.displayName = 'Vision - About Me';
+
 
 
 // === Skills Card Component ===

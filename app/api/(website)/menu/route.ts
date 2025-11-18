@@ -1,4 +1,3 @@
-import { auth } from "@/auth";
 import { getAllMenuItemsForWebsite } from "@/lib/crud-actions/website/menu";
 import { deslugify } from "@/lib/utils";
 import { NextRequest, NextResponse } from "next/server"
@@ -14,14 +13,6 @@ const path = '/api/menu';
 ================================================= */
 export async function GET(req: NextRequest) {
     try {
-        const session = await auth();
-        const userId = session?.user.id;
-
-        // === Authenticate User ===
-        if (!userId) {
-            return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
-        }
-
         // === Extract query parameters with defaults ===
         const { searchParams } = new URL(req.url);
         const page = Number(searchParams.get("page") || 1);

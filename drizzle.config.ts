@@ -18,6 +18,6 @@ export default defineConfig({
   schema: './lib/drizzle-schema/*',   // <- Schema files location
   dialect: 'mysql',                   // <- Database dialect (Options: 'mysql' | 'pg' | 'sqlite')
   dbCredentials: {
-    url: process.env.DATABASE_URL!,   // <- Database connection URL from environment variable
+    url: `mysql://${process.env.DATABASE_USER}:${process.env.DATABASE_PASSWORD}@${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}/${process.env.DATABASE_NAME}`,   // <- Database connection URL from environment variable
   },
 });

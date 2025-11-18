@@ -20,6 +20,7 @@ export const metadata: Metadata = {
         "order management system",
         "restaurant invoice system",
         "employee management",
+        "project",
         "POS for restaurants",
         "cafe POS",
         "food business software"
@@ -29,13 +30,10 @@ export const metadata: Metadata = {
     },
 };
 
-/* === Main Application Layout === */
+/* === Main Website Layout === */
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     return (
-        <main
-            className="flex flex-col items-center min-h-screen max-w-screen font-sans
-  bg-gradient-to-tl from-neutral-950 to-[#001529] text-white"
-        >
+        <main className="flex flex-col items-center min-h-screen max-w-screen font-sans bg-gradient-to-tl from-neutral-950 to-[#001529] text-white">
             <Navbar />
             {children}
             <Footer />

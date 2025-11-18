@@ -28,6 +28,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { findItemByKey } from "@/lib/utils";
 import Link from "next/link";
+import LoadingCarousel from "@/components/ui/loading-carousel";
 
 // === Register GSAP plugins ===
 if (typeof window !== "undefined") {
@@ -59,6 +60,13 @@ export interface KeyFeatureInterface {
     borderColor: string;
 }
 
+/** === Display Project Image Section === */
+export interface ProjectDisplayImageInterface {
+    text: string;
+    image: string;
+    url?: string;
+}
+
 /** === Technologies Section === */
 export interface TechnologyInterface {
     name: string;
@@ -80,7 +88,6 @@ const AboutProject = () => {
     const techStackRef = useRef<HTMLDivElement>(null);
     const ctaRef = useRef<HTMLDivElement>(null);
 
-    // Use useLayoutEffect to ensure DOM is ready before animations
     useLayoutEffect(() => {
         const ctx = gsap.context(() => {
 
@@ -109,6 +116,7 @@ const AboutProject = () => {
             // Stats counter animation 
             if (statsRef.current) {
                 const statElements = statsRef.current.querySelectorAll(".stat-card");
+                if (statElements.length === 0) return;
 
                 gsap.from(statElements, {
                     scrollTrigger: {
@@ -175,6 +183,8 @@ const AboutProject = () => {
                 });
 
                 const featureItems = overviewRef.current.querySelectorAll(".feature-item");
+                if (featureItems.length === 0) return;
+
                 gsap.from(featureItems, {
                     scrollTrigger: {
                         trigger: overviewRef.current,
@@ -193,6 +203,8 @@ const AboutProject = () => {
             // Mission & Vision animation
             if (missionVisionRef.current) {
                 const cards = missionVisionRef.current.querySelectorAll(".mission-vision-card");
+                if (cards.length === 0) return;
+
                 gsap.from(cards, {
                     scrollTrigger: {
                         trigger: missionVisionRef.current,
@@ -211,6 +223,8 @@ const AboutProject = () => {
             // Features grid animation 
             if (featuresRef.current) {
                 const featureCards = featuresRef.current.querySelectorAll(".feature-card");
+                if (featureCards.length === 0) return;
+
                 gsap.from(featureCards, {
                     scrollTrigger: {
                         trigger: featuresRef.current,
@@ -376,6 +390,53 @@ const AboutProject = () => {
         },
     ];
 
+    const ProjectDisplayImage: ProjectDisplayImageInterface[] = [
+        {
+            text: "Welcome Dashboard",
+            image: "/project-display-carousel/light-dashboard.png",
+        },
+        {
+            text: "Sleek dark-mode dashboard.",
+            image: "/project-display-carousel/dark-dashboard.png",
+        },
+        {
+            text: "Manage Orders",
+            image: "/project-display-carousel/light-orders-page.png",
+        },
+        {
+            text: "Stay organized with dark-mode order tracking and details.",
+            image: "/project-display-carousel/dark-orders-page.png",
+        },
+        {
+            text: "Preview invoices in both light and dark modes seamlessly.",
+            image: "/project-display-carousel/light-dark-invoice-view.png",
+        },
+        {
+            text: "Generate print-ready invoices with clean formatting.",
+            image: "/project-display-carousel/invoice-print.png",
+        },
+        {
+            text: "Manage all users, roles, and account details in one place.",
+            image: "/project-display-carousel/users-page.png",
+        },
+        {
+            text: "View monthly profit/loss charts, income & expenses, and detailed transactions.",
+            image: "/project-display-carousel/light-dark-reports.png",
+        },
+        {
+            text: "Control access levels with a powerful permission management system.",
+            image: "/project-display-carousel/manage-permissions.png",
+        },
+        {
+            text: "Check employee work summaries and financial statements.",
+            image: "/project-display-carousel/employee-statement.png",
+        },
+        {
+            text: "Print salary statements with clear, structured formatting.",
+            image: "/project-display-carousel/salary-statement-print.png",
+        },
+    ];
+
     const technologies: TechnologyInterface[] = [
         {
             name: 'React',
@@ -464,7 +525,6 @@ const AboutProject = () => {
             {/* === Stats Section === */}
             <StatCards ref={statsRef} stats={stats} />
 
-
             {/* === Overview Card  === */}
             <OverviewCard ref={overviewRef} features={features} />
 
@@ -474,13 +534,14 @@ const AboutProject = () => {
             {/* === Key Features Grid  === */}
             <KeyFeatureCards ref={featuresRef} keyFeatures={keyfeatures} />
 
+            {/* === Image Carousel  === */}
+            <ImageCarousel ref={featuresRef} DisplayImage={ProjectDisplayImage} />
+
             {/* === Tech Stack Section - Redesigned === */}
             <TechStack ref={techStackRef} technologies={technologies} />
 
-
             {/* === CTA Section === */}
             <Cta />
-
 
         </div >
     );
@@ -535,7 +596,7 @@ const StatCards = forwardRef<HTMLDivElement, { stats: StatInterface[] }>(
                 {stats.map((stat, i) => (
                     <Card
                         key={i}
-                        className="stat-card h-full relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl border border-white/10 hover:border-emerald-500/30 p-6 sm:p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl group overflow-hidden"
+                        className="stat-card h-full text-white relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl border border-white/10 hover:border-emerald-500/30 p-6 sm:p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl group overflow-hidden"
                     >
                         {/* Left Accent Bar */}
                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-500 via-teal-400 to-emerald-500 scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-top"></div>
@@ -568,7 +629,7 @@ const StatCards = forwardRef<HTMLDivElement, { stats: StatInterface[] }>(
                                     <span className="bg-gradient-to-r from-white to-emerald-100 bg-clip-text text-transparent">
                                         {stat.value}
                                     </span>
-                                    <span className="text-emerald-400 ml-0.5">{stat.suffix}</span>
+                                    <span className="text-emerald-400 dark:text-emerald-400 ml-0.5">{stat.suffix}</span>
                                 </div>
 
                                 {/* Label */}
@@ -833,7 +894,7 @@ export const KeyFeatureCards = forwardRef<HTMLDivElement, { keyFeatures: KeyFeat
                         return (
                             <Card
                                 key={i}
-                                className="feature-card h-full relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl border border-white/10 hover:border-opacity-30 p-6 sm:p-7 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl group overflow-hidden rounded-2xl"
+                                className="feature-card h-full outline-none relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl border border-white/10 hover:border-opacity-30 p-6 sm:p-7 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl group overflow-hidden rounded-2xl"
                                 style={{ '--hover-border-color': feature.borderColor.replace('border-', '') } as React.CSSProperties}
                             >
                                 {/* Left Accent Bar */}
@@ -885,6 +946,48 @@ export const KeyFeatureCards = forwardRef<HTMLDivElement, { keyFeatures: KeyFeat
     }
 );
 KeyFeatureCards.displayName = 'About Project - Key Feature Cards';
+
+
+
+// === Key Features Card Component ===
+export const ImageCarousel = forwardRef<HTMLDivElement, { DisplayImage: ProjectDisplayImageInterface[] }>(
+    ({ DisplayImage, ...props }, ref) => {
+
+        return (
+            <div
+                ref={ref}
+                {...props}
+                className="w-full max-w-full group outline-none border-none group-hover:-translate-y-1 hover:shadow-2xl sm:max-w-6xl space-y-8 sm:space-y-10 px-4"
+            >
+                <div className="relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl border border-white/10 hover:border-emerald-500/30 rounded-lg overflow-hidden group transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl group-hover:shadow-emerald-500/10">
+
+                    {/* Bottom Accent Line */}
+                    <div className={`absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`} />
+
+                    {/* Top Gradient Line */}
+                    <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/75 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                    {/* Background Glow */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/0 to-emerald-500/0 group-hover:from-emerald-500/5 group-hover:to-teal-500/5 transition-all duration-700" />
+
+                    {/* Floating Orb */}
+                    <div className="absolute bottom-0 right-0 w-32 h-32 sm:w-40 sm:h-40 bg-emerald-500/10 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2 group-hover:bg-emerald-500/15 transition-colors duration-700" />
+
+                    <LoadingCarousel
+                        showNavigation={true}
+                        animateText={true}
+                        pauseOnHover={true}
+                        className="p-0 sm:p-7 w-full max-w-full"
+                        aspectRatio="wide"
+                        tips={DisplayImage}
+                    />
+                </div>
+            </div>
+
+        );
+    }
+);
+ImageCarousel.displayName = 'About Project - Image Carousel';
 
 
 

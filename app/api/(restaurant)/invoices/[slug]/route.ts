@@ -76,7 +76,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     const parsed = invoiceActionFormSchema.parse(body);
 
     // === Check for duplicate order ID ===
-    const duplicate = await checkDuplicate("InvoicesTable", "orderId", parsed.orderId);
+    const duplicate = await checkDuplicate("InvoicesTable", "orderId", Number(parsed.orderId));
     if (duplicate) {
       return NextResponse.json(
         { error: "This order id is already in use." },

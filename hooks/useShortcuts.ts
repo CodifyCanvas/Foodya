@@ -4,11 +4,9 @@
 import { useEffect } from "react";
 import { navLink } from "@/constants";
 import { usePermissionNavigation } from "@/hooks/usePermissionNavigation";
-import { useTheme } from "next-themes";
 
 export function useShortcuts() {
   const { handleNavigation } = usePermissionNavigation();
-  const { theme, setTheme } = useTheme()
 
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {
@@ -35,19 +33,4 @@ export function useShortcuts() {
     window.addEventListener("keydown", handleKeydown);
     return () => window.removeEventListener("keydown", handleKeydown);
   }, [handleNavigation]);
-
-  // Theme toggle shortcut (Ctrl + Shift + L)
-  useEffect(() => {
-    const handleThemeShortcut = (e: KeyboardEvent) => {
-      // Check for Ctrl + Shift + L
-      if (!(e.ctrlKey && e.shiftKey && e.key.toUpperCase() === "L")) return;
-
-      e.preventDefault();
-      setTheme(theme === "light" ? "dark" : "light");
-    };
-
-    window.addEventListener("keydown", handleThemeShortcut);
-    return () => window.removeEventListener("keydown", handleThemeShortcut);
-  }, [theme, setTheme]);
-
 }

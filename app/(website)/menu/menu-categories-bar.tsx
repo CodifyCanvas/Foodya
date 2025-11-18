@@ -110,7 +110,7 @@ const CategoriesBar: React.FC = () => {
 
     /** === Loading + Error State === */
     if (isLoading) return <SkeletonCategoriesBar />;
-    if (error) return <p>Error loading categories.</p>;
+    if (error) return <p className="text-red-400 text-center font-medium py-5">Error loading categories.</p>;
 
     return (
         <div className="relative select-none">

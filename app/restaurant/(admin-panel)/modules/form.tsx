@@ -38,7 +38,7 @@ interface FormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   data: ModuleInterface | null
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export function RoleForm({ open, onOpenChange, data }: FormDialogProps) {
