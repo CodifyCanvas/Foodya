@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import MenuItemContainer from './menu-items-container'
+import { Loader } from 'lucide-react';
 
 const MenuPage = () => {
     return (
@@ -19,7 +20,13 @@ const MenuPage = () => {
             </header>
 
             {/* Menu Items */}
-            <MenuItemContainer />
+            <Suspense fallback={
+                <div className="flex-1 h-full w-full bg-transparent  flex justify-center items-center">
+                    <Loader className="animate-spin size-7 text-gray-500" />
+                </div>
+            }>
+                <MenuItemContainer />
+            </Suspense>
         </section>
     );
 };

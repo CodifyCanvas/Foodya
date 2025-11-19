@@ -51,7 +51,8 @@
   --shadow-xl: 0 1px 3px 0px oklch(0.00 0 0 / 0.10), 0 8px 10px -1px oklch(0.00 0 0 / 0.10);
   --shadow-2xl: 0 1px 3px 0px oklch(0.00 0 0 / 0.25);
  
-  --scrollbar-track: oklch(94.774% 0.02659 246.449); /* light background */
+  /* --scrollbar-track: oklch(94.774% 0.02659 246.449); light background */
+  --scrollbar-track: transparent; /* light background */
   --scrollbar-thumb: oklch(0.60 0 0);               /* medium gray */
   --scrollbar-thumb-hover: oklch(0.40 0 0);         /* darker gray */
 }
@@ -98,7 +99,8 @@
   --shadow-xl: 0 1px 3px 0px oklch(0.00 0 0 / 0.10), 0 8px 10px -1px oklch(0.00 0 0 / 0.10);
   --shadow-2xl: 0 1px 3px 0px oklch(0.00 0 0 / 0.25);
 
-  --scrollbar-track: oklch(0.14 0 0);               /* dark background */
+  /* --scrollbar-track: oklch(0.14 0 0);               dark background */
+  --scrollbar-track: transparent;               /* dark background */
   --scrollbar-thumb: oklch(0.56 0 0);              /* lighter gray for contrast */
   --scrollbar-thumb-hover: oklch(0.71 0 0);        /* hover accent */  
 }
@@ -203,7 +205,7 @@
 /* ===============================
    Custom Scrollbar Styles (Global & Scrollable Elements)
    =============================== */
-
+   
 body,
 html,
 .scroll-bar {
@@ -220,7 +222,7 @@ html::-webkit-scrollbar,
 body::-webkit-scrollbar-track,
 html::-webkit-scrollbar-track,
 .scroll-bar::-webkit-scrollbar-track {
-  background: var(--scrollbar-track);            /* Track background */
+  background: var(--scrollbar-track); /* Transparent background */
   border-radius: 10px;
 }
 
@@ -229,19 +231,20 @@ html::-webkit-scrollbar-thumb,
 .scroll-bar::-webkit-scrollbar-thumb {
   background-color: var(--scrollbar-thumb);
   border-radius: 10px;
-  border: 2px solid var(--scrollbar-track);      /* Padding around thumb */
+  border: 2px solid var(--scrollbar-track); /* Padding around thumb */
 }
 
 body::-webkit-scrollbar-thumb:hover,
 html::-webkit-scrollbar-thumb:hover,
 .scroll-bar::-webkit-scrollbar-thumb:hover {
-  background-color: var(--scrollbar-thumb-hover);          /* Hover effect */
+  background-color: var(--scrollbar-thumb-hover); /* Hover effect */
 }
 
 /* styles/globals.css or equivalent */
 .scrollbar-hidden::-webkit-scrollbar {
   display: none;
 }
+
 .scrollbar-hidden {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */

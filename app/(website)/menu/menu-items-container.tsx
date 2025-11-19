@@ -10,7 +10,6 @@ import useSWR from "swr";
 import { swrFetcher } from "@/lib/swr";
 import { MenuResponse } from "@/lib/definations";
 import Masonry from "react-masonry-css";
-import ServiceUnavailable from "@/app/errors/service-unavailable";
 import { MenuItemSkeleton } from "@/components/fallbacks/skeletons";
 import MenuItemCard from "./menu-item-card";
 import { getVisiblePages } from "@/lib/utils";

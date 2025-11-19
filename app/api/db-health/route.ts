@@ -24,6 +24,6 @@ export async function GET() {
     return NextResponse.json({ message: "Database Connection status is ok" }, { status: 200 });
   } catch (e) {
     console.error(`[GET ${path}] Failed to fetch Database Health: `, e)
-    return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+    return NextResponse.json({ error: "Database connection failed" }, { status: 503 });
   }
 }

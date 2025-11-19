@@ -58,10 +58,7 @@ export function useDbCheck(): void {
     });
 
     if (error) {
-        // Ensure we handle both status and message
-        const msg = encodeURIComponent(error.error || "Unknown error");
-        const status = error.status || 503;
-
-        router.push(`/errors/database?msg=${msg}&status=${status}`);
+        console.error("Error [useDdCheck] hook: ", error)
+        router.push(`/errors/database`);
     }
 }
